@@ -66,17 +66,19 @@ export async function resolveModel(
   fullId: string,
 ): Promise<OpenCodeModelEntry> {
   const slashIdx = fullId.indexOf("/");
+  let entry: OpenCodeModelEntry;
+
   if (slashIdx === -1) {
     // Combo model — no provider prefix
-    return { ...TEMPLATE };
+    entry = { ...TEMPLATE };
+  } else {
+    const modelName = fullId.slice(slashIdx + 1);
+    const devModel = await lookupModel(modelName);
+    entry = devModel ? mapModel(devModel) : { ...TEMPLATE };
   }
 
-  const modelName = fullId.slice(slashIdx + 1);
-  const devModel = await lookupModel(modelName);
+  // Always prefix display name so OpenCode shows "9Router <id>"
+  entry.name = `9Router ${fullId}`;
 
-  if (!devModel) {
-    return { ...TEMPLATE };
-  }
-
-  return mapModel(devModel);
+  return entry;
 }
