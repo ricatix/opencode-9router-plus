@@ -73,11 +73,30 @@ async function buildIndex(): Promise<Map<string, ModelsDevModel>> {
   return index;
 }
 
+/** Normalize model name for lookup: try exact then fuzzy variations */
+function tryLookup(name: string): ModelsDevModel | null {
+  if (!flatIndex) return null;
+
+  // 1 — Exact match
+  if (flatIndex.has(name)) return flatIndex.get(name)!;
+
+  // 2 — Insert dash between word and number: gpt5.5 → gpt-5.5
+  const dashed = name.replace(/([a-zA-Z])(\d)/, "$1-$2");
+  if (dashed !== name && flatIndex.has(dashed)) return flatIndex.get(dashed)!;
+
+  // 3 — Second dash: gpt-5.5 → gpt-5.5 (already has dash)
+  //    Also try: replace dot with dash: gpt5.5 → gpt5-5
+  const dotDash = name.replace(/\./g, "-");
+  if (dotDash !== name && flatIndex.has(dotDash)) return flatIndex.get(dotDash)!;
+
+  return null;
+}
+
 export async function lookupModel(
   modelName: string,
 ): Promise<ModelsDevModel | null> {
   if (!flatIndex) {
     flatIndex = await buildIndex();
   }
-  return flatIndex.get(modelName) ?? null;
+  return tryLookup(modelName);
 }
