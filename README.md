@@ -1,6 +1,6 @@
-# Opencode 9Router Plugin
+# Opencode 9Router Plus
 
-![Preview plugin](https://unpkg.com/opencode-9router-plugin@latest/assets/images/cover2.png)
+![Preview plugin](https://unpkg.com/opencode-9router-plus@latest/assets/images/cover2.png)
 
 Dynamic 9router provider plugin for [opencode](https://opencode.ai/).
 
@@ -20,7 +20,7 @@ It discovers available models from your 9router endpoint at startup and injects 
 Use opencode's native plugin installer:
 
 ```bash
-opencode plugin opencode-9router-plugin
+opencode plugin opencode-9router-plus
 ```
 
 Then set your API key and restart opencode.
@@ -60,20 +60,20 @@ opencode models 9router
 If the native installer is unavailable, use the package CLI:
 
 ```bash
-npx opencode-9router-plugin install
+npx opencode-9router-plus install
 ```
 
-The CLI first tries `opencode plugin opencode-9router-plugin`. If that fails, it falls back to safe config editing.
+The CLI first tries `opencode plugin opencode-9router-plus`. If that fails, it falls back to safe config editing.
 
 Useful options:
 
 ```bash
-npx opencode-9router-plugin install --global
-npx opencode-9router-plugin install --project
-npx opencode-9router-plugin install --config ./opencode.json
-npx opencode-9router-plugin install --dry-run
-npx opencode-9router-plugin install --yes
-npx opencode-9router-plugin install --manual
+npx opencode-9router-plus install --global
+npx opencode-9router-plus install --project
+npx opencode-9router-plus install --config ./opencode.json
+npx opencode-9router-plus install --dry-run
+npx opencode-9router-plus install --yes
+npx opencode-9router-plus install --manual
 ```
 
 The fallback editor:
@@ -82,7 +82,7 @@ The fallback editor:
 - supports global and project config targets
 - creates backups before writing existing files
 - writes atomically through a temp file and rename
-- avoids duplicate plugin entries, including tuple entries like `["opencode-9router-plugin", {}]`
+- avoids duplicate plugin entries, including tuple entries like `["opencode-9router-plus", {}]`
 - refuses to edit JSONC files with comments because preserving comments safely is not guaranteed
 
 ## Check Setup
@@ -90,7 +90,7 @@ The fallback editor:
 Run diagnostics:
 
 ```bash
-npx opencode-9router-plugin check
+npx opencode-9router-plus check
 ```
 
 It checks:
@@ -106,13 +106,13 @@ It checks:
 Use opencode's native plugin management if available. Otherwise:
 
 ```bash
-npx opencode-9router-plugin uninstall --global
+npx opencode-9router-plus uninstall --global
 ```
 
 or:
 
 ```bash
-npx opencode-9router-plugin uninstall --project
+npx opencode-9router-plus uninstall --project
 ```
 
 ## Manual Config
@@ -122,7 +122,7 @@ If you prefer to edit config manually, add the package name to `plugin`:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-9router-plugin"]
+  "plugin": ["opencode-9router-plus"]
 }
 ```
 
@@ -154,10 +154,13 @@ Project notes:
 ## Troubleshooting
 
 - Restart opencode after changing config or installing plugins.
-- If `/model` does not show 9router models, run `npx opencode-9router-plugin check`.
+- If `/model` does not show 9router models, run `npx opencode-9router-plus check`.
 - If models are empty, verify that your 9router endpoint is running and `/models` is reachable.
 - If you see `Missing API Key`, set `OPENCODE_9ROUTER_API_KEY` and restart opencode.
 - If you previously used a local development copy, remove duplicate local entries such as `./plugins/opencode-9router.ts` before switching to the npm package.
 
 ## Github Repository
-https://github.com/mdhb2/opencode-9router-plugin
+https://github.com/ricatix/opencode-9router-plus
+
+## Credits
+Forked from the original [opencode-9router-plugin](https://github.com/mdhb2/opencode-9router-plugin) by [mdhb2](https://github.com/mdhb2).

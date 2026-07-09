@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-const CACHE_DIR = path.join(os.homedir(), ".cache", "opencode-9router-plugin");
+const CACHE_DIR = path.join(os.homedir(), ".cache", "opencode-9router-plus");
 const CACHE_FILE = path.join(CACHE_DIR, "models.dev.json");
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 

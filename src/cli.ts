@@ -8,7 +8,7 @@ import os from "node:os";
 import path from "node:path";
 import { getCacheAge } from "./cache.js";
 
-const PACKAGE_NAME = "opencode-9router-plugin";
+const PACKAGE_NAME = "opencode-9router-plus";
 const DEFAULT_CONFIG = { $schema: "https://opencode.ai/config.json" };
 
 type JsonObject = Record<string, any>;
