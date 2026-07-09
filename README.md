@@ -134,8 +134,22 @@ Do not hardcode model lists. The plugin discovers them dynamically at startup.
 - `OPENCODE_9ROUTER_API_KEY` (recommended): API key used by provider options and model discovery requests
 - `OPENCODE_9ROUTER_TIMEOUT_MS` (optional): fetch timeout in ms. Default `5000`
 
-2. Create a tag such as `v0.1.0`.
-3. Publish to npm manually or with GitHub Actions on tagged releases.
+## Development
+
+```bash
+bun install
+bun run build
+bun run clean
+bun run prepublishOnly
+```
+
+`prepublishOnly` intentionally uses npm lifecycle commands internally: `npm run clean && npm run build`.
+
+Project notes:
+
+- Source lives in `src/`; generated output goes to `dist/`.
+- No test script, CI, linter, or formatter is configured.
+- `AGENTS.md` tracks project facts for coding agents; keep it aligned with README changes.
 
 ## Troubleshooting
 
