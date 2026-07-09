@@ -57,21 +57,20 @@ function mapModel(dev: ModelsDevModel): OpenCodeModelEntry {
  * Resolve a 9Router model ID (e.g. "mistral/mistral-large-latest")
  * to an OpenCode model entry.
  *
- * - Models with "/" → extract name after "/", lookup in models.dev
+ * - Models with "/" → extract basename after last "/", lookup in models.dev
  * - Models without "/" (combos) → template
  * - No match in models.dev → template
  */
 export async function resolveModel(
   fullId: string,
 ): Promise<OpenCodeModelEntry> {
-  const slashIdx = fullId.indexOf("/");
+  const modelName = getModelsDevLookupName(fullId);
   let entry: OpenCodeModelEntry;
 
-  if (slashIdx === -1) {
+  if (modelName === fullId) {
     // Combo model — no provider prefix
     entry = { ...TEMPLATE };
   } else {
-    const modelName = fullId.slice(slashIdx + 1);
     const devModel = await lookupModel(modelName);
     entry = devModel ? mapModel(devModel) : { ...TEMPLATE };
   }
@@ -80,4 +79,9 @@ export async function resolveModel(
   entry.name = fullId;
 
   return entry;
+}
+
+export function getModelsDevLookupName(fullId: string): string {
+  const slashIdx = fullId.lastIndexOf("/");
+  return slashIdx === -1 ? fullId : fullId.slice(slashIdx + 1);
 }
