@@ -2,6 +2,10 @@
   "name": "opencode-9router-plus",
   "version": "0.1.4",
   "description": "Dynamic 9router provider plugin for opencode",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricatix/opencode-9router-plus.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
