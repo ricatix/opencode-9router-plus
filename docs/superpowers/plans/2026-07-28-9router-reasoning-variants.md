@@ -278,7 +278,7 @@ Keep a temporary compatibility export until Task 4 rewires the mapper:
 export async function lookupModel(modelName: string): Promise<ModelsDevModel | null>;
 ```
 
-It may use existing legacy fuzzy lookup against `api.json` only for current display metadata. It must not provide `reasoning_options`, provider-aware resolution, or a new last-write-wins path. Remove it only in Task 4 after `src/model-mapper.ts` uses `lookupModelsDev`.
+It may use existing legacy fuzzy lookup against `api.json` only for current display metadata. It must not provide `reasoning_options`, provider-aware resolution, or a new last-write-wins path. Legacy compatibility contract: an ID present under exactly one provider retains its metadata; an ID present under two or more providers is tombstoned and returns `null`, permanently for that catalog build, including later occurrences. Preserve dash insertion and dot-to-dash normalization. Remove it only in Task 4 after `src/model-mapper.ts` uses `lookupModelsDev`.
 
 - [x] **Step 5: Add fixture payloads and run tests**
 
@@ -296,6 +296,13 @@ Expected: PASS.
 Run: `bun test tests/models-dev.test.ts tests/cache.test.ts && bun run build`
 
 Expected: PASS. The build proves compatibility `lookupModel` keeps current `src/model-mapper.ts` valid until Task 4.
+
+### Task 2 corrective verification
+
+- Mock `globalThis.fetch`; call `resetModelsDevCatalogsForTest()` before and after each legacy lookup test. No live network or cache fixture.
+- Verify two-provider collision returns `null`; unique ID returns metadata; third collision remains `null`; reversed provider order remains `null`.
+- Verify legacy dash/dot normalization still resolves a unique ID.
+- Run `bun test tests/models-dev.test.ts`, `bun test`, and `bun run build`.
 
 - [x] **Step 6: Commit provider-aware metadata layer**
 

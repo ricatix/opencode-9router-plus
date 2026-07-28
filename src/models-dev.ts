@@ -84,19 +84,22 @@ export function resetModelsDevCatalogsForTest(): void {
   modelCatalogPromise = null;
 }
 
-function legacyLookup(index: Map<string, ModelsDevModel>, name: string): ModelsDevModel | null {
-  return index.get(name)
-    ?? index.get(name.replace(/([a-zA-Z])(\d)/, "$1-$2"))
-    ?? index.get(name.replace(/\./g, "-"))
-    ?? null;
+function legacyLookup(index: Map<string, ModelsDevModel | null>, name: string): ModelsDevModel | null {
+  const dashed = name.replace(/([a-zA-Z])(\d)/, "$1-$2");
+  for (const candidate of [name, dashed, name.replace(/\./g, "-"), dashed.replace(/\./g, "-")]) {
+    if (index.has(candidate)) return index.get(candidate) ?? null;
+  }
+  return null;
 }
 
 /** Temporary display-metadata compatibility for current mapper. */
 export async function lookupModel(modelName: string): Promise<ModelsDevModel | null> {
   apiCatalogPromise ??= loadCatalog<ApiCatalog>("models-dev-api", API_URL);
-  const index = new Map<string, ModelsDevModel>();
+  const index = new Map<string, ModelsDevModel | null>();
   for (const provider of Object.values(await apiCatalogPromise)) {
-    for (const [id, model] of Object.entries(provider.models ?? {})) index.set(id, model);
+    for (const [id, model] of Object.entries(provider.models ?? {})) {
+      index.set(id, index.has(id) ? null : model);
+    }
   }
   return legacyLookup(index, modelName);
 }
