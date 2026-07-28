@@ -4,7 +4,7 @@
 
 **Goal:** Tampilkan varian reasoning-effort aman, per route-model 9router, dalam picker OpenCode tanpa memaksa effort pada varian `default`.
 
-**Architecture:** Discovery 9router mempertahankan objek model serta capability-nya. Resolver murni memisahkan identitas route, canonical model/provider, metadata models.dev provider-specific/model-only, lalu menghitung variants aman. Snapshot route map digenerate di CI dari source 9router yang di-whitelist; runtime hanya memakai snapshot yang sudah dikomit dan models.dev cache.
+**Architecture:** Discovery 9router mempertahankan objek model serta capability-nya. Resolver murni memisahkan identitas route, canonical model/provider, metadata models.dev provider-specific/model-only, lalu menghitung variants aman. Snapshot route map yang dikomit dipakai runtime bersama models.dev cache. Workflow detector hanya mendeteksi revisi upstream dan membuka/memperbarui PR laporan; workflow tidak pernah membuat, mengedit, atau memvalidasi `src/generated/9router-route-map.ts`, tidak mengambil blob/source, dan tidak menurunkan mapping.
 
 **Tech Stack:** TypeScript ESM, Bun built-in test runner, TypeScript compiler, GitHub Actions, GitHub REST API.
 
@@ -27,19 +27,18 @@ Proceed through every checkbox within that Task only after Oracle explicitly app
 - Create: `src/route-types.ts` — type data discovery dan route capability bersama.
 - Create: `src/route-map.ts` — resolver `routeId` ke canonical provider/model memakai snapshot.
 - Create: `src/capability-resolver.ts` — fungsi murni variants reasoning aman.
-- Create: `src/generated/9router-route-map.ts` — output generator kecil, dikomit.
+- Create: `src/generated/9router-route-map.ts` — snapshot kecil, dikomit.
 - Modify: `src/model-mapper.ts` — pilih metadata canonical dan inject `variants`.
 - Modify: `src/index.ts` — pertahankan objek discovery dan teruskan context ke mapper.
-- Create: `scripts/generate-route-map.ts` — parser text-only source 9router menjadi snapshot.
 - Create: `tests/fixtures/models-dev.ts` — payload catalog kecil dan discovery entries.
 - Create: `tests/models-dev.test.ts` — provider boundary, fallback unik, cache catalog.
 - Create: `tests/route-map.test.ts` — canonicalisasi route dan invariants snapshot.
 - Create: `tests/capability-resolver.test.ts` — matrix safe variants.
 - Create: `tests/model-mapper.test.ts` — mapper menggabungkan metadata/variants.
 - Create: `tests/index.test.ts` — discovery object dan config injection.
-- Modify: `package.json` — script `test` dan `generate:route-map`.
-- Create: `.github/workflows/refresh-route-map.yml` — refresh snapshot harian/manual lewat bot PR.
-- Modify: `README.md` — perilaku picker, batas aman, dan refresh snapshot.
+- Create: `.github/workflows/watch-9router-upstream.yml` — detector revisi harian/manual yang membuka/memperbarui PR laporan saja.
+- Create: `docs/upstream/9router-change-report.md` — checkpoint revisi dan laporan perubahan upstream.
+- Modify: `README.md` — perilaku picker dan batas aman.
 
 ## Task 1: Shared types and safe route snapshot
 
@@ -512,186 +511,27 @@ git add src/model-mapper.ts src/index.ts tests/model-mapper.test.ts tests/index.
 git commit -m "feat: inject 9router reasoning variants"
 ```
 
-## Task 5: Route-map generator and protected refresh workflow
+## Task 5: Detector workflow for upstream changes
 
 **Files:**
-- Create: `scripts/generate-route-map.ts`
-- Modify: `package.json`
-- Create: `.github/workflows/refresh-route-map.yml`
-- Test: `tests/route-map.test.ts`
+- Create: `.github/workflows/watch-9router-upstream.yml`
+- Create: `docs/upstream/9router-change-report.md`
 
-- [ ] **Step 1: Extend tests for generated snapshot invariants**
+- [ ] **Step 1: Add daily/manual detector workflow**
 
-Add tests that invoke exported generator helpers using fixture source strings. Assert:
+Create a workflow with cron `17 4 * * *`, `workflow_dispatch`, a concurrency group, 10-minute job limit, `contents` and `pull-requests` write permissions, and no direct `main` update. It checks the report checkpoint revision through `gh api`. If unchanged, it exits without a PR. If changed, it calls only GitHub's compare endpoint and uses `jq` to render changed-path summaries and first commit lines into the report.
 
-```ts
-expect(snapshot.sourceCommit).toMatch(/^[0-9a-f]{40}$/);
-expect(snapshot.directProviders.length).toBeGreaterThan(10);
-expect(Object.keys(snapshot.aliases)).toContain("cx");
-expect(() => validateRouteMapSnapshot({ ...snapshot, directProviders: [] })).toThrow();
-```
+The workflow PR may modify only `docs/upstream/9router-change-report.md` through `add-paths`. It must never generate, edit, or validate `src/generated/9router-route-map.ts`; fetch blobs/source; derive mappings; run Bun, install, test, or build; use `curl`, ETag/cache, or release changes. Compare failure must fail the job and must not advance the checkpoint.
 
-- [ ] **Step 2: Run generator invariant tests; confirm failure**
+- [ ] **Step 2: Validate workflow syntax**
 
-Run: `bun test tests/route-map.test.ts`
+Run native YAML validation when available without installing dependencies.
 
-Expected: FAIL because generator helpers do not exist.
-
-- [ ] **Step 3: Implement text-only route-map generator**
-
-Create `scripts/generate-route-map.ts` with exports:
-
-```ts
-export function generateRouteMap(sourceCommit: string, files: ReadonlyMap<string, string>): RouteMapSnapshot;
-export function renderRouteMap(snapshot: RouteMapSnapshot): string;
-```
-
-Wrap CLI execution in an ESM entrypoint guard so `tests/route-map.test.ts` can import these helpers without writing files:
-
-```ts
-if (import.meta.main) {
-  await main(process.argv.slice(2));
-}
-```
-
-The CLI portion accepts `--commit <sha> --input <directory> --output src/generated/9router-route-map.ts`. It must:
-
-1. Read only whitelist paths matching `open-sse/providers/registry/*.js`, `open-sse/config/providerModels.js`, and `src/shared/constants/providers.js`.
-2. Extract literal `id`, `alias`, `aliases`, `upstreamModelId`, and suffix/prefix rules with constrained regex or TypeScript AST parsing.
-3. Never import, evaluate, or execute fetched JavaScript.
-4. Reject empty input, non-40-hex commit, no direct providers, missing `cx`, or a generated direct-provider count less than half of currently committed snapshot.
-5. Write output atomically and render only data literals plus a type import.
-
-- [ ] **Step 4: Add Bun scripts**
-
-Modify `package.json` scripts:
-
-```json
-"test": "bun test",
-"generate:route-map": "bun scripts/generate-route-map.ts"
-```
-
-Keep `prepublishOnly` unchanged because npm invokes it during publishing.
-
-- [ ] **Step 5: Add daily/manual GitHub workflow**
-
-Create `.github/workflows/refresh-route-map.yml`:
-
-```yaml
-name: Refresh 9router route map
-
-on:
-  schedule:
-    - cron: "17 4 * * *"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
-
-jobs:
-  refresh:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - name: Restore commit ETag
-        uses: actions/cache/restore@v4
-        with:
-          path: .tmp/route-map-etag
-          key: route-map-etag-restore-${{ github.run_id }}
-          restore-keys: route-map-etag-
-      - name: Resolve one upstream revision conditionally
-        id: revision
-        run: |
-          etag_file=.tmp/route-map-etag/commit.etag
-          mkdir -p "$(dirname "$etag_file")"
-          header=()
-          if test -s "$etag_file"; then
-            header=(-H "If-None-Match: $(cat "$etag_file")")
-          fi
-          status="$(curl -sS -D .tmp/route-map-headers -o .tmp/route-map-commit.json -w '%{http_code}' \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "${header[@]}" \
-            https://api.github.com/repos/decolua/9router/commits/master)"
-          if test "$status" = 304; then
-            printf 'unchanged=true\n' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          test "$status" = 200
-          sha="$(jq -r .sha .tmp/route-map-commit.json)"
-          test -n "$sha"
-          printf 'sha=%s\n' "$sha" >> "$GITHUB_OUTPUT"
-          awk 'BEGIN{IGNORECASE=1} /^etag:/{sub(/^[^:]*:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit}' .tmp/route-map-headers > "$etag_file"
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - name: Save commit ETag
-        if: steps.revision.outputs.unchanged != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: .tmp/route-map-etag
-          key: route-map-etag-${{ steps.revision.outputs.sha }}
-      - name: Fetch whitelisted source at revision
-        if: steps.revision.outputs.unchanged != 'true'
-        run: ./scripts/fetch-route-map-source.sh "${{ steps.revision.outputs.sha }}" .tmp/9router
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - if: steps.revision.outputs.unchanged != 'true'
-        run: bun run generate:route-map -- --commit "${{ steps.revision.outputs.sha }}" --input .tmp/9router --output src/generated/9router-route-map.ts
-      - if: steps.revision.outputs.unchanged != 'true'
-        run: bun test
-      - if: steps.revision.outputs.unchanged != 'true'
-        run: bun run build
-      - uses: peter-evans/create-pull-request@v7
-        if: steps.revision.outputs.unchanged != 'true'
-        with:
-          branch: bot/refresh-9router-route-map
-          title: "chore: refresh 9router route mapping"
-          commit-message: "chore: refresh 9router route mapping"
-          body: "Automated snapshot refresh from decolua/9router at ${{ steps.revision.outputs.sha }}."
-```
-
-Create `scripts/fetch-route-map-source.sh` in same task:
+- [ ] **Step 3: Commit detector workflow**
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-sha="$1"
-out="$2"
-repo="decolua/9router"
-mkdir -p "$out/open-sse/providers/registry" "$out/open-sse/config" "$out/src/shared/constants"
-
-tree="$(gh api "repos/$repo/git/trees/$sha?recursive=1")"
-paths="$(jq -r '.tree[].path | select(. == "open-sse/config/providerModels.js" or . == "src/shared/constants/providers.js" or startswith("open-sse/providers/registry/")) | select(endswith(".js"))' <<<"$tree")"
-test -n "$paths"
-
-while IFS= read -r path; do
-  target="$out/$path"
-  mkdir -p "$(dirname "$target")"
-  gh api "repos/$repo/contents/$path?ref=$sha" --jq .content | base64 --decode > "$target"
-done <<<"$paths"
-
-test -s "$out/open-sse/config/providerModels.js"
-test -s "$out/src/shared/constants/providers.js"
-test -n "$(printf '%s\n' "$paths" | grep '^open-sse/providers/registry/')"
-```
-
-The workflow persists only the commit endpoint ETag in Actions cache. A `304` ends the job. The generated snapshot retains authoritative `sourceCommit`; a changed revision fetches all whitelisted files at that one SHA using the script above. Do not use raw GitHub URLs or execute downloaded files.
-
-- [ ] **Step 6: Run generator and full checks locally**
-
-Run: `bun test && bun run build`
-
-Expected: PASS.
-
-- [ ] **Step 7: Commit generator and CI automation**
-
-```bash
-git add scripts/generate-route-map.ts scripts/fetch-route-map-source.sh package.json .github/workflows/refresh-route-map.yml src/generated/9router-route-map.ts tests/route-map.test.ts
-git commit -m "ci: refresh 9router route mapping"
+git add .github/workflows/watch-9router-upstream.yml docs/upstream/9router-change-report.md
+git commit -m "ci: watch 9router upstream"
 ```
 
 ## Task 6: Documentation and release-safe verification
@@ -711,12 +551,12 @@ For 9router models whose `/models` capability explicitly sets `reasoning: true`,
 
 The plugin never exposes `max`. It exposes `none` only when the route confirms thinking can be disabled, and exposes `xhigh` only when both route metadata and models.dev show it is non-lossy. No inference request is sent to determine variants.
 
-Route mapping is a committed snapshot refreshed by a daily/manual GitHub Actions workflow. Runtime never fetches 9router source or GitHub.
+Route mapping is a committed snapshot. A daily/manual GitHub Actions detector reports upstream revision changes in a PR. Runtime never fetches 9router source or GitHub.
 ```
 
 - [ ] **Step 2: Document maintainer refresh behavior**
 
-Add README maintainer note: workflow watches only registry files, `providerModels.js`, and provider constants; generator parses source as text/AST; tests/build gate a bot PR; merge does not publish because release remains tag-triggered.
+Add README maintainer note: workflow detects upstream revision changes through GitHub APIs and opens/updates a report-only PR. It never fetches source/blobs, derives mappings, generates/edits/validates the route-map snapshot, or runs tests/build. Merge does not publish because release remains tag-triggered.
 
 - [ ] **Step 3: Run full verification**
 
@@ -752,5 +592,6 @@ git commit -m "docs: explain reasoning variants"
 - [ ] `thinkingFormat` is never used as provider identity.
 - [ ] Ambiguous/custom routes do not receive guessed provider-specific metadata.
 - [ ] Runtime performs no GitHub/source fetch and no inference probe.
-- [ ] Snapshot workflow uses one source revision, validates output, opens/updates PR, never pushes `main`.
+- [ ] Detector workflow compares one upstream revision, opens/updates report PR, never pushes `main`.
+- [ ] Detector never generates, edits, or validates `src/generated/9router-route-map.ts`; never fetches blobs/source; never derives mappings.
 - [ ] `bun test` and `bun run build` pass.
