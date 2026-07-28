@@ -2,40 +2,47 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-const CACHE_DIR = path.join(os.homedir(), ".cache", "opencode-9router-plus");
-const CACHE_FILE = path.join(CACHE_DIR, "models.dev.json");
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+export type CacheName = "models-dev-api" | "models-dev-models";
+
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const files: Record<CacheName, string> = {
+  "models-dev-api": "models.dev.api.json",
+  "models-dev-models": "models.dev.models.json",
+};
+let cacheDir = path.join(os.homedir(), ".cache", "opencode-9router-plus");
 
 interface CacheEntry {
   timestamp: number;
-  data: Record<string, any>;
+  data: unknown;
 }
 
-export async function readCache(): Promise<Record<string, any> | null> {
+function cacheFile(name: CacheName): string {
+  return path.join(cacheDir, files[name]);
+}
+
+export function setCacheDirForTest(dir?: string): void {
+  cacheDir = dir ?? path.join(os.homedir(), ".cache", "opencode-9router-plus");
+}
+
+export async function readCache(name: CacheName): Promise<unknown | null> {
   try {
-    const raw = await fs.readFile(CACHE_FILE, "utf8");
-    const entry: CacheEntry = JSON.parse(raw);
-    if (Date.now() - entry.timestamp < CACHE_TTL_MS) {
-      return entry.data;
-    }
-    return null; // expired
+    const entry = JSON.parse(await fs.readFile(cacheFile(name), "utf8")) as CacheEntry;
+    return Date.now() - entry.timestamp < CACHE_TTL_MS ? entry.data : null;
   } catch {
-    return null; // missing or corrupt
+    return null;
   }
 }
 
-export async function writeCache(data: Record<string, any>): Promise<void> {
-  await fs.mkdir(CACHE_DIR, { recursive: true });
-  const entry: CacheEntry = { timestamp: Date.now(), data };
-  const tmp = path.join(CACHE_DIR, `.models.dev.${process.pid}.tmp`);
-  await fs.writeFile(tmp, JSON.stringify(entry), "utf8");
-  await fs.rename(tmp, CACHE_FILE);
+export async function writeCache(name: CacheName, data: unknown): Promise<void> {
+  await fs.mkdir(cacheDir, { recursive: true });
+  const tmp = path.join(cacheDir, `.${files[name].replace(/\.json$/, "")}.${process.pid}.tmp`);
+  await fs.writeFile(tmp, JSON.stringify({ timestamp: Date.now(), data }), "utf8");
+  await fs.rename(tmp, cacheFile(name));
 }
 
-export async function getCacheAge(): Promise<{ exists: boolean; ageMs?: number }> {
+export async function getCacheAge(name: CacheName = "models-dev-api"): Promise<{ exists: boolean; ageMs?: number }> {
   try {
-    const stat = await fs.stat(CACHE_FILE);
-    return { exists: true, ageMs: Date.now() - stat.mtimeMs };
+    return { exists: true, ageMs: Date.now() - (await fs.stat(cacheFile(name))).mtimeMs };
   } catch {
     return { exists: false };
   }

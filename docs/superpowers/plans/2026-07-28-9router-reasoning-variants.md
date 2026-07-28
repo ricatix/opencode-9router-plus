@@ -186,8 +186,9 @@ git commit -m "feat: add 9router route resolver"
 - Modify: `src/models-dev.ts`
 - Create: `tests/fixtures/models-dev.ts`
 - Test: `tests/models-dev.test.ts`
+- Test: `tests/cache.test.ts`
 
-- [ ] **Step 1: Write failing catalog lookup tests**
+- [x] **Step 1: Write failing catalog lookup tests**
 
 ```ts
 import { describe, expect, test } from "bun:test";
@@ -203,8 +204,10 @@ describe("models.dev lookup", () => {
     ]);
   });
 
-  test("does not choose a last-write-wins provider collision", () => {
-    expect(lookup.lookup(undefined, "shared-model").modelOnly).toBeNull();
+  test("keeps provider collisions isolated", () => {
+    expect(lookup.lookup("provider-a", "shared-model").providerModel?.name).toBe("Provider A Shared");
+    expect(lookup.lookup("provider-b", "shared-model").providerModel?.name).toBe("Provider B Shared");
+    expect(lookup.lookup(undefined, "shared-model").providerModel).toBeNull();
   });
 
   test("uses model-only catalog only for canonical model key", () => {
@@ -213,13 +216,13 @@ describe("models.dev lookup", () => {
 });
 ```
 
-- [ ] **Step 2: Run models.dev tests; confirm failure**
+- [x] **Step 2: Run models.dev tests; confirm failure**
 
 Run: `bun test tests/models-dev.test.ts`
 
 Expected: FAIL because `createModelsDevLookup` does not exist.
 
-- [ ] **Step 3: Make cache catalog-specific while preserving atomic semantics**
+- [x] **Step 3: Make cache catalog-specific while preserving atomic semantics**
 
 Replace single-purpose cache API in `src/cache.ts` with:
 
@@ -232,7 +235,9 @@ export async function getCacheAge(name?: CacheName): Promise<{ exists: boolean; 
 
 Map names to `models.dev.api.json` and `models.dev.models.json` inside existing `~/.cache/opencode-9router-plus`. Retain 24-hour TTL, `mkdir`, temp-file write, and `rename`. Keep `getCacheAge()` defaulting to `models-dev-api` so current CLI output stays compatible.
 
-- [ ] **Step 4: Replace lossy models.dev index with two catalog loaders**
+Add `tests/cache.test.ts` with an injected temporary cache directory seam. It must assert that writing `models-dev-api` never changes `models-dev-models`, `getCacheAge()` without an argument reads the API catalog file, and an entry older than 24 hours returns `null`. Temporary output names must include the catalog name, for example `.models.dev.api.${process.pid}.tmp` and `.models.dev.models.${process.pid}.tmp`, so concurrent catalog writes cannot collide.
+
+- [x] **Step 4: Replace lossy models.dev index with two catalog loaders**
 
 In `src/models-dev.ts`:
 
@@ -247,8 +252,8 @@ export interface ReasoningOption {
 
 2. Add `reasoning_options?: ReasoningOption[]` to `ModelsDevModel`.
 3. Add URLs `https://models.dev/api.json` and `https://models.dev/models.json`.
-4. Export pure `createModelsDevLookup(apiCatalog, modelCatalog)` with `.lookup(provider, canonicalModelId)`.
-5. Export async `lookupModelsDev(provider, canonicalModelId)` that loads each catalog lazily and returns:
+4. Export pure `createModelsDevLookup(apiCatalog, modelCatalog)` with `.lookup(provider, canonicalModelRef)`.
+5. Export async `lookupModelsDev(provider, canonicalModelRef)` that loads each catalog lazily and returns:
 
 ```ts
 export interface ModelsDevLookup {
@@ -257,7 +262,7 @@ export interface ModelsDevLookup {
 }
 ```
 
-`models.json` is `Record<string, ModelsDevModel>` keyed by canonical ref. Model-only lookup is exact `modelsJson[canonicalRef]`, for example `modelsJson["openai/gpt-5.6-sol"]`; it never falls back to basename matching. Provider lookup uses `apiJson[provider].models` and probes two candidates in order: canonical model local key (`gpt-5.6-sol`), then full canonical ref (`openai/gpt-5.6-sol`). Do not use current dash/dot fuzzy fallback for reasoning options.
+`models.json` is `Record<string, ModelsDevModel>` keyed by canonical ref. Model-only lookup is exact `modelsJson[canonicalRef]`, for example `modelsJson["openai/gpt-5.6-sol"]`; it never falls back to basename matching. Split `canonicalModelRef` once at its first slash into `canonicalProvider` and `localModelId`; reject an unscoped value for model-only lookup. Provider lookup uses `apiJson[provider].models` and probes `localModelId` (`gpt-5.6-sol`) then the full canonical ref (`openai/gpt-5.6-sol`). Never construct `${provider}/${canonicalModelRef}`; it can produce `openai/openai/gpt-5.6-sol`. Do not use current dash/dot fuzzy fallback for reasoning options.
 
 Export a test-only reset seam so fixture tests never fetch network data:
 
@@ -267,7 +272,15 @@ export function resetModelsDevCatalogsForTest(): void;
 
 It clears module-local catalog promises/maps only. Production code must not call it.
 
-- [ ] **Step 5: Add fixture payloads and run tests**
+Keep a temporary compatibility export until Task 4 rewires the mapper:
+
+```ts
+export async function lookupModel(modelName: string): Promise<ModelsDevModel | null>;
+```
+
+It may use existing legacy fuzzy lookup against `api.json` only for current display metadata. It must not provide `reasoning_options`, provider-aware resolution, or a new last-write-wins path. Remove it only in Task 4 after `src/model-mapper.ts` uses `lookupModelsDev`.
+
+- [x] **Step 5: Add fixture payloads and run tests**
 
 `tests/fixtures/models-dev.ts` must include:
 
@@ -280,10 +293,14 @@ Run: `bun test tests/models-dev.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit provider-aware metadata layer**
+Run: `bun test tests/models-dev.test.ts tests/cache.test.ts && bun run build`
+
+Expected: PASS. The build proves compatibility `lookupModel` keeps current `src/model-mapper.ts` valid until Task 4.
+
+- [x] **Step 6: Commit provider-aware metadata layer**
 
 ```bash
-git add src/cache.ts src/models-dev.ts tests/fixtures/models-dev.ts tests/models-dev.test.ts
+git add src/cache.ts src/models-dev.ts tests/fixtures/models-dev.ts tests/models-dev.test.ts tests/cache.test.ts docs/superpowers/plans/2026-07-28-9router-reasoning-variants.md
 git commit -m "feat: preserve models.dev provider metadata"
 ```
 
