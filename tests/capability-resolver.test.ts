@@ -5,7 +5,7 @@ const resolve = (capabilities: unknown, reasoningOptions?: unknown) =>
   resolveReasoningVariants({ capabilities: capabilities as never, reasoningOptions: reasoningOptions as never });
 const all = { none: { reasoningEffort: "none" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" } };
 const baseline = { low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" } };
-const options = (values: string[]) => [{ type: "reasoning_effort", values }];
+const options = (values: string[]) => [{ type: "effort", values }];
 
 describe("resolveReasoningVariants Oracle Task 3 matrix", () => {
   test("1 absent capabilities", () => expect(resolve(undefined)).toEqual({}));
@@ -31,9 +31,9 @@ describe("resolveReasoningVariants Oracle Task 3 matrix", () => {
   test("21 metadata exact efforts filters", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, options(["low", "high"]))).toEqual({ low: { reasoningEffort: "low" }, high: { reasoningEffort: "high" } }));
   test("22 metadata excludes all", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, options([]))).toEqual({}));
   test("23 no exact effort entry", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, [{ type: "other", values: ["low"] }])).toEqual({}));
-  test("24 wrong type case", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, [{ type: "Reasoning_Effort", values: ["low"] }])).toEqual({}));
+  test("24 wrong type case", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, [{ type: "Effort", values: ["low"] }])).toEqual({}));
   test("25 malformed options", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, {})).toEqual({}));
-  test("26 malformed values", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, [{ type: "reasoning_effort", values: "low" }])).toEqual({}));
+  test("26 malformed values", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, [{ type: "effort", values: "low" }])).toEqual({}));
   test("27 invalid effort ignored", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, options(["low", "max", " LOW "]))).toEqual({ low: { reasoningEffort: "low" } }));
   test("28 max never output", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, options(["max"]))).toEqual({}));
   test("29 metadata none still needs disable", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, options(["none"]))).toEqual({}));
@@ -48,4 +48,7 @@ describe("resolveReasoningVariants Oracle Task 3 matrix", () => {
   test("38 xhigh route and metadata", () => expect(resolve({ reasoning: true, thinkingFormat: "openai", thinkingRange: ["xhigh"] }, options(["xhigh"]))).toEqual({ xhigh: { reasoningEffort: "xhigh" } }));
   test("39 xhigh needs route evidence", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, options(["xhigh"]))).toEqual({}));
   test("40 no mutation and malformed safe", () => { const caps = { reasoning: true, thinkingFormat: "openai", thinkingRange: ["xhigh"] }; const metadata = options(["low", "xhigh"]); const before = JSON.stringify([caps, metadata]); expect(resolve(caps, metadata)).toEqual({ low: { reasoningEffort: "low" }, xhigh: { reasoningEffort: "xhigh" } }); expect(JSON.stringify([caps, metadata])).toBe(before); });
+  test("41 reasoning_effort metadata rejected", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, [{ type: "reasoning_effort", values: ["low"] }])).toEqual({}));
+  test("42 on-off array range empty", () => expect(resolve({ reasoning: true, thinkingFormat: "openai", thinkingRange: ["on", "off"] })).toEqual({}));
+  test("43 on-off object range empty", () => expect(resolve({ reasoning: true, thinkingFormat: "openai", thinkingRange: { values: ["on"] } })).toEqual({}));
 });

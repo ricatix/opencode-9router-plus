@@ -20,8 +20,17 @@ function routeEfforts(value: unknown): ReasoningEffort[] | null {
 
 function metadataEfforts(value: unknown): ReasoningEffort[] | null {
   if (!Array.isArray(value)) return null;
-  const option = value.find((item) => item && typeof item === "object" && (item as ReasoningOption).type === "reasoning_effort");
+  const option = value.find((item) => item && typeof item === "object" && (item as ReasoningOption).type === "effort");
   return option ? exactEfforts((option as ReasoningOption).values) : null;
+}
+
+function isOnOffOnlyRange(value: unknown): boolean {
+  const values = Array.isArray(value)
+    ? value
+    : value && typeof value === "object" && "values" in value
+      ? (value as { values?: unknown }).values
+      : null;
+  return Array.isArray(values) && values.length > 0 && values.every((item) => item === "on" || item === "off");
 }
 
 export function resolveReasoningVariants(input: {
@@ -33,6 +42,7 @@ export function resolveReasoningVariants(input: {
 
   const format = typeof capabilities.thinkingFormat === "string" ? capabilities.thinkingFormat.trim().toLowerCase() : "";
   if (format === "adaptive" || format === "claude-adaptive" || format === "minimax") return {};
+  if (isOnOffOnlyRange(capabilities.thinkingRange)) return {};
 
   const metadata = input.reasoningOptions === undefined ? undefined : metadataEfforts(input.reasoningOptions);
   if (metadata === null) return {};
