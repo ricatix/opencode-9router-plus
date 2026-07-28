@@ -10,17 +10,15 @@
 
 ---
 
-## Mandatory Oracle progression gate
+## Mandatory Oracle task gate
 
-Before executing **every** checkbox step in this plan, request Oracle review with:
+Before starting each numbered Task, request one Oracle review with:
 
-1. Completed-step evidence: changed paths, focused test/build output, and relevant diff.
-2. Exact next checkbox step.
+1. Task goal, target files, proposed tests, and exact task steps.
+2. Evidence from completed prior task: changed paths, focused test/build output, and relevant diff.
 3. Risks, requirement conflicts, or simpler alternative discovered.
 
-Proceed only after Oracle explicitly approves that exact next step. If Oracle rejects or requests a change, revise the plan or completed work, verify again, then request a new approval. Do not combine approvals: one approval authorizes one checkbox step only.
-
-For the first checkbox in each task, provide the task goal, target files, and proposed failing test as evidence instead of completed-step output. Oracle is an implementation gate here; user approval remains required for any scope change, destructive action, dependency addition, or release action.
+Proceed through every checkbox within that Task only after Oracle explicitly approves the Task. If implementation reveals a requirement conflict, scope change, destructive action, dependency addition, or release action, pause and request a fresh Oracle review before continuing. User approval remains required for scope changes, destructive actions, dependency additions, and releases.
 
 ## File structure
 
@@ -123,6 +121,7 @@ export interface RouteMapSnapshot {
   sourceCommit: string;
   directProviders: readonly string[];
   aliases: Readonly<Record<string, string>>;
+  providerRules: Readonly<Record<string, string>>;
   suffixRules: Readonly<Record<string, readonly string[]>>;
   wrapperRules: Readonly<Record<string, { prefix: string; providerAliases?: Readonly<Record<string, string>> }>>;
   prefixRules: Readonly<Record<string, string>>;
@@ -139,6 +138,7 @@ export const ROUTE_MAP_SNAPSHOT: RouteMapSnapshot = {
   sourceCommit: "79918c7830695bbca4a45c9fea4a42c3e9fd73d1",
   directProviders: ["openai", "openrouter", "anthropic", "google", "azure", "mistral", "deepseek", "zai", "zhipuai", "xai", "groq", "cohere", "perplexity", "minimax", "stepfun", "hunyuan", "nvidia", "togetherai", "deepinfra", "cerebras", "featherless", "chutes"],
   aliases: { cx: "codex", gcli: "grok-cli", gb: "grok-cli", bb: "blackbox" },
+  providerRules: { codex: "openai", "grok-cli": "xai" },
   suffixRules: { codex: ["-review"], "grok-cli": ["-high", "-medium", "-low"], deepseek: ["-none", "-max"] },
   wrapperRules: { blackbox: { prefix: "blackboxai/", providerAliases: { "x-ai": "xai" } } },
   prefixRules: { "deepseek-": "deepseek", "kimi-": "moonshot", "qwen": "qwen", "glm-": "zhipuai", "minimax-": "minimax" },
@@ -159,7 +159,7 @@ Implementation order:
 
 1. Split only first `/`; invalid/no-slash values return `{ routeAlias: "", routeModelId: routeId }`.
 2. Reject `openai-compatible-*`, `anthropic-compatible-*`, `local`, and `passthrough` aliases before applying provider-specific rules.
-3. Convert alias to route provider through `aliases`; direct provider uses its alias as canonical provider.
+3. Convert alias to route provider through `aliases`; prefer `providerRules[routeProvider]` as canonical provider, then use direct provider route alias as canonical provider.
 4. Prefer exact `upstreamModels[routeId]`; parse scoped wrapper IDs only for declared `wrapperRules`.
 5. Apply only suffixes declared for route provider, then strong prefix rule.
 6. Return route identity even if canonical fields remain absent.
@@ -175,7 +175,7 @@ Expected: PASS.
 - [ ] **Step 6: Commit route mapping boundary**
 
 ```bash
-git add src/route-types.ts src/route-map.ts src/generated/9router-route-map.ts tests/route-map.test.ts
+git add src/route-types.ts src/route-map.ts src/generated/9router-route-map.ts tests/route-map.test.ts docs/superpowers/plans/2026-07-28-9router-reasoning-variants.md
 git commit -m "feat: add 9router route resolver"
 ```
 
