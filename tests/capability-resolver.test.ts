@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { resolveReasoningVariants } from "../src/capability-resolver.js";
+import { resolveCatalogVariants, resolveReasoningVariants } from "../src/capability-resolver.js";
+import { NINE_ROUTER_LLM_CATALOG } from "../src/generated/9router-llm-catalog.js";
+import type { NineRouterLlmCatalog } from "../src/route-types.js";
 
 const resolve = (capabilities: unknown, reasoningOptions?: unknown) =>
   resolveReasoningVariants({ capabilities: capabilities as never, reasoningOptions: reasoningOptions as never });
@@ -51,4 +53,36 @@ describe("resolveReasoningVariants Oracle Task 3 matrix", () => {
   test("41 reasoning_effort metadata rejected", () => expect(resolve({ reasoning: true, thinkingFormat: "openai" }, [{ type: "reasoning_effort", values: ["low"] }])).toEqual({}));
   test("42 on-off array range empty", () => expect(resolve({ reasoning: true, thinkingFormat: "openai", thinkingRange: ["on", "off"] })).toEqual({}));
   test("43 on-off object range empty", () => expect(resolve({ reasoning: true, thinkingFormat: "openai", thinkingRange: { values: ["on"] } })).toEqual({}));
+});
+
+const picker = (patternLevels: readonly { pattern: string; levels: readonly string[] }[] = [], formatLevels: Readonly<Record<string, readonly string[]>> = {}): NineRouterLlmCatalog["reasoningPicker"] => ({ patternLevels, formatLevels });
+const resolveCatalog = (rawModelId: string, staticCapabilities: unknown, customPicker = picker()) => resolveCatalogVariants({ rawModelId, staticCapabilities: staticCapabilities as never, picker: customPicker });
+const variants = (...levels: string[]) => Object.fromEntries(levels.map((reasoningEffort) => [reasoningEffort, { reasoningEffort }]));
+
+describe("resolveCatalogVariants Task 4", () => {
+  test("snapshot picker gives gpt-5.6-sol seven discrete efforts", () => expect(resolveCatalog("cx/gpt-5.6-sol", { reasoning: true, thinkingFormat: "openai" }, NINE_ROUTER_LLM_CATALOG.reasoningPicker)).toEqual(variants("none", "minimal", "low", "medium", "high", "xhigh", "max")));
+  test("first matching pattern wins", () => expect(resolveCatalog("model", { reasoning: true }, picker([{ pattern: "*", levels: ["low"] }, { pattern: "model", levels: ["high"] }]))).toEqual(variants("low")));
+  test("glob is case sensitive, escapes regex literals, wildcard matches zero or many", () => {
+    const rules = [{ pattern: "v1.2+[x]?*", levels: ["minimal"] }];
+    expect(resolveCatalog("v1.2+[x]?", { reasoning: true }, picker(rules))).toEqual(variants("minimal"));
+    expect(resolveCatalog("v1.2+[x]?suffix", { reasoning: true }, picker(rules))).toEqual(variants("minimal"));
+    expect(resolveCatalog("V1.2+[x]?", { reasoning: true }, picker(rules))).toEqual({});
+  });
+  test("falls back to exact thinking format", () => expect(resolveCatalog("other", { reasoning: true, thinkingFormat: "openai" }, picker([], { openai: ["low", "high"] }))).toEqual(variants("low", "high")));
+  test("missing or non-true reasoning gives no variants", () => {
+    expect(resolveCatalog("model", undefined)).toEqual({});
+    expect(resolveCatalog("model", { reasoning: false })).toEqual({});
+    expect(resolveCatalog("model", { reasoning: "true" })).toEqual({});
+  });
+  test("false thinkingCanDisable removes none only", () => expect(resolveCatalog("model", { reasoning: true, thinkingCanDisable: false }, picker([{ pattern: "*", levels: ["none", "low"] }]))).toEqual(variants("low")));
+  test("non-discrete levels and unknown formats give no variants", () => {
+    expect(resolveCatalog("model", { reasoning: true }, picker([{ pattern: "*", levels: ["auto", "on", "off", "thinking", "unknown"] }]))).toEqual({});
+    expect(resolveCatalog("model", { reasoning: true, thinkingFormat: "missing" }, picker())).toEqual({});
+  });
+  test("max and xhigh retain distinct payloads without mutating input", () => {
+    const capabilities = { reasoning: true, thinkingFormat: "fmt", thinkingRange: ["on"] };
+    const customPicker = picker([], { fmt: ["xhigh", "max"] }); const before = JSON.stringify([capabilities, customPicker]);
+    expect(resolveCatalog("model", capabilities, customPicker)).toEqual(variants("xhigh", "max"));
+    expect(JSON.stringify([capabilities, customPicker])).toBe(before);
+  });
 });
