@@ -25,16 +25,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          previous="$(grep -E '^Upstream revision: \`[0-9a-f]{40}\`$' docs/upstream/9router-change-report.md | grep -Eo '[0-9a-f]{40}')"
-          current="$(gh api repos/decolua/9router/commits/master --jq .sha)"
-          test "${#previous}" = 40
-          test "${#current}" = 40
+          previous="$(grep -E '^Current upstream SHA: `[0-9a-f]{40}`$' docs/upstream/9router-change-report.md | grep -Eo '[0-9a-f]{40}')"
+          current="$(gh api repos/decolua/9router/git/ref/heads/master --jq '.object.sha')"
+          printf '%s' "$previous" | grep -Eq '^[0-9a-f]{40}$'
+          printf '%s' "$current" | grep -Eq '^[0-9a-f]{40}$'
           printf 'previous=%s\ncurrent=%s\n' "$previous" "$current" >> "$GITHUB_OUTPUT"
-          if test "$previous" = "$current"; then
-            printf 'changed=false\n' >> "$GITHUB_OUTPUT"
-          else
-            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
-          fi
+          test "$previous" = "$current" && printf 'changed=false\n' >> "$GITHUB_OUTPUT" || printf 'changed=true\n' >> "$GITHUB_OUTPUT"
       - name: Render change report
         if: steps.upstream.outputs.changed == 'true'
         env:
@@ -43,48 +39,15 @@ jobs:
           CURRENT: ${{ steps.upstream.outputs.current }}
         run: |
           set -euo pipefail
-          gh api "repos/decolua/9router/compare/${PREVIOUS}...${CURRENT}" > compare.json
-          jq -r --arg previous "$PREVIOUS" --arg current "$CURRENT" '
-            ([.files[]?.additions] | add // 0) as $additions |
-            ([.files[]?.deletions] | add // 0) as $deletions |
-            [.files[]? | "- `\(.filename)` (\(.status)): +\(.additions) / -\(.deletions)"] as $files |
-            [.commits[]? | "- [`\(.sha[0:12])`](https://github.com/decolua/9router/commit/\(.sha)): \(.commit.message | split("\n")[0])"] as $commits |
-            "# 9router upstream change report",
-            "",
-            "Upstream repository: `decolua/9router`",
-            "Upstream branch: `master`",
-            "Upstream revision: `\($current)`",
-            "Previous revision: `\($previous)`",
-            "Compare URL: https://github.com/decolua/9router/compare/\($previous)...\($current)",
-            "",
-            "## Summary",
-            "",
-            "Commits: \(.total_commits // (.commits | length))",
-            "Changed files: \(.files | length)",
-            "Additions: \($additions)",
-            "Deletions: \($deletions)",
-            "",
-            "## Changed files",
-            "",
-            ($files[]? // "- None"),
-            "",
-            "## Commits",
-            "",
-            ($commits[]? // "- None"),
-            "",
-            "> Report-only update. No route map, runtime, or release changes."
-          ' compare.json > docs/upstream/9router-change-report.md
+          compare="$(mktemp)"
+          trap 'rm -f "$compare"' EXIT
+          gh api "repos/decolua/9router/compare/${PREVIOUS}...${CURRENT}" > "$compare"
+          scripts/render-9router-upstream-report.sh --previous "$PREVIOUS" --current "$CURRENT" --compare "$compare" --output docs/upstream/9router-change-report.md
       - uses: peter-evans/create-pull-request@v7
         if: steps.upstream.outputs.changed == 'true'
         with:
           branch: bot/watch-9router-upstream
           title: "docs: report 9router upstream changes"
           commit-message: "docs: report 9router upstream changes"
-          body: |
-            Automated report-only update for decolua/9router.
-
-            Previous: ${{ steps.upstream.outputs.previous }}
-            Current: ${{ steps.upstream.outputs.current }}
-
-            No route map, runtime, or release changes. No direct main changes.
+          body: "Report-only upstream watch update. No catalog refresh or runtime change."
           add-paths: docs/upstream/9router-change-report.md

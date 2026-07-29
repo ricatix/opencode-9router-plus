@@ -145,6 +145,14 @@ bun run prepublishOnly
 
 `prepublishOnly` intentionally uses npm lifecycle commands internally: `npm run clean && npm run build`.
 
+## Upstream Catalog Review
+
+Scheduled upstream watch reports only whitelisted catalog-input paths. It never runs upstream source, applies detector output, refreshes the catalog, publishes, tags, or releases.
+
+Manual catalog refresh is offline and audited: use an explicit 40 lowercase hexadecimal upstream SHA, review changes in a separate refresh PR, then run local tooling against approved inputs.
+
+`/v1/models` controls listing. Static catalog uses reviewed semantics matching routes; `models.dev` provides enrichment only. Dynamic or unmatched models use a safe template, default requests send no forced reasoning effort, and discrete variants use a source-backed picker. Detector uses GitHub API; merging its report PR cannot publish because release remains tag-triggered.
+
 Project notes:
 
 - Source lives in `src/`; generated output goes to `dist/`.
