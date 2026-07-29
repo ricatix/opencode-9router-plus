@@ -1,7 +1,7 @@
-import { resolveReasoningVariants, type ModelVariants } from "./capability-resolver.js";
+import { resolveCatalogVariants, type CatalogModelVariants, type ModelVariants } from "./capability-resolver.js";
 import { lookupModelsDev, type ModelsDevModel } from "./models-dev.js";
-import { ROUTE_MAP_SNAPSHOT } from "./generated/9router-route-map.js";
-import { resolveRouteModel } from "./route-map.js";
+import { NINE_ROUTER_LLM_CATALOG } from "./generated/9router-llm-catalog.js";
+import { matchLlmCatalogRoute } from "./llm-catalog.js";
 import type { NineRouterDiscoveryEntry } from "./route-types.js";
 
 export interface OpenCodeModelEntry {
@@ -16,12 +16,11 @@ export interface OpenCodeModelEntry {
   cost?: { input: number; output: number };
   limit?: { context: number; output: number };
   modalities?: { input: string[]; output: string[] };
-  variants?: ModelVariants;
+  variants?: ModelVariants | CatalogModelVariants;
 }
 
 export interface ModelMapperDependencies {
   lookupModelsDev?: typeof lookupModelsDev;
-  resolveRouteModel?: typeof resolveRouteModel;
 }
 
 const TEMPLATE: OpenCodeModelEntry = {
@@ -50,14 +49,16 @@ export async function resolveModel(
   discovery?: NineRouterDiscoveryEntry,
   dependencies: ModelMapperDependencies = {},
 ): Promise<OpenCodeModelEntry> {
-  const route = (dependencies.resolveRouteModel ?? resolveRouteModel)(fullId, ROUTE_MAP_SNAPSHOT);
-  const metadata = route.canonicalProvider && route.canonicalModelId
-    ? await (dependencies.lookupModelsDev ?? lookupModelsDev)(route.canonicalProvider, `${route.canonicalProvider}/${route.canonicalModelId}`)
+  const route = matchLlmCatalogRoute(fullId, NINE_ROUTER_LLM_CATALOG);
+  const canonicalProvider = route?.canonicalProvider ?? route?.providerId;
+  const canonicalModelId = route?.canonicalModelId ?? route?.model.upstreamModelId ?? route?.modelId;
+  const metadata = canonicalProvider && canonicalModelId
+    ? await (dependencies.lookupModelsDev ?? lookupModelsDev)(canonicalProvider, `${canonicalProvider}/${canonicalModelId}`)
     : null;
   const selected = metadata?.providerModel ?? metadata?.modelOnly ?? null;
   const entry = selected ? mapModel(selected) : { ...TEMPLATE };
-  const variants = resolveReasoningVariants({ capabilities: discovery?.capabilities, reasoningOptions: selected?.reasoning_options });
-  if (Object.keys(variants).length) entry.variants = variants;
+  if (route?.model.reasoning?.reasoning === true) entry.variants = resolveCatalogVariants({ rawModelId: fullId, staticCapabilities: route.model.reasoning, picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker });
+  else if (!route && discovery?.capabilities?.reasoning === true) entry.variants = {};
   entry.id = fullId;
   entry.name = fullId;
   return entry;

@@ -1,4 +1,6 @@
 import type { Plugin } from "@opencode-ai/plugin";
+import { NINE_ROUTER_LLM_CATALOG } from "./generated/9router-llm-catalog.js";
+import { matchLlmCatalogRoute } from "./llm-catalog.js";
 import { resolveModel } from "./model-mapper.js";
 import type { NineRouterDiscoveryEntry } from "./route-types.js";
 
@@ -30,6 +32,7 @@ function entry(value: unknown): NineRouterDiscoveryEntry | null {
   if (!id) return null;
   const result: NineRouterDiscoveryEntry = { id };
   if (typeof item.name === "string" && item.name.length) result.name = item.name;
+  if (typeof item.kind === "string") result.kind = item.kind;
   if (item.capabilities && typeof item.capabilities === "object" && !Array.isArray(item.capabilities)) result.capabilities = item.capabilities as NineRouterDiscoveryEntry["capabilities"];
   return result;
 }
@@ -53,6 +56,11 @@ export async function listModels(baseUrl: string, timeoutMs: number, apiKey: str
   return [];
 }
 
+function eligibleRuntimeEntries(entries: NineRouterDiscoveryEntry[]): NineRouterDiscoveryEntry[] {
+  return entries.filter((model) => matchLlmCatalogRoute(model.id, NINE_ROUTER_LLM_CATALOG)
+    || !model.kind || model.kind === "llm" || model.kind === "unknown");
+}
+
 export function pickDefaultModel(entries: NineRouterDiscoveryEntry[]): string | null {
   for (const priority of ["gpt", "claude", "gemini", "deepseek", "small"]) {
     const found = entries.find((item) => item.id.toLowerCase().includes(priority));
@@ -65,16 +73,18 @@ const plugin: Plugin = async () => {
   const baseUrl = process.env.OPENCODE_9ROUTER_URL || DEFAULT_BASE;
   const apiKey = process.env.OPENCODE_9ROUTER_API_KEY || "";
   const timeoutMs = Number(process.env.OPENCODE_9ROUTER_TIMEOUT_MS || DEFAULT_TIMEOUT_MS);
-  let discoveredModels: NineRouterDiscoveryEntry[] = [];
+  let runtimeEntries: NineRouterDiscoveryEntry[] = [];
   let defaultModel: string | null = null;
-  try { discoveredModels = await listModels(baseUrl, timeoutMs, apiKey); defaultModel = pickDefaultModel(discoveredModels); }
+  try { runtimeEntries = eligibleRuntimeEntries(await listModels(baseUrl, timeoutMs, apiKey)); defaultModel = pickDefaultModel(runtimeEntries); }
   catch (err) { console.warn("opencode-9router plugin: failed to discover models:", (err as any)?.message || err); }
   return { config: async (cfg: AnyCfg) => {
     cfg.provider ||= {}; cfg.provider["9router"] ||= {}; cfg.provider["9router"].npm ||= "@ai-sdk/openai-compatible";
     cfg.provider["9router"].options ||= {}; cfg.provider["9router"].options.name ||= "9Router"; cfg.provider["9router"].options.baseURL ||= baseUrl;
     if (apiKey && !cfg.provider["9router"].options.apiKey) cfg.provider["9router"].options.apiKey = apiKey;
     cfg.provider["9router"].models ||= {};
-    for (const model of discoveredModels) if (!cfg.provider["9router"].models[model.id]) cfg.provider["9router"].models[model.id] = await resolveModel(model.id, model);
+    for (const model of runtimeEntries) {
+      if (!cfg.provider["9router"].models[model.id]) cfg.provider["9router"].models[model.id] = await resolveModel(model.id, model);
+    }
     if (!cfg.model && defaultModel) cfg.model = `9router/${defaultModel}`;
   }};
 };

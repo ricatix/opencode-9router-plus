@@ -10,7 +10,7 @@ const lookup = createModelsDevLookup(apiCatalog, modelCatalog);
 
 describe("models.dev lookup", () => {
   test("uses canonical provider entry before model-only metadata", () => {
-    expect(lookup.lookup("openai", "gpt-5.6-sol").providerModel?.reasoning_options).toEqual([
+    expect(lookup.lookup("codex", "gpt-5.6-sol").providerModel?.reasoning_options).toEqual([
       { type: "effort", values: ["none", "low", "medium", "high", "xhigh", "max"] },
     ]);
   });
@@ -22,7 +22,7 @@ describe("models.dev lookup", () => {
   });
 
   test("uses model-only catalog only for canonical model key", () => {
-    expect(lookup.lookup(undefined, "openai/gpt-5.6-sol").modelOnly?.id).toBe("openai/gpt-5.6-sol");
+    expect(lookup.lookup(undefined, "codex/gpt-5.6-sol").modelOnly?.id).toBe("codex/gpt-5.6-sol");
     expect(lookup.lookup(undefined, "gpt-5.6-sol").modelOnly).toBeNull();
   });
 });

@@ -61,8 +61,8 @@ function matchesGlob(value: string, pattern: string): boolean {
   return new RegExp(`^${source}$`).test(value);
 }
 
-type CatalogReasoningEffort = "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
-type CatalogModelVariants = Partial<Record<CatalogReasoningEffort, { reasoningEffort: CatalogReasoningEffort }>>;
+export type CatalogReasoningEffort = "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
+export type CatalogModelVariants = Partial<Record<CatalogReasoningEffort, { reasoningEffort: CatalogReasoningEffort }>>;
 const catalogEfforts: readonly CatalogReasoningEffort[] = ["none", "minimal", "low", "medium", "high", "xhigh", "max"];
 
 export function resolveCatalogVariants(input: {

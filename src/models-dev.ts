@@ -97,9 +97,7 @@ export async function lookupModel(modelName: string): Promise<ModelsDevModel | n
   apiCatalogPromise ??= loadCatalog<ApiCatalog>("models-dev-api", API_URL);
   const index = new Map<string, ModelsDevModel | null>();
   for (const provider of Object.values(await apiCatalogPromise)) {
-    for (const [id, model] of Object.entries(provider.models ?? {})) {
-      index.set(id, index.has(id) ? null : model);
-    }
+    for (const [id, model] of Object.entries(provider.models ?? {})) index.set(id, index.has(id) ? null : model);
   }
   return legacyLookup(index, modelName);
 }
