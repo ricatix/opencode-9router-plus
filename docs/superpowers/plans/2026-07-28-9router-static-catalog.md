@@ -24,7 +24,7 @@ matrix, commands, prior-task evidence, and risks; do not edit before approval.
 - [ ] **Step 0: Oracle task gate**
 
 Ask Oracle to approve this Task. Existing `RouteMapSnapshot` and
-`RouteModelResolution` must remain until Task 4 migrates their consumers.
+`RouteModelResolution` must remain until Task 5 migrates their consumers.
 
 - [ ] **Step 1: Write red tests**
 
@@ -107,41 +107,57 @@ git add src/route-types.ts src/llm-catalog.ts tests/fixtures/9router-llm-catalog
 git commit -m "feat: add static LLM catalog contract"
 ```
 
-## Task 2: Reviewed full static LLM snapshot
+## Task 2: Bounded local offline AST extractor
 
-**Files:** Create `src/generated/9router-llm-catalog.ts`, `docs/upstream/9router-llm-catalog-manifest.md`; modify `tests/llm-catalog.test.ts`.
+**Files:** Create `scripts/extract-9router-llm-catalog.ts`,
+`tests/extract-9router-llm-catalog.test.ts`, `tests/fixtures/9router-extractor/`;
+modify `package.json` with exact script
+`"extract:9router-catalog": "bun scripts/extract-9router-llm-catalog.ts"`.
+Fixtures are synthetic minimum files only: registry index, literal provider,
+Codex helper/provider, Grok config/provider, picker/capability, and rejected
+syntax cases; never a full checkout. No generated
+catalog, manifest, runtime, consumer, or route-map files.
 
 - [ ] **Step 0: Oracle task gate**
 
-Ask Oracle to approve exact pinned SHA, whitelist, manual-review manifest,
-snapshot fields, tests, and the rule that old route-map modules remain until
-Task 4.
+Ask Oracle to approve pinned source, CLI, AST contract, whitelist, diagnostics,
+candidate path, test matrix, commands, and rule that old route maps remain
+until Task 5.
 
-- [ ] **Step 1: Write red snapshot tests**
+- [ ] **Step 1: Write red extractor tests**
 
-```ts
-import { NINE_ROUTER_LLM_CATALOG } from "../src/generated/9router-llm-catalog.js";
-
-test("snapshot is LLM-only data from one immutable revision", () => {
-  validateLlmCatalog(NINE_ROUTER_LLM_CATALOG);
-  expect(NINE_ROUTER_LLM_CATALOG.sourceCommit).toMatch(/^[0-9a-f]{40}$/);
-  expect(NINE_ROUTER_LLM_CATALOG.sourceFiles).toContain("open-sse/providers/thinkingLevels.js");
-});
-test("snapshot provenance is complete and ordered", () => {
-  expect(NINE_ROUTER_LLM_CATALOG.sourceFiles).toEqual([...NINE_ROUTER_LLM_CATALOG.sourceFiles].sort());
-  expect(Object.keys(NINE_ROUTER_LLM_CATALOG.providers)).toEqual([...Object.keys(NINE_ROUTER_LLM_CATALOG.providers)].sort());
-});
-```
+Test exported `PINNED_9ROUTER_COMMIT`,
+`extractCatalog({sourceDir}): Promise<ExtractCatalogResult>`,
+`renderCatalogModule(result): string`, and
+`writeCatalogAtomically(outputPath, contents): Promise<void>`. Test accepted
+literals, reviewed static refs/imported constants, statically-resolvable spreads,
+Codex review flattening,
+`GROK_CLI_MODEL`, Grok reasoning gate, deterministic atomic candidate output,
+and exact count checks. Reject calls, computed properties, unsupported imports
+or identifiers, unknown forms, dynamic construction, conflicting facts,
+outside-whitelist reads, wrong SHA, dirty whitelist path, and count mismatches.
+Test atomic prior-output preservation and temporary-file cleanup. Require useful
+`file:line:column` diagnostics with AST form and rejected field.
 
 - [ ] **Step 2: Confirm red state**
 
-Run: `bun test tests/llm-catalog.test.ts`
+Run: `bun test tests/extract-9router-llm-catalog.test.ts`
 
-Expected: FAIL; generated catalog absent.
+Expected: FAIL; extractor absent.
 
-- [ ] **Step 3: Create manual reviewed data snapshot**
+- [ ] **Step 3: Implement bounded extractor**
 
-Review one immutable latest `decolua/9router@master` SHA. Extract static data only; never execute source. Whitelist:
+Input is local pinned `decolua/9router@79918c7830695bbca4a45c9fea4a42c3e9fd73d1`.
+CLI accepts exactly `--source-dir <local pinned directory>` and `--output
+<candidate path>`; no source-commit override. Export `PINNED_9ROUTER_COMMIT`,
+`extractCatalog`, `renderCatalogModule`, and `writeCatalogAtomically`; result
+has catalog/diagnostics/counts. Verify local Git HEAD exact pin and clean
+whitelisted paths via local read-only Git subprocess before output; this is the
+only permitted subprocess. Fully render and
+validate before temp same-dir write/rename; preserve old output and clean temp
+on failure. Never write committed snapshot. No execution, eval, import, require,
+network, install, or fetch. Use existing TypeScript compiler API AST only; add
+no dependency. Read only this whitelist:
 
 ```text
 open-sse/providers/registry/index.js
@@ -156,59 +172,89 @@ open-sse/providers/thinkingLevels.js
 open-sse/providers/capabilities.js
 ```
 
-`models/helpers.js` derived Codex review models are manually flattened. Exclude
-`pricing.js`: matcher behavior is copied as source literal/pattern and Task 3
-has its own `*` matcher; `config/providers.js` output is not copied;
-`providers/shared.js` is transport/auth-only.
-`config/grokCli.js` `GROK_CLI_MODEL` and reasoning-effort gate are manually
-flattened facts.
+Accept static literals, object/array literals, no-substitution templates,
+reviewed static refs/imported constants, statically-resolvable object/array
+spread, exact `withCodexReviewModels`, and exact
+`PROVIDER_DEFAULTS.format`/`GROK_CLI_MODEL`/Grok gate extraction. Unknown forms
+fail `file:line:column` diagnostics. Require
+sorted unique sourceFiles/provider keys, 100 providers, 468 LLM records, and
+excluded image 60/stt 21/embedding 33/tts 27/video 3.
 
-Create `NINE_ROUTER_LLM_CATALOG` with real SHA, exact source paths, all statically declared LLM providers/models, `alias || id`, aliases, source-backed upstream/canonical identities, dynamic flags, reasoning facts, literal `FORMAT_LEVELS`, and source-ordered `PATTERN_THINKING`. Exclude non-LLM, fetched routes, inferred data, and executable expressions.
-
-- [ ] **Step 4: Add manual-review provenance manifest**
-
-Create `docs/upstream/9router-llm-catalog-manifest.md`. It records the exact
-40-hex SHA, sorted whitelist, every registry import/provider reviewed, static
-LLM provider/model counts, dynamic/passthrough provider list, and unsupported
-syntax report. Unsupported syntax matters only in catalog, capability, or
-picker fields. A nonempty report or conflicting source fact aborts refresh
-before catalog replacement.
-
-Add tests rejecting outside-whitelist/duplicate paths, missing
-`thinkingLevels.js` or `capabilities.js`, malformed SHA, duplicate aliases,
-and non-LLM entries. Stable source/provider order is mandatory.
-
-- [ ] **Step 5: Add source golden checks**
-
-```ts
-expect(matchLlmCatalogRoute("cx/gpt-5.6-sol", NINE_ROUTER_LLM_CATALOG)).toMatchObject({ providerId: "codex", canonicalProvider: "openai", canonicalModelId: "gpt-5.6-sol" });
-expect(NINE_ROUTER_LLM_CATALOG.reasoningPicker.patternLevels.find((r) => r.pattern === "*gpt-5.6-sol*")?.levels).toEqual(["none", "minimal", "low", "medium", "high", "xhigh", "max"]);
-```
-
-Run: `bun test tests/llm-catalog.test.ts`
+Run: `bun test tests/extract-9router-llm-catalog.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 6: Oracle review and commit**
+- [ ] **Step 4: Oracle review and commit**
 
-Run: `bun test tests/llm-catalog.test.ts && bun test && bun run build && git diff --check`
+Run: `bun test tests/extract-9router-llm-catalog.test.ts && bun test && bun run build && git diff --check`
 
 After Oracle approval:
 
 ```bash
-git add src/generated/9router-llm-catalog.ts src/route-types.ts src/llm-catalog.ts tests/fixtures/9router-llm-catalog.ts tests/llm-catalog.test.ts
-git add -f docs/upstream/9router-llm-catalog-manifest.md
-git commit -m "feat: add 9router static LLM catalog snapshot"
+git add package.json scripts/extract-9router-llm-catalog.ts tests/extract-9router-llm-catalog.test.ts tests/fixtures/9router-extractor/
+git commit -m "feat: add bounded 9router catalog extractor"
 ```
 
-## Task 3: Source-authoritative reasoning variants
+## Task 3: Reviewed full static LLM snapshot
+
+**Files:** Create `src/generated/9router-llm-catalog.ts`,
+`docs/upstream/9router-llm-catalog-manifest.md`; modify
+`tests/llm-catalog.test.ts`.
+
+- [ ] **Step 0: Oracle task gate**
+
+Ask Oracle to approve candidate comparison, reviewed literal snapshot, manifest,
+counts, sourceFiles, tests, commands, Task 2 evidence, and old route maps until
+Task 5.
+
+- [ ] **Step 1: Write red snapshot tests**
+
+Test candidate and checked-in literal snapshot match after review; validator,
+exact SHA, sorted unique sourceFiles including picker/capability paths, sorted
+provider keys, 100 providers, 468 LLM models, excluded totals, dynamic IDs,
+Codex flattening, and Sol canonical/picker goldens.
+
+- [ ] **Step 2: Confirm red state**
+
+Run: `bun test tests/llm-catalog.test.ts`
+
+Expected: FAIL; reviewed snapshot absent.
+
+- [ ] **Step 3: Review candidate and add snapshot/manifest**
+
+Follow exact order: (1) generate candidate to temporary path, (2) manually
+review candidate, (3) copy candidate unchanged to
+`src/generated/9router-llm-catalog.ts`, (4) generate fresh temporary candidate,
+(5) `cmp` fresh candidate with checked-in snapshot. Commands:
+
+```bash
+bun run extract:9router-catalog --source-dir .slim/clonedeps/repos/decolua__9router --output /tmp/9router-llm-catalog.candidate.ts
+cp /tmp/9router-llm-catalog.candidate.ts src/generated/9router-llm-catalog.ts
+bun run extract:9router-catalog --source-dir .slim/clonedeps/repos/decolua__9router --output /tmp/9router-llm-catalog.fresh.ts
+cmp /tmp/9router-llm-catalog.fresh.ts src/generated/9router-llm-catalog.ts
+```
+
+Extractor output is candidate. Manual edits require extractor fix and rerun.
+Manifest records sourceFiles, importer/fact inventory, every provider
+row with registry path/LLM/excluded counts/dynamic flags, totals, approved
+flattening, and exclusions `pricing` matcher not copied, `config/providers`
+output not copied, `shared` transport/auth-only. Any diagnostic, conflict, or
+candidate mismatch aborts without replacement.
+
+- [ ] **Step 4: Pass and Oracle review/commit**
+
+Run: `bun test tests/llm-catalog.test.ts && bun test && bun run build && git diff --check`
+
+After Oracle approval, commit snapshot, manifest, and tests.
+
+## Task 4: Source-authoritative reasoning variants
 
 **Files:** Modify `src/capability-resolver.ts`, `tests/capability-resolver.test.ts`.
 
 - [ ] **Step 0: Oracle task gate**
 
 Ask Oracle to approve picker API replacement, `minimal`/`max` policy, test
-matrix, and unchanged runtime integration until Task 4.
+matrix, and unchanged runtime integration until Task 5.
 
 - [ ] **Step 1: Write red picker tests**
 
@@ -256,7 +302,7 @@ git add src/capability-resolver.ts tests/capability-resolver.test.ts
 git commit -m "feat: mirror 9router reasoning picker variants"
 ```
 
-## Task 4: Runtime/catalog/models.dev composition
+## Task 5: Runtime/catalog/models.dev composition
 
 **Files:** Modify `src/index.ts`, `src/model-mapper.ts`, `src/models-dev.ts`, `src/route-types.ts`, `tests/index.test.ts`, `tests/model-mapper.test.ts`, `tests/fixtures/models-dev.ts`; delete `src/generated/9router-route-map.ts`, `src/route-map.ts`, `tests/route-map.test.ts`.
 
@@ -314,7 +360,7 @@ git rm src/generated/9router-route-map.ts src/route-map.ts tests/route-map.test.
 git commit -m "feat: intersect runtime models with 9router catalog"
 ```
 
-## Task 5: Detector and documentation boundary
+## Task 6: Detector and documentation boundary
 
 **Files:** Modify `.github/workflows/watch-9router-upstream.yml`, `docs/upstream/9router-change-report.md`, `README.md`; create `docs/upstream/9router-llm-catalog-refresh.md`, `scripts/render-9router-upstream-report.sh`, `tests/watch-9router-upstream.test.ts`, `tests/fixtures/9router-compare.json`, `tests/fixtures/9router-change-report.md`.
 
@@ -410,6 +456,10 @@ git commit -m "docs: describe 9router LLM catalog refresh"
 
 ## Plan self-review
 
-- Tasks run catalog contract, reviewed snapshot, picker, runtime composition, then detector/docs.
+- Tasks run catalog contract, bounded extractor, reviewed snapshot, picker, runtime composition, then detector/docs.
 - Each task has Oracle approval before work and Oracle completion review before commit.
 - No task executes 9router source, fetches GitHub at runtime, adds non-LLM models, or auto-applies upstream changes.
+- For this spec/plan amendment only, stage exactly
+  `docs/superpowers/specs/2026-07-28-9router-static-catalog-design.md` and
+  `docs/superpowers/plans/2026-07-28-9router-static-catalog.md`; leave `.slim/`
+  unstaged. Verify with `git status --short` before Oracle review.

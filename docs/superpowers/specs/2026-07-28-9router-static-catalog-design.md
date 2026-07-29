@@ -128,7 +128,7 @@ open-sse/providers/capabilities.js
 `open-sse/providers/models/helpers.js` supplies derived static Codex review
 models and is manually flattened into the snapshot. Excluded dependencies:
 `open-sse/providers/pricing.js` matcher behavior is copied as source literal/
-pattern and Task 3 has its own `*` matcher; `open-sse/config/providers.js`
+pattern and Task 4 has its own `*` matcher; `open-sse/config/providers.js`
 output is not copied; `open-sse/providers/shared.js` is transport/auth-only.
 `open-sse/config/grokCli.js` supplies `GROK_CLI_MODEL` and its reasoning-effort
 gate; both are manually flattened facts.
@@ -147,29 +147,51 @@ the pinned registry import list. It explicitly excludes account-scoped,
 fetched, passthrough, and synthetic runtime routes. `modelsFetcher` and
 `passthroughModels` flags document that boundary.
 
-## Snapshot extraction safety
+## Bounded local offline extraction
 
-The snapshot is created outside plugin runtime, from one pinned 9router commit.
-Fetched source is untrusted input.
+The snapshot is created outside plugin runtime from local pinned
+`decolua/9router@79918c7830695bbca4a45c9fea4a42c3e9fd73d1`. Source is
+untrusted input.
 
-- Never import, evaluate, require, spawn, or execute fetched JavaScript.
-- Extract only explicitly supported literal data shapes.
-- Reject or report computed expressions, dynamic model construction, spread
-  expressions, calls, template literals, and conflicting duplicate facts.
+- Export testable API: `PINNED_9ROUTER_COMMIT`;
+  `extractCatalog({ sourceDir }): Promise<ExtractCatalogResult>`;
+  `renderCatalogModule(result): string`; and
+  `writeCatalogAtomically(outputPath, contents): Promise<void>`. Result contains
+  `catalog`, `diagnostics`, and `counts`.
+- CLI accepts only `--source-dir <local pinned directory>` and `--output
+  <candidate path>`; no public source-commit override exists. It verifies local
+  Git `HEAD` equals `79918c7830695bbca4a45c9fea4a42c3e9fd73d1` and every
+  whitelisted path is clean before output. Local read-only `git` for
+  HEAD/cleanliness verification is the only subprocess permitted; no other
+  subprocess is permitted.
+- Never import, evaluate, require, spawn, execute, install, fetch, or use
+  network access for source JavaScript.
+- Use already-installed TypeScript compiler API AST only; add no dependency.
+- Read only exact whitelist paths. Accept static literals, object/array literals,
+  no-substitution templates, reviewed static references/imported constants,
+  statically-resolvable object/array spread, exact `withCodexReviewModels`, and
+  exact `PROVIDER_DEFAULTS.format`/`GROK_CLI_MODEL`/Grok gate extraction.
+  Unknown forms fail as `file:line:column` diagnostics.
 - Preserve unknown/dynamic providers as flags, not fabricated models.
-- Produce deterministic data order and retain the source commit.
-- A failed extraction never replaces the committed snapshot.
+- Produce deterministic sourceFiles/provider/model order; require sorted unique
+  sourceFiles and provider keys, 100 providers, 468 LLM records, and excluded
+  totals image 60/stt 21/embedding 33/tts 27/video 3 before candidate success.
+- Fully render and validate before write. Write temporary file in output's same
+  directory, rename only after success, preserve prior output on every failure,
+  and clean temporary files. Test preservation and cleanup.
 
 `sourceCommit` must be one immutable lowercase 40-hex Git SHA. Every source
-file must be fetched from that exact SHA. The snapshot validator rejects a
+file must be read from the verified local checkout at that exact SHA. The snapshot validator rejects a
 missing/malformed SHA, a file outside the exact whitelist, or mismatched
 provenance. The extractor parses only approved data paths; unsupported syntax
 outside those paths is ignored. Unsupported syntax inside an authoritative
 catalog/picker/capability field fails with file path and location.
 
-The implementation may use a constrained parser or a checked-in manually
-reviewed snapshot refresh process. It must not claim full semantic recreation
-of 9router JavaScript.
+Task 3 order is exact: generate candidate to temporary path; manually review
+candidate; copy candidate unchanged to `src/generated/9router-llm-catalog.ts`;
+generate fresh temporary candidate; `cmp` fresh candidate with checked-in
+snapshot. Manual edits require extractor fix and rerun. It does not claim full
+semantic recreation of 9router JavaScript.
 
 ## Runtime catalog intersection
 
