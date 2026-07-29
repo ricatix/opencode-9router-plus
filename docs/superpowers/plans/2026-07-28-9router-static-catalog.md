@@ -139,6 +139,7 @@ until Task 5.
 Test exported `PINNED_9ROUTER_COMMIT`,
 `extractCatalog({sourceDir}): Promise<ExtractCatalogResult>`,
 `renderCatalogModule(result): string`, and
+`renderReviewMetadata(result): string`, and
 `writeCatalogAtomically(outputPath, contents): Promise<void>`. Test accepted
 literals, reviewed static refs/imported constants, statically-resolvable spreads,
 Codex review flattening,
@@ -171,6 +172,24 @@ Test field slicing, individually:
 - no duplicate Codex review when explicit review records and
   `withCodexReviewModels` inventory meet.
 
+## Review metadata boundary
+
+`result.catalog` is LLM-only runtime data. `result.review` is local non-runtime
+audit evidence. `renderCatalogModule` emits catalog only;
+`renderReviewMetadata` emits deterministic review JSON. Review metadata never
+enters runtime catalog, candidate module, generated source, or OpenCode injection.
+
+`ExcludedKindCounts` is exactly `{image,stt,embedding,tts,video}`.
+`ProviderReviewRow` is exactly `{providerId,sourceFile,catalogKey,staticLlmCount,
+excluded: ExcludedKindCounts,modelsFetcher,passthroughModels}`.
+`CatalogReviewMetadata` is exactly `{providers,totals:{providers,staticLlm,
+excluded,excludedByKind}}`. Rows have unique nonempty provider IDs; unique concrete
+direct-child source files present in catalog sourceFiles; matching catalog keys;
+LLM counts equal retained models; nonnegative integers; source marker flags; and
+registry export order with `mimo-free` before `mmf`. Row sums equal review totals
+and result counts. Review has no excluded records, source content, timestamp,
+absolute path, or machine metadata.
+
 - [ ] **Step 2: Confirm red state**
 
 Run: `bun test tests/extract-9router-llm-catalog.test.ts`
@@ -188,8 +207,9 @@ Expected: FAIL; extractor absent.
 Input is local pinned `decolua/9router@79918c7830695bbca4a45c9fea4a42c3e9fd73d1`.
 CLI accepts exactly `--source-dir <local pinned directory>` and `--output
 <candidate path>`; no source-commit override. Export `PINNED_9ROUTER_COMMIT`,
-`extractCatalog`, `renderCatalogModule`, and `writeCatalogAtomically`; result
-has catalog/diagnostics/counts. Verify local Git HEAD exact pin and clean
+`extractCatalog`, `renderCatalogModule`, `renderReviewMetadata`, and
+`writeCatalogAtomically`; result has runtime catalog/review/diagnostics/counts.
+Verify local Git HEAD exact pin and clean
 whitelisted paths via local read-only Git subprocess before output; this is the
 only permitted subprocess. Fully render and
 validate before temp same-dir write/rename; preserve old output and clean temp
@@ -232,6 +252,15 @@ static special forms only: `withCodexReviewModels`, `GROK_CLI_MODEL`,
 `PROVIDER_DEFAULTS.format`, `MODEL_DEFAULTS.kind`, and Grok gate. Accept explicit
 or helper-derived Codex reviews only when pinned inventory uses them, with no
 duplicates. No generic evaluator, source execution, or runtime policy.
+
+Task 2 corrective follow-up scope is extractor script and extractor tests only.
+It adds `result.review` and `renderReviewMetadata(result)`, verifies review row
+and total invariants, and proves review metadata is absent from catalog render.
+It changes no fixtures, source clone, runtime, package, or snapshot files.
+Required tests: exact review types/rows/invariants; deterministic review renderer;
+review renderer contains no candidate/runtime source, timestamp, absolute path, or
+machine metadata; candidate render bytes remain unchanged before/after review
+metadata; production review totals and row sums match 100/468/144 result counts.
 
 Run: `bun test tests/extract-9router-llm-catalog.test.ts`
 
@@ -295,10 +324,13 @@ review candidate, (3) copy candidate unchanged to
 (5) `cmp` fresh candidate with checked-in snapshot. Commands:
 
 ```bash
-bun run extract:9router-catalog --source-dir .slim/clonedeps/repos/decolua__9router --output /tmp/9router-llm-catalog.candidate.ts
-cp /tmp/9router-llm-catalog.candidate.ts src/generated/9router-llm-catalog.ts
-bun run extract:9router-catalog --source-dir .slim/clonedeps/repos/decolua__9router --output /tmp/9router-llm-catalog.fresh.ts
-cmp /tmp/9router-llm-catalog.fresh.ts src/generated/9router-llm-catalog.ts
+bun run extract:9router-catalog --source-dir .slim/clonedeps/repos/decolua__9router --output /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.candidate.ts
+bun -e 'import { extractCatalog, renderReviewMetadata } from "./scripts/extract-9router-llm-catalog.ts"; const r = await extractCatalog({ sourceDir: ".slim/clonedeps/repos/decolua__9router" }); await Bun.write("/var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.review.json", renderReviewMetadata(r));'
+shasum -a 256 /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.candidate.ts /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.review.json
+cp /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.candidate.ts src/generated/9router-llm-catalog.ts
+bun run extract:9router-catalog --source-dir .slim/clonedeps/repos/decolua__9router --output /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.fresh.ts
+cmp /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.fresh.ts src/generated/9router-llm-catalog.ts
+shasum -a 256 /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.fresh.ts
 ```
 
 Extractor output is candidate. Manual review verifies pinned HEAD and clean
@@ -306,11 +338,21 @@ whitelist, `projectionVersion: 1`, reviewed projection inventory, 100/468/144
 totals, dynamic IDs, source-order routeOwners including `mmf` owner `mmf`,
 Codex/Grok facts, Sol canonical/picker goldens, and exact candidate bytes before
 copying unchanged. Manual edits require extractor fix and rerun. Manifest records
+candidate SHA-256, fresh candidate SHA-256, review JSON SHA-256, and confirms
+candidate SHA-256 equals fresh candidate SHA-256 after successful `cmp`. It also records
 projectionVersion, projection inventory, sourceFiles, importer/fact inventory, every provider
 row with registry path/LLM/excluded counts/dynamic flags, totals, approved
 flattening, and exclusions `pricing` matcher not copied, `config/providers`
 output not copied, `shared` transport/auth-only. Any diagnostic, conflict, or
 candidate mismatch aborts without replacement.
+
+Review JSON is temporary and uncommitted. The manifest 100-row matrix is
+transcribed from review JSON. Crosscheck candidate providers/LLM against
+rows/review/result; exclusions against rows/review/result/manifest; flags and
+catalog keys review versus candidate; and collisions review versus candidate
+`routeOwners`. Manual review
+checks provenance, projection inventory, collision/golden facts, and checksum;
+it does not manually recount every model from source.
 
 - [ ] **Step 4: Pass and Oracle review/commit**
 

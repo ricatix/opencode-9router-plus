@@ -168,9 +168,25 @@ projection, and Grok CLI model/gate projection.
 
 - Export testable API: `PINNED_9ROUTER_COMMIT`;
   `extractCatalog({ sourceDir }): Promise<ExtractCatalogResult>`;
-  `renderCatalogModule(result): string`; and
+  `renderCatalogModule(result): string`;
+  `renderReviewMetadata(result): string`; and
   `writeCatalogAtomically(outputPath, contents): Promise<void>`. Result contains
-  `catalog`, `diagnostics`, and `counts`.
+  `catalog`, `projectionVersion`, `projections`, `routeCollisions`, `diagnostics`,
+  `counts`, and non-runtime `review`.
+- `ExcludedKindCounts` is exactly `{ image, stt, embedding, tts, video }`.
+  `ProviderReviewRow` is exactly `{ providerId, sourceFile, catalogKey,
+  staticLlmCount, excluded: ExcludedKindCounts, modelsFetcher,
+  passthroughModels }`. `CatalogReviewMetadata` is exactly `{ providers,
+  totals: { providers, staticLlm, excluded, excludedByKind } }`.
+- `result.catalog` remains runtime LLM-only. `result.review` is non-runtime audit
+  metadata of type `CatalogReviewMetadata`. Rows have unique nonempty provider
+  IDs; a unique concrete direct-child `sourceFile` present in `catalog.sourceFiles`;
+  `catalogKey` equal to its catalog provider; LLM count equal to retained models;
+  nonnegative integer counts; and flags equal source markers. Rows retain registry
+  export order, `mimo-free` precedes `mmf`, and row sums equal review totals and
+  result counts. Review contains no excluded records, source content, timestamp,
+  absolute path, or machine metadata. Review metadata never enters runtime
+  catalog, candidate module, generated source, or OpenCode injection.
 - CLI accepts only `--source-dir <local pinned directory>` and `--output
   <candidate path>`; no public source-commit override exists. It verifies local
   Git `HEAD` equals `79918c7830695bbca4a45c9fea4a42c3e9fd73d1` and every
@@ -229,6 +245,10 @@ semantic recreation of 9router JavaScript.
 
 Task 2 tests are minimum safety and determinism checks, not exhaustive mutation
 proof of upstream function behavior.
+
+Task 3 writes temporary review JSON with `renderReviewMetadata(result)`, checks
+its SHA-256, and bases the manifest provider matrix and excluded-kind totals only
+on that reviewed metadata. Review JSON is never committed as runtime catalog data.
 
 ## Runtime catalog intersection
 
