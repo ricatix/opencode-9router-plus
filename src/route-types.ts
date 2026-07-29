@@ -30,6 +30,7 @@ export interface NineRouterLlmCatalog {
   sourceCommit: string;
   sourceFiles: readonly string[];
   providers: Readonly<Record<string, StaticLlmProvider>>;
+  routeOwners: Readonly<Record<string, string>>;
   reasoningPicker: {
     formatLevels: Readonly<Record<string, readonly string[]>>;
     patternLevels: readonly { pattern: string; levels: readonly string[] }[];

@@ -14,13 +14,14 @@ export function validateLlmCatalog(catalog: unknown): asserts catalog is NineRou
   if (!isRecord(catalog) || typeof catalog.sourceCommit !== "string" || !/^[0-9a-f]{40}$/.test(catalog.sourceCommit)) throw new TypeError("Invalid LLM catalog sourceCommit");
   if (!Array.isArray(catalog.sourceFiles) || catalog.sourceFiles.length === 0 || !catalog.sourceFiles.every((file) => nonemptyString(file) && sourceFile.test(file)) || new Set(catalog.sourceFiles).size !== catalog.sourceFiles.length) throw new TypeError("Invalid LLM catalog sourceFiles");
   if (!isRecord(catalog.providers)) throw new TypeError("Invalid LLM catalog providers");
+  if (!isRecord(catalog.routeOwners)) throw new TypeError("Invalid LLM catalog routeOwners");
 
-  const routeKeys = new Set<string>();
+  const routeKeys = new Map<string, string[]>();
   for (const [recordKey, provider] of Object.entries(catalog.providers)) {
     if (!isRecord(provider) || !nonemptyString(provider.id) || provider.id !== recordKey || !nonemptyString(provider.catalogKey) || !Array.isArray(provider.aliases) || !provider.aliases.every(nonemptyString) || !Array.isArray(provider.models)) throw new TypeError("Invalid LLM catalog provider");
+    if (new Set([provider.catalogKey, ...provider.aliases]).size !== provider.aliases.length + 1) throw new TypeError("Duplicate LLM catalog provider route key");
     for (const routeKey of [provider.catalogKey, ...provider.aliases]) {
-      if (routeKeys.has(routeKey)) throw new TypeError("Duplicate LLM catalog route key");
-      routeKeys.add(routeKey);
+      routeKeys.set(routeKey, [...(routeKeys.get(routeKey) ?? []), provider.id]);
     }
     const modelIds = new Set<string>();
     for (const model of provider.models) {
@@ -29,6 +30,8 @@ export function validateLlmCatalog(catalog: unknown): asserts catalog is NineRou
       modelIds.add(model.id);
     }
   }
+  for (const [key, owners] of routeKeys) if (!nonemptyString(catalog.routeOwners[key]) || !owners.includes(catalog.routeOwners[key])) throw new TypeError("Invalid LLM catalog route owner");
+  for (const [key, owner] of Object.entries(catalog.routeOwners)) if (!routeKeys.has(key) || !nonemptyString(owner)) throw new TypeError("Orphan LLM catalog route owner");
   if (!isRecord(catalog.reasoningPicker) || !isRecord(catalog.reasoningPicker.formatLevels) || !Object.values(catalog.reasoningPicker.formatLevels).every((levels) => Array.isArray(levels) && levels.every(nonemptyString)) || !Array.isArray(catalog.reasoningPicker.patternLevels) || !catalog.reasoningPicker.patternLevels.every((entry) => isRecord(entry) && nonemptyString(entry.pattern) && Array.isArray(entry.levels) && entry.levels.every(nonemptyString))) throw new TypeError("Invalid LLM catalog reasoningPicker");
 }
 
@@ -38,7 +41,7 @@ export function matchLlmCatalogRoute(routeId: string, catalog: NineRouterLlmCata
   if (slash <= 0 || slash === routeId.length - 1) return null;
   const routeKey = routeId.slice(0, slash);
   const modelId = routeId.slice(slash + 1);
-  const provider = Object.values(catalog.providers).find((entry) => entry.catalogKey === routeKey || entry.aliases.includes(routeKey));
+  const provider = catalog.routeOwners[routeKey] ? catalog.providers[catalog.routeOwners[routeKey]] : undefined;
   const model = provider?.models.find((entry) => entry.id === modelId);
   return provider && model ? { providerId: provider.id, catalogKey: provider.catalogKey, modelId, canonicalProvider: model.canonicalProvider, canonicalModelId: model.canonicalModelId, provider, model } : null;
 }

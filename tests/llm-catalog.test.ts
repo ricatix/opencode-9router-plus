@@ -20,6 +20,7 @@ describe("LLM catalog", () => {
     expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, providers: { one: { ...CATALOG_FIXTURE.providers.codex, id: "one" }, two: { ...CATALOG_FIXTURE.providers["grok-cli"], id: "two", catalogKey: "cx" } } })).toThrow();
     expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, providers: { one: { ...CATALOG_FIXTURE.providers.codex, id: "one" }, two: { ...CATALOG_FIXTURE.providers["grok-cli"], id: "two", aliases: ["cx"] } } })).toThrow();
     expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, providers: { codex: { ...CATALOG_FIXTURE.providers.codex, models: [{ id: "same", kind: "llm" }, { id: "same", kind: "llm" }] } } })).toThrow();
+    expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, providers: { codex: { ...CATALOG_FIXTURE.providers.codex, aliases: ["cx"] }, "grok-cli": CATALOG_FIXTURE.providers["grok-cli"] } })).toThrow();
   });
 
   test("matches exact static route and preserves entry identity", () => {
@@ -32,5 +33,13 @@ describe("LLM catalog", () => {
     expect(matchLlmCatalogRoute("gcli", CATALOG_FIXTURE)).toBeNull();
     expect(matchLlmCatalogRoute("gcli/grok-4.5-HIGH", CATALOG_FIXTURE)).toBeNull();
     expect(matchLlmCatalogRoute("cx/GPT 5.6 Sol", CATALOG_FIXTURE)).toBeNull();
+  });
+
+  test("uses source-order route owner for catalog key collisions", () => {
+    const providers = { "mimo-free": { id: "mimo-free", catalogKey: "mmf", aliases: [], models: [{ id: "first", kind: "llm" as const }] }, mmf: { id: "mmf", catalogKey: "mmf", aliases: [], models: [{ id: "last", kind: "llm" as const }] } };
+    const catalog = { ...CATALOG_FIXTURE, providers, routeOwners: { mmf: "mmf" } };
+    validateLlmCatalog(catalog);
+    expect(matchLlmCatalogRoute("mmf/last", catalog)?.providerId).toBe("mmf");
+    expect(matchLlmCatalogRoute("mmf/first", catalog)).toBeNull();
   });
 });

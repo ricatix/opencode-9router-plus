@@ -7,5 +7,6 @@ export const CATALOG_FIXTURE: NineRouterLlmCatalog = {
     codex: { id: "codex", catalogKey: "cx", aliases: [], models: [{ id: "gpt-5.6-sol", name: "GPT 5.6 Sol", kind: "llm" }] },
     "grok-cli": { id: "grok-cli", catalogKey: "gcli", aliases: ["gb"], models: [{ id: "grok-4.5-high", kind: "llm", canonicalProvider: "xai", canonicalModelId: "grok-4.5" }] },
   },
+  routeOwners: { cx: "codex", gcli: "grok-cli", gb: "grok-cli" },
   reasoningPicker: { formatLevels: {}, patternLevels: [] },
 };
