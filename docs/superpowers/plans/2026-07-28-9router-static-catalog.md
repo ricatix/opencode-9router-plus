@@ -113,9 +113,19 @@ git commit -m "feat: add static LLM catalog contract"
 `tests/extract-9router-llm-catalog.test.ts`, `tests/fixtures/9router-extractor/`;
 modify `package.json` with exact script
 `"extract:9router-catalog": "bun scripts/extract-9router-llm-catalog.ts"`.
-Fixtures are synthetic minimum files only: registry index, literal provider,
-Codex helper/provider, Grok config/provider, picker/capability, and rejected
-syntax cases; never a full checkout. No generated
+Fixtures are synthetic minimum files only, never a full checkout:
+`tests/fixtures/9router-extractor/valid/registry.js`,
+`tests/fixtures/9router-extractor/valid/providers-schema.js`,
+`tests/fixtures/9router-extractor/valid/models-schema.js`,
+`tests/fixtures/9router-extractor/valid/models-helpers.js`,
+`tests/fixtures/9router-extractor/valid/grok-cli.js`,
+`tests/fixtures/9router-extractor/valid/thinking-levels.js`,
+`tests/fixtures/9router-extractor/valid/capabilities.js`,
+`tests/fixtures/9router-extractor/unsupported-call/registry.js`, and
+`tests/fixtures/9router-extractor/outside-whitelist/registry.js`. Tests create
+temporary Git repositories and use internal test-only pin-verifier seam or
+fixture profile, so synthetic repo need not fake real SHA. Public CLI always
+uses fixed pin with no override. No generated
 catalog, manifest, runtime, consumer, or route-map files.
 
 - [ ] **Step 0: Oracle task gate**
@@ -142,6 +152,12 @@ Test atomic prior-output preservation and temporary-file cleanup. Require useful
 - [ ] **Step 2: Confirm red state**
 
 Run: `bun test tests/extract-9router-llm-catalog.test.ts`
+
+Typecheck:
+
+```bash
+bun ./node_modules/typescript/bin/tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --types node scripts/extract-9router-llm-catalog.ts
+```
 
 Expected: FAIL; extractor absent.
 
@@ -186,7 +202,21 @@ Expected: PASS.
 
 - [ ] **Step 4: Oracle review and commit**
 
-Run: `bun test tests/extract-9router-llm-catalog.test.ts && bun test && bun run build && git diff --check`
+Run:
+
+```bash
+bun test tests/extract-9router-llm-catalog.test.ts
+bun ./node_modules/typescript/bin/tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --types node scripts/extract-9router-llm-catalog.ts
+bun run extract:9router-catalog -- --source-dir .slim/clonedeps/repos/decolua__9router --output /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.one.ts
+bun run extract:9router-catalog -- --source-dir .slim/clonedeps/repos/decolua__9router --output /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.two.ts
+cmp /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.one.ts /var/folders/60/_ldv6xgj6tn846fmqk8_mx_r0000gn/T/opencode/9router-llm-catalog.two.ts
+bun test
+bun run build
+git diff --check
+```
+
+Both extraction result/output checks must report 100 providers, 468 static LLM
+records, and 144 excluded non-LLM records before completion.
 
 After Oracle approval:
 

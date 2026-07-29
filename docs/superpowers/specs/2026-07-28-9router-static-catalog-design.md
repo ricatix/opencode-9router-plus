@@ -167,6 +167,11 @@ untrusted input.
 - Never import, evaluate, require, spawn, execute, install, fetch, or use
   network access for source JavaScript.
 - Use already-installed TypeScript compiler API AST only; add no dependency.
+- Typecheck extractor with installed compiler, never `bunx`:
+
+  ```bash
+  bun ./node_modules/typescript/bin/tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --types node scripts/extract-9router-llm-catalog.ts
+  ```
 - Read only exact whitelist paths. Accept static literals, object/array literals,
   no-substitution templates, reviewed static references/imported constants,
   statically-resolvable object/array spread, exact `withCodexReviewModels`, and
