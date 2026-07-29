@@ -25,6 +25,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "extract:9router-catalog": "bun scripts/extract-9router-llm-catalog.ts",
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build"

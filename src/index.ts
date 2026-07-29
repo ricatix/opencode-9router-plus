@@ -1,8 +1,10 @@
 import type { Plugin } from "@opencode-ai/plugin";
+import { NINE_ROUTER_LLM_CATALOG } from "./generated/9router-llm-catalog.js";
+import { matchLlmCatalogRoute } from "./llm-catalog.js";
 import { resolveModel } from "./model-mapper.js";
+import type { NineRouterDiscoveryEntry } from "./route-types.js";
 
 type AnyCfg = Record<string, any>;
-
 const DEFAULT_BASE = "http://localhost:20128/v1";
 const DEFAULT_TIMEOUT_MS = 5000;
 
@@ -12,95 +14,79 @@ function buildHeaders(apiKey: string): Record<string, string> {
   return headers;
 }
 
-async function fetchJson(url: string, timeoutMs: number, apiKey: string): Promise<any> {
+async function fetchJson(url: string, timeoutMs: number, apiKey: string): Promise<unknown> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: buildHeaders(apiKey),
-    });
+    const res = await fetch(url, { signal: controller.signal, headers: buildHeaders(apiKey) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } finally {
-    clearTimeout(id);
-  }
+    return res.json();
+  } finally { clearTimeout(id); }
 }
 
-function extractModels(json: any): string[] {
-  if (!json) return [];
-  if (Array.isArray(json)) {
-    return json.map((it: any) => it?.id || it?.name || String(it)).filter(Boolean);
-  }
-  if (Array.isArray(json.models)) return json.models.map((m: any) => m?.id || m?.name).filter(Boolean);
-  if (Array.isArray(json.data)) return json.data.map((m: any) => m?.id || m?.name).filter(Boolean);
-  const maybe = json.model || json.default_model || json.name;
-  return maybe ? [maybe] : [];
+function entry(value: unknown): NineRouterDiscoveryEntry | null {
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return { id: String(value) };
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const item = value as Record<string, unknown>;
+  const id = typeof item.id === "string" && item.id.length ? item.id : typeof item.name === "string" && item.name.length ? item.name : null;
+  if (!id) return null;
+  const result: NineRouterDiscoveryEntry = { id };
+  if (typeof item.name === "string" && item.name.length) result.name = item.name;
+  if (typeof item.kind === "string") result.kind = item.kind;
+  if (item.capabilities && typeof item.capabilities === "object" && !Array.isArray(item.capabilities)) result.capabilities = item.capabilities as NineRouterDiscoveryEntry["capabilities"];
+  return result;
 }
 
-async function listModels(baseUrl: string, timeoutMs: number, apiKey: string): Promise<string[]> {
-  const tries = [`${baseUrl}/models`, `${baseUrl}/model`, `${baseUrl}`];
-  for (const url of tries) {
+export function extractDiscoveryEntries(json: unknown): NineRouterDiscoveryEntry[] {
+  const values = Array.isArray(json) ? json
+    : json && typeof json === "object" && Array.isArray((json as Record<string, unknown>).models) ? (json as Record<string, unknown>).models as unknown[]
+    : json && typeof json === "object" && Array.isArray((json as Record<string, unknown>).data) ? (json as Record<string, unknown>).data as unknown[]
+    : json && typeof json === "object" ? [(json as Record<string, unknown>).model ?? (json as Record<string, unknown>).default_model ?? (json as Record<string, unknown>).name]
+    : [];
+  return values.map(entry).filter((value): value is NineRouterDiscoveryEntry => value !== null);
+}
+
+export async function listModels(baseUrl: string, timeoutMs: number, apiKey: string): Promise<NineRouterDiscoveryEntry[]> {
+  for (const url of [`${baseUrl}/models`, `${baseUrl}/model`, baseUrl]) {
     try {
-      const data = await fetchJson(url, timeoutMs, apiKey);
-      const models = extractModels(data);
-      if (models.length > 0) return models;
-    } catch {
-      // try next endpoint
-    }
+      const entries = extractDiscoveryEntries(await fetchJson(url, timeoutMs, apiKey));
+      if (entries.length) return entries;
+    } catch { /* try next endpoint */ }
   }
   return [];
 }
 
-function pickDefaultModel(models: string[]): string | null {
-  if (!models.length) return null;
-  const priorities = ["gpt", "claude", "gemini", "deepseek", "small"];
-  for (const p of priorities) {
-    const found = models.find((m) => m.toLowerCase().includes(p));
-    if (found) return found;
+function eligibleRuntimeEntries(entries: NineRouterDiscoveryEntry[]): NineRouterDiscoveryEntry[] {
+  return entries.filter((model) => matchLlmCatalogRoute(model.id, NINE_ROUTER_LLM_CATALOG)
+    || !model.kind || model.kind === "llm" || model.kind === "unknown");
+}
+
+export function pickDefaultModel(entries: NineRouterDiscoveryEntry[]): string | null {
+  for (const priority of ["gpt", "claude", "gemini", "deepseek", "small"]) {
+    const found = entries.find((item) => item.id.toLowerCase().includes(priority));
+    if (found) return found.id;
   }
-  return models[0] ?? null;
+  return entries[0]?.id ?? null;
 }
 
 const plugin: Plugin = async () => {
   const baseUrl = process.env.OPENCODE_9ROUTER_URL || DEFAULT_BASE;
   const apiKey = process.env.OPENCODE_9ROUTER_API_KEY || "";
   const timeoutMs = Number(process.env.OPENCODE_9ROUTER_TIMEOUT_MS || DEFAULT_TIMEOUT_MS);
-
-  let discoveredModels: string[] = [];
+  let runtimeEntries: NineRouterDiscoveryEntry[] = [];
   let defaultModel: string | null = null;
-
-  try {
-    discoveredModels = await listModels(baseUrl, timeoutMs, apiKey);
-    defaultModel = pickDefaultModel(discoveredModels);
-  } catch (err) {
-    console.warn("opencode-9router plugin: failed to discover models:", (err as any)?.message || err);
-  }
-
-  return {
-    config: async (cfg: AnyCfg) => {
-      cfg.provider ||= {};
-      cfg.provider["9router"] ||= {};
-      cfg.provider["9router"].npm ||= "@ai-sdk/openai-compatible";
-      cfg.provider["9router"].options ||= {};
-      cfg.provider["9router"].options.name ||= "9Router";
-      cfg.provider["9router"].options.baseURL ||= baseUrl;
-      if (apiKey && !cfg.provider["9router"].options.apiKey) {
-        cfg.provider["9router"].options.apiKey = apiKey;
-      }
-
-      cfg.provider["9router"].models ||= {};
-      for (const model of discoveredModels) {
-        if (!cfg.provider["9router"].models[model]) {
-          cfg.provider["9router"].models[model] = await resolveModel(model);
-        }
-      }
-
-      if (!cfg.model && defaultModel) {
-        cfg.model = `9router/${defaultModel}`;
-      }
-    },
-  };
+  try { runtimeEntries = eligibleRuntimeEntries(await listModels(baseUrl, timeoutMs, apiKey)); defaultModel = pickDefaultModel(runtimeEntries); }
+  catch (err) { console.warn("opencode-9router plugin: failed to discover models:", (err as any)?.message || err); }
+  return { config: async (cfg: AnyCfg) => {
+    cfg.provider ||= {}; cfg.provider["9router"] ||= {}; cfg.provider["9router"].npm ||= "@ai-sdk/openai-compatible";
+    cfg.provider["9router"].options ||= {}; cfg.provider["9router"].options.name ||= "9Router"; cfg.provider["9router"].options.baseURL ||= baseUrl;
+    if (apiKey && !cfg.provider["9router"].options.apiKey) cfg.provider["9router"].options.apiKey = apiKey;
+    cfg.provider["9router"].models ||= {};
+    for (const model of runtimeEntries) {
+      if (!cfg.provider["9router"].models[model.id]) cfg.provider["9router"].models[model.id] = await resolveModel(model.id, model);
+    }
+    if (!cfg.model && defaultModel) cfg.model = `9router/${defaultModel}`;
+  }};
 };
 
 export default plugin;

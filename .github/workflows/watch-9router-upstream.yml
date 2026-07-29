@@ -1,0 +1,53 @@
+name: Watch 9router upstream
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: watch-9router-upstream
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect upstream revision
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          previous="$(grep -E '^Current upstream SHA: `[0-9a-f]{40}`$' docs/upstream/9router-change-report.md | grep -Eo '[0-9a-f]{40}')"
+          current="$(gh api repos/decolua/9router/git/ref/heads/master --jq '.object.sha')"
+          printf '%s' "$previous" | grep -Eq '^[0-9a-f]{40}$'
+          printf '%s' "$current" | grep -Eq '^[0-9a-f]{40}$'
+          printf 'previous=%s\ncurrent=%s\n' "$previous" "$current" >> "$GITHUB_OUTPUT"
+          test "$previous" = "$current" && printf 'changed=false\n' >> "$GITHUB_OUTPUT" || printf 'changed=true\n' >> "$GITHUB_OUTPUT"
+      - name: Render change report
+        if: steps.upstream.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS: ${{ steps.upstream.outputs.previous }}
+          CURRENT: ${{ steps.upstream.outputs.current }}
+        run: |
+          set -euo pipefail
+          compare="$(mktemp)"
+          trap 'rm -f "$compare"' EXIT
+          gh api "repos/decolua/9router/compare/${PREVIOUS}...${CURRENT}" > "$compare"
+          scripts/render-9router-upstream-report.sh --previous "$PREVIOUS" --current "$CURRENT" --compare "$compare" --output docs/upstream/9router-change-report.md
+      - uses: peter-evans/create-pull-request@v7
+        if: steps.upstream.outputs.changed == 'true'
+        with:
+          branch: bot/watch-9router-upstream
+          title: "docs: report 9router upstream changes"
+          commit-message: "docs: report 9router upstream changes"
+          body: "Report-only upstream watch update. No catalog refresh or runtime change."
+          add-paths: docs/upstream/9router-change-report.md

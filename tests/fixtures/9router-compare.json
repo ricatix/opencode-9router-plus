@@ -1,0 +1,9 @@
+{
+  "files": [
+    { "filename": "open-sse/providers/models/helpers.js" },
+    { "filename": "open-sse/providers/registry/index.js" },
+    { "filename": "README.md" },
+    { "filename": "open-sse/providers/registry/index.js" }
+  ],
+  "unrelated": "must not render"
+}
