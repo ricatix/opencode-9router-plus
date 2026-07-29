@@ -149,6 +149,26 @@ outside-whitelist reads, wrong SHA, dirty whitelist path, and count mismatches.
 Test atomic prior-output preservation and temporary-file cleanup. Require useful
 `file:line:column` diagnostics with AST form and rejected field.
 
+Test field slicing, individually:
+
+- transport headers spread succeeds without import;
+- OAuth-only Google constant succeeds;
+- computed/call/template in ignored subtree succeeds;
+- unsupported provider `id` hard fails;
+- unsupported provider `models` hard fails;
+- unsupported model `id` hard fails;
+- unsupported model `kind`/`type` hard fails;
+- unsupported model `upstreamModelId` hard fails;
+- unsupported `reasoning` fact hard fails;
+- ignored model `quotaFamily` unsupported syntax succeeds;
+- missing `kind`/`type` defaults to LLM via `MODEL_DEFAULTS.kind`;
+- explicit non-LLM increments exclusion;
+- `kind` wins `type`;
+- `matchPattern` implementation is not evaluated;
+- diagnostic contains exact authoritative field path;
+- no duplicate Codex review when explicit review records and
+  `withCodexReviewModels` inventory meet.
+
 - [ ] **Step 2: Confirm red state**
 
 Run: `bun test tests/extract-9router-llm-catalog.test.ts`
@@ -195,6 +215,21 @@ spread, exact `withCodexReviewModels`, and exact
 fail `file:line:column` diagnostics. Require
 sorted unique sourceFiles/provider keys, 100 providers, 468 LLM records, and
 excluded image 60/stt 21/embedding 33/tts 27/video 3.
+
+Authoritative registry provider fields are exactly `id`, `alias`, `aliases`,
+`models`, `modelsFetcher`, and `passthroughModels`; authoritative model fields
+are `id`, `name`, `kind`, `type`, `upstreamModelId`, `canonicalProvider`,
+`canonicalModelId`, `reasoning`, and reasoning keys under `capabilities`.
+Picker slices are exactly `FORMAT_LEVELS` and `PATTERN_THINKING`; capabilities
+retain reasoning keys only. Skip unknown top-level/model fields before traversal
+without diagnostic, resolution, or evaluation. Ignore unsupported syntax wholly
+inside `priority,uiAlias,display,category,authModes,hasOAuth,transport,oauth,
+features,serviceKinds,pricing,usage,headers,retry,executor`; unsupported syntax
+in exact authoritative fields hard-fails with diagnostic field path. Known
+static special forms only: `withCodexReviewModels`, `GROK_CLI_MODEL`,
+`PROVIDER_DEFAULTS.format`, `MODEL_DEFAULTS.kind`, and Grok gate. Accept explicit
+or helper-derived Codex reviews only when pinned inventory uses them, with no
+duplicates. No generic evaluator, source execution, or runtime policy.
 
 Run: `bun test tests/extract-9router-llm-catalog.test.ts`
 

@@ -177,6 +177,22 @@ untrusted input.
   statically-resolvable object/array spread, exact `withCodexReviewModels`, and
   exact `PROVIDER_DEFAULTS.format`/`GROK_CLI_MODEL`/Grok gate extraction.
   Unknown forms fail as `file:line:column` diagnostics.
+- Registry provider authoritative fields are exactly `id`, `alias`, `aliases`,
+  `models`, `modelsFetcher`, and `passthroughModels`. Authoritative model fields
+  are exactly `id`, `name`, `kind`, `type`, `upstreamModelId`,
+  `canonicalProvider`, `canonicalModelId`, `reasoning`, and reasoning keys in
+  `capabilities`. Capability extraction retains reasoning keys only; picker
+  extraction is exactly `FORMAT_LEVELS` and `PATTERN_THINKING`.
+- Skip unknown top-level/model fields before traversal, without diagnostic,
+  resolution, or evaluation. Unsupported syntax wholly under ignored non-fact
+  fields/subtrees `priority`, `uiAlias`, `display`, `category`, `authModes`,
+  `hasOAuth`, `transport`, `oauth`, `features`, `serviceKinds`, `pricing`,
+  `usage`, `headers`, `retry`, and `executor` is ignored. Unsupported expression
+  in an authoritative field hard-fails with diagnostic field path.
+- Known static special forms are only `withCodexReviewModels`, `GROK_CLI_MODEL`,
+  `PROVIDER_DEFAULTS.format`, `MODEL_DEFAULTS.kind`, and Grok gate. Accept
+  explicit Codex review records or helper-derived reviews only when pinned
+  inventory uses them; never emit duplicate review records.
 - Preserve unknown/dynamic providers as flags, not fabricated models.
 - Produce deterministic sourceFiles/provider/model order; require sorted unique
   sourceFiles and provider keys, 100 providers, 468 LLM records, and excluded
