@@ -12,6 +12,8 @@ It discovers available models from your 9router endpoint at startup and injects 
 - Registers provider `9router` using `@ai-sdk/openai-compatible`
 - Sends `OPENCODE_9ROUTER_API_KEY` as Bearer auth when discovering models
 - Injects dynamically discovered models into opencode config at runtime
+- Uses reviewed static catalog capabilities and supported reasoning variants for known LLM routes
+- Uses `models.dev` for metadata enrichment only; unmatched models receive safe template
 - Does not write opencode config from the runtime plugin
 - Includes an explicit installer/check CLI for safer setup and troubleshooting
 
@@ -126,7 +128,7 @@ If you prefer to edit config manually, add the package name to `plugin`:
 }
 ```
 
-Do not hardcode model lists. The plugin discovers them dynamically at startup.
+Do not hardcode model lists. The plugin lists them dynamically from the live `/v1/models` endpoint at startup.
 
 ## Environment Variables
 
@@ -138,6 +140,7 @@ Do not hardcode model lists. The plugin discovers them dynamically at startup.
 
 ```bash
 bun install
+bun test
 bun run build
 bun run clean
 bun run prepublishOnly
@@ -147,16 +150,16 @@ bun run prepublishOnly
 
 ## Upstream Catalog Review
 
-Scheduled upstream watch reports only whitelisted catalog-input paths. It never runs upstream source, applies detector output, refreshes the catalog, publishes, tags, or releases.
+`/v1/models` controls runtime listing. Reviewed static catalog supplies capabilities and supported reasoning variants for known LLM routes. `models.dev` enriches metadata only. Dynamic or unmatched models receive safe template.
 
-Manual catalog refresh is offline and audited: use an explicit 40 lowercase hexadecimal upstream SHA, review changes in a separate refresh PR, then run local tooling against approved inputs.
+Scheduled upstream watch reports only whitelisted catalog-input paths. It never runs upstream source, applies detector output, refreshes catalog, publishes, tags, or releases.
 
-`/v1/models` controls listing. Static catalog uses reviewed semantics matching routes; `models.dev` provides enrichment only. Dynamic or unmatched models use a safe template, default requests send no forced reasoning effort, and discrete variants use a source-backed picker. Detector uses GitHub API; merging its report PR cannot publish because release remains tag-triggered.
+Manual catalog refresh is offline and audited: use explicit 40 lowercase hexadecimal upstream SHA, review changes in separate refresh PR, then run local tooling against approved inputs.
 
 Project notes:
 
 - Source lives in `src/`; generated output goes to `dist/`.
-- No test script, CI, linter, or formatter is configured.
+- Tests run with `bun test`, including catalog extraction and upstream watch behavior.
 - `AGENTS.md` tracks project facts for coding agents; keep it aligned with README changes.
 
 ## Troubleshooting
@@ -165,7 +168,7 @@ Project notes:
 - If `/model` does not show 9router models, run `npx opencode-9router-plus check`.
 - If models are empty, verify that your 9router endpoint is running and `/models` is reachable.
 - If you see `Missing API Key`, set `OPENCODE_9ROUTER_API_KEY` and restart opencode.
-- If you previously used a local development copy, remove duplicate local entries such as `./plugins/opencode-9router.ts` before switching to the npm package.
+- If plugin loads twice, remove duplicate `opencode-9router-plus` entries from your OpenCode config before restarting.
 
 ## Github Repository
 https://github.com/ricatix/opencode-9router-plus
