@@ -1,6 +1,6 @@
 import type { CatalogRouteMatch, NineRouterLlmCatalog } from "./route-types.js";
 
-const sourceFile = /^open-sse\/(?:providers\/registry\/(?:index|[^/]+)\.js|providers\/index\.js|providers\/models\/schema\.js|config\/providerModels\.js|providers\/(?:thinkingLevels|capabilities)\.js)$/;
+const sourceFile = /^open-sse\/(?:providers\/registry\/(?:index|[^/]+)\.js|providers\/(?:index|schema)\.js|providers\/models\/schema\.js|config\/providerModels\.js|providers\/(?:thinkingLevels|capabilities)\.js)$/;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

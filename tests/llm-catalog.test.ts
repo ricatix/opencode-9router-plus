@@ -10,6 +10,7 @@ describe("LLM catalog", () => {
     expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, sourceFiles: "open-sse/providers/registry/index.js" })).toThrow();
     expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, sourceFiles: ["bad.js"] })).toThrow();
     expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, sourceFiles: ["open-sse/providers/registry/index.js", "open-sse/providers/registry/index.js"] })).toThrow();
+    expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, sourceFiles: ["open-sse/providers/schema.js", "open-sse/providers/models/schema.js"] })).not.toThrow();
     expect(() => validateLlmCatalog({ ...CATALOG_FIXTURE, providers: { bad: { id: "bad", catalogKey: "bad", aliases: [], models: [{ id: "image", kind: "image" }] } } })).toThrow();
   });
 
