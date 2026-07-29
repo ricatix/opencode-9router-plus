@@ -80,6 +80,7 @@ injection:
 type NineRouterLlmCatalog = {
   sourceCommit: string
   sourceFiles: readonly string[]
+  routeOwners: Readonly<Record<string, string>> // registry source-order owner; last writer wins
   providers: Readonly<Record<string, {
     id: string
     catalogKey: string // 9router `alias || id`
@@ -136,6 +137,8 @@ gate; both are manually flattened facts.
 The snapshot must retain:
 
 - provider `id`, `alias`, additional aliases, and `catalogKey`;
+- `routeOwners`, built from registry import order; collisions retain providers and
+  resolve to last declaring owner, never an alphabetical owner;
 - static LLM model `id`, optional display name, and `upstreamModelId`;
 - static dynamic-catalog flags: `modelsFetcher` and `passthroughModels`;
 - reasoning-related capability facts only;
@@ -147,11 +150,21 @@ the pinned registry import list. It explicitly excludes account-scoped,
 fetched, passthrough, and synthetic runtime routes. `modelsFetcher` and
 `passthroughModels` flags document that boundary.
 
-## Bounded local offline extraction
+## Bounded local offline candidate generation
 
 The snapshot is created outside plugin runtime from local pinned
 `decolua/9router@79918c7830695bbca4a45c9fea4a42c3e9fd73d1`. Source is
 untrusted input.
+
+This is bounded local offline candidate generation, not semantic JavaScript
+verification. It is a transcription aid for reviewed source projections. Future
+pin changes require Oracle approval and projection review before candidate data
+may replace a reviewed snapshot.
+
+`projectionVersion` is literal `1`. Reviewed projection inventory: provider
+route fields, LLM model fields, source-order last-wins root `routeOwners`,
+reasoning capability tables, `FORMAT_LEVELS`, `PATTERN_THINKING`, Codex review
+projection, and Grok CLI model/gate projection.
 
 - Export testable API: `PINNED_9ROUTER_COMMIT`;
   `extractCatalog({ sourceDir }): Promise<ExtractCatalogResult>`;
@@ -213,6 +226,9 @@ candidate; copy candidate unchanged to `src/generated/9router-llm-catalog.ts`;
 generate fresh temporary candidate; `cmp` fresh candidate with checked-in
 snapshot. Manual edits require extractor fix and rerun. It does not claim full
 semantic recreation of 9router JavaScript.
+
+Task 2 tests are minimum safety and determinism checks, not exhaustive mutation
+proof of upstream function behavior.
 
 ## Runtime catalog intersection
 

@@ -75,11 +75,11 @@ Add alongside old route-map types:
 export type NineRouterModelKind = "llm" | "image" | "tts" | "stt" | "embedding" | "image-to-text" | "web";
 export interface StaticLlmModel { id: string; name?: string; kind: "llm"; upstreamModelId?: string; canonicalProvider?: string; canonicalModelId?: string; reasoning?: NineRouterCapabilities; }
 export interface StaticLlmProvider { id: string; catalogKey: string; aliases: readonly string[]; models: readonly StaticLlmModel[]; modelsFetcher?: true; passthroughModels?: true; }
-export interface NineRouterLlmCatalog { sourceCommit: string; sourceFiles: readonly string[]; providers: Readonly<Record<string, StaticLlmProvider>>; reasoningPicker: { formatLevels: Readonly<Record<string, readonly string[]>>; patternLevels: readonly { pattern: string; levels: readonly string[] }[]; }; }
+export interface NineRouterLlmCatalog { sourceCommit: string; sourceFiles: readonly string[]; routeOwners: Readonly<Record<string, string>>; providers: Readonly<Record<string, StaticLlmProvider>>; reasoningPicker: { formatLevels: Readonly<Record<string, readonly string[]>>; patternLevels: readonly { pattern: string; levels: readonly string[] }[]; }; }
 export interface CatalogRouteMatch { providerId: string; catalogKey: string; modelId: string; canonicalProvider?: string; canonicalModelId?: string; provider: StaticLlmProvider; model: StaticLlmModel; }
 ```
 
-Implement `validateLlmCatalog()` and `matchLlmCatalogRoute()`. Validate lowercase 40-hex SHA, source files, LLM-only models, conflicting aliases, duplicate IDs. Match only first `/`, provider catalog key/alias, exact model ID. Never use display name, models.dev, or `thinkingFormat`.
+Implement `validateLlmCatalog()` and `matchLlmCatalogRoute()`. Validate lowercase 40-hex SHA, source files, LLM-only models, provider/model IDs, and `routeOwners`. Catalog-key/alias collisions retain providers; registry source order writes `routeOwners` last-owner-wins. Match only first `/`, route owner, exact model ID. Never use display name, models.dev, or `thinkingFormat`.
 
 Also test and implement: missing/empty source files, an outside-whitelist source
 path, duplicate `catalogKey`, duplicate aliases,
@@ -107,7 +107,7 @@ git add src/route-types.ts src/llm-catalog.ts tests/fixtures/9router-llm-catalog
 git commit -m "feat: add static LLM catalog contract"
 ```
 
-## Task 2: Bounded local offline AST extractor
+## Task 2: Bounded local offline candidate generation
 
 **Files:** Create `scripts/extract-9router-llm-catalog.ts`,
 `tests/extract-9router-llm-catalog.test.ts`, `tests/fixtures/9router-extractor/`;
@@ -147,7 +147,9 @@ and exact count checks. Reject calls, computed properties, unsupported imports
 or identifiers, unknown forms, dynamic construction, conflicting facts,
 outside-whitelist reads, wrong SHA, dirty whitelist path, and count mismatches.
 Test atomic prior-output preservation and temporary-file cleanup. Require useful
-`file:line:column` diagnostics with AST form and rejected field.
+`file:line:column` diagnostics with AST form and rejected field. These are
+minimum safety/determinism checks, not exhaustive mutation proof of upstream
+function semantics.
 
 Test field slicing, individually:
 
@@ -181,7 +183,7 @@ bun ./node_modules/typescript/bin/tsc --noEmit --target ES2022 --module NodeNext
 
 Expected: FAIL; extractor absent.
 
-- [ ] **Step 3: Implement bounded extractor**
+- [ ] **Step 3: Implement bounded candidate generator**
 
 Input is local pinned `decolua/9router@79918c7830695bbca4a45c9fea4a42c3e9fd73d1`.
 CLI accepts exactly `--source-dir <local pinned directory>` and `--output
@@ -299,8 +301,12 @@ bun run extract:9router-catalog --source-dir .slim/clonedeps/repos/decolua__9rou
 cmp /tmp/9router-llm-catalog.fresh.ts src/generated/9router-llm-catalog.ts
 ```
 
-Extractor output is candidate. Manual edits require extractor fix and rerun.
-Manifest records sourceFiles, importer/fact inventory, every provider
+Extractor output is candidate. Manual review verifies pinned HEAD and clean
+whitelist, `projectionVersion: 1`, reviewed projection inventory, 100/468/144
+totals, dynamic IDs, source-order routeOwners including `mmf` owner `mmf`,
+Codex/Grok facts, Sol canonical/picker goldens, and exact candidate bytes before
+copying unchanged. Manual edits require extractor fix and rerun. Manifest records
+projectionVersion, projection inventory, sourceFiles, importer/fact inventory, every provider
 row with registry path/LLM/excluded counts/dynamic flags, totals, approved
 flattening, and exclusions `pricing` matcher not copied, `config/providers`
 output not copied, `shared` transport/auth-only. Any diagnostic, conflict, or
