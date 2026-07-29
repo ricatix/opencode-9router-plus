@@ -149,10 +149,16 @@ open-sse/providers/registry/*.js
 open-sse/providers/index.js
 open-sse/providers/schema.js
 open-sse/providers/models/schema.js
+open-sse/providers/models/helpers.js
 open-sse/config/providerModels.js
 open-sse/providers/thinkingLevels.js
 open-sse/providers/capabilities.js
 ```
+
+`models/helpers.js` derived Codex review models are manually flattened. Exclude
+`pricing.js`: matcher behavior is copied as source literal/pattern and Task 3
+has its own `*` matcher; `config/providers.js` output is not copied;
+`providers/shared.js` is transport/auth-only.
 
 Create `NINE_ROUTER_LLM_CATALOG` with real SHA, exact source paths, all statically declared LLM providers/models, `alias || id`, aliases, source-backed upstream/canonical identities, dynamic flags, reasoning facts, literal `FORMAT_LEVELS`, and source-ordered `PATTERN_THINKING`. Exclude non-LLM, fetched routes, inferred data, and executable expressions.
 
@@ -324,6 +330,7 @@ open-sse/providers/registry/*.js
 open-sse/providers/index.js
 open-sse/providers/schema.js
 open-sse/providers/models/schema.js
+open-sse/providers/models/helpers.js
 open-sse/config/providerModels.js
 open-sse/providers/thinkingLevels.js
 open-sse/providers/capabilities.js

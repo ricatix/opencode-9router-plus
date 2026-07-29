@@ -116,6 +116,7 @@ open-sse/providers/registry/*.js
 open-sse/providers/index.js
 open-sse/providers/schema.js
 open-sse/providers/models/schema.js
+open-sse/providers/models/helpers.js
 open-sse/config/providerModels.js
 open-sse/providers/thinkingLevels.js
 open-sse/providers/capabilities.js
@@ -123,6 +124,11 @@ open-sse/providers/capabilities.js
 
 `open-sse/providers/index.js` imports `PROVIDER_DEFAULTS.format` from
 `open-sse/providers/schema.js`; both schema paths are provenance inputs.
+`open-sse/providers/models/helpers.js` supplies derived static Codex review
+models and is manually flattened into the snapshot. Excluded dependencies:
+`open-sse/providers/pricing.js` matcher behavior is copied as source literal/
+pattern and Task 3 has its own `*` matcher; `open-sse/config/providers.js`
+output is not copied; `open-sse/providers/shared.js` is transport/auth-only.
 
 The snapshot must retain:
 
