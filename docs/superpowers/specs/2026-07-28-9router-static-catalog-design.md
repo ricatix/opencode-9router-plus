@@ -118,6 +118,7 @@ open-sse/providers/schema.js
 open-sse/providers/models/schema.js
 open-sse/providers/models/helpers.js
 open-sse/config/providerModels.js
+open-sse/config/grokCli.js
 open-sse/providers/thinkingLevels.js
 open-sse/providers/capabilities.js
 ```
@@ -129,6 +130,8 @@ models and is manually flattened into the snapshot. Excluded dependencies:
 `open-sse/providers/pricing.js` matcher behavior is copied as source literal/
 pattern and Task 3 has its own `*` matcher; `open-sse/config/providers.js`
 output is not copied; `open-sse/providers/shared.js` is transport/auth-only.
+`open-sse/config/grokCli.js` supplies `GROK_CLI_MODEL` and its reasoning-effort
+gate; both are manually flattened facts.
 
 The snapshot must retain:
 
