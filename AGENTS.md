@@ -1,8 +1,8 @@
 # PROJECT KNOWLEDGE BASE
 
 **Maintained manually:** current behavior
-**Commit:** 83479b7
-**Branch:** master
+**Commit:** 566d896
+**Branch:** main
 
 ## OVERVIEW
 TypeScript ESM plugin for OpenCode. Runtime lists models from live 9router `/v1/models` and injects provider/model config without hardcoded lists in `opencode.json`. Reviewed static catalog supplies LLM capabilities and reasoning variants. `models.dev` enriches metadata only. Unmatched models use safe template.
@@ -58,7 +58,7 @@ opencode-9router-plus/
 - TypeScript: ES2022, NodeNext, declarations, strict mode.
 - Runtime env: `OPENCODE_9ROUTER_URL`, `OPENCODE_9ROUTER_API_KEY`, `OPENCODE_9ROUTER_TIMEOUT_MS`.
 - Live discovery decides listed models. Static reviewed catalog decides known-route capabilities and reasoning variants.
-- `models.dev` enriches matched canonical metadata. It does not decide listing or capabilities.
+- `models.dev` enriches canonical metadata, then unique exact global model-ID matches. Uncatalogued `provider/model` IDs use only unambiguous legacy metadata. It does not decide listing, route ownership, or reasoning variants.
 - CLI config writes back up existing files and write atomically. Commented `.jsonc` fallback edits are refused.
 - Prefer `bun test` and `bun run build`. Publish lifecycle retains `npm run clean && npm run build`.
 
@@ -72,10 +72,10 @@ opencode-9router-plus/
 - Do not commit or push `docs/superpowers/`; local-only and ignored. Tracked legacy docs need separate `git rm --cached` later.
 
 ## NOTES
-- Catalog route matching runs before models.dev enrichment. Unmatched runtime models receive safe template.
+- Catalog route matching runs before models.dev enrichment. Provider metadata is preferred field-by-field; global metadata fills missing fields. Exact global-ID fallback and legacy lookup reject ambiguity. Models without unambiguous metadata receive safe template.
 - Catalog extractor, upstream watch renderer, runtime, and mapping are covered by Bun tests.
 - Upstream watch workflow reports changes only. It does not refresh catalog, publish, tag, or release.
-- `models.dev` cache: `~/.cache/opencode-9router-plus/models.dev.json`.
+- `models.dev` cache: `~/.cache/opencode-9router-plus/models-dev-api.json` and `~/.cache/opencode-9router-plus/models-dev-models.json`.
 - Both `bun.lock` and `package-lock.json` exist. Avoid dependency edits unless lockfile policy is explicit.
 
 ## COMMANDS
