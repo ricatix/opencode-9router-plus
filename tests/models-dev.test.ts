@@ -54,6 +54,16 @@ describe("models.dev lookup", () => {
     expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBeNull();
   });
 
+  test("accepts shared model-only metadata aliases", () => {
+    const terra = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
+    const fallbackLookup = createModelsDevLookup({}, {
+      "openai/gpt-5.6-terra": terra,
+      "openai-legacy/gpt-5.6-terra": terra,
+    });
+
+    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBe(terra);
+  });
+
   test("returns provider exact and unique model-only leaf metadata", () => {
     const provider = { id: "gpt-5.6-terra", name: "Codex Terra" };
     const global = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
