@@ -84,10 +84,11 @@ export async function resolveModel(
     : null;
   const providerModel = metadata?.providerModel ?? null;
   const modelOnly = metadata?.modelOnly ?? null;
-  const entry = providerModel || modelOnly ? { ...TEMPLATE, ...mapModel(providerModel, modelOnly) } : { ...TEMPLATE };
-  if (!providerModel && !modelOnly && legacyMetadata?.limit?.context !== undefined && legacyMetadata.limit.output !== undefined) {
-    entry.limit = { context: legacyMetadata.limit.context, output: legacyMetadata.limit.output };
-  }
+  const entry = providerModel || modelOnly
+    ? { ...TEMPLATE, ...mapModel(providerModel, modelOnly) }
+    : legacyMetadata
+      ? { ...TEMPLATE, ...mapModel(legacyMetadata, null) }
+      : { ...TEMPLATE };
   if (route?.model.reasoning?.reasoning === true) entry.variants = resolveCatalogVariants({ rawModelId: fullId, staticCapabilities: route.model.reasoning, picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker });
   else if (!route && discovery?.capabilities?.reasoning === true) entry.variants = {};
   entry.id = fullId;

@@ -66,13 +66,14 @@ describe("resolveModel", () => {
     expect(entry.family).toBe("model");
   });
 
-  test("uses ambiguity-safe legacy metadata only to restore limits for uncatalogued provider/model IDs", async () => {
+  test("enriches uncatalogued provider/model IDs from unambiguous legacy metadata", async () => {
     const entry = await resolveModel("private-provider/private-model", undefined, {
       lookupModel: async (id) => id === "private-model"
         ? {
             id,
             name: "Private Model",
             family: "private",
+            release_date: "2025-01-01",
             attachment: true,
             reasoning: true,
             temperature: false,
@@ -83,15 +84,32 @@ describe("resolveModel", () => {
           }
         : null,
     });
-    expect(entry).toEqual({
+    expect(entry).toMatchObject({
       id: "private-provider/private-model",
-      name: "private-provider/private-model",
-      attachment: false,
-      reasoning: false,
-      temperature: true,
-      tool_call: true,
+      name: "Private Model",
+      family: "private",
+      release_date: "2025-01-01",
+      attachment: true,
+      reasoning: true,
+      temperature: false,
+      tool_call: false,
+      cost: { input: 1, output: 2 },
+      modalities: { input: ["image"], output: ["audio"] },
       limit: { context: 131072, output: 8192 },
     });
+  });
+
+  test("enriches uncatalogued vision model from unambiguous legacy metadata", async () => {
+    const entry = await resolveModel("private/vision", undefined, {
+      lookupModel: async () => ({
+        id: "vision",
+        name: "Private Vision",
+        modalities: { input: ["text", "image"], output: ["text"] },
+      }),
+    });
+    expect(entry.id).toBe("private/vision");
+    expect(entry.name).toBe("Private Vision");
+    expect(entry.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
   });
 
   test("uses legacy lookup for uncatalogued slash IDs without mutating discovery", async () => {
