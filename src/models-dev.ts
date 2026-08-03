@@ -49,7 +49,15 @@ export function createModelsDevLookup(apiCatalog: ApiCatalog, modelCatalog: Mode
       const providerModel = provider
         ? apiCatalog[provider]?.models[localModelId] ?? apiCatalog[provider]?.models[canonicalModelRef] ?? null
         : null;
-      const modelOnly = slash === -1 ? null : modelCatalog[canonicalModelRef] ?? null;
+      const exactModel = modelCatalog[canonicalModelRef];
+      if (exactModel) return { providerModel, modelOnly: exactModel };
+
+      const modelLeaf = canonicalModelRef.slice(canonicalModelRef.lastIndexOf("/") + 1);
+      const matches = new Set<ModelsDevModel>();
+      for (const [key, model] of Object.entries(modelCatalog)) {
+        if (key.slice(key.lastIndexOf("/") + 1) === modelLeaf) matches.add(model);
+      }
+      const modelOnly = matches.size === 1 ? [...matches][0] : null;
       return { providerModel, modelOnly };
     },
   };
@@ -86,10 +94,13 @@ export function resetModelsDevCatalogsForTest(): void {
 
 function legacyLookup(index: Map<string, ModelsDevModel | null>, name: string): ModelsDevModel | null {
   const dashed = name.replace(/([a-zA-Z])(\d)/, "$1-$2");
-  for (const candidate of [name, dashed, name.replace(/\./g, "-"), dashed.replace(/\./g, "-")]) {
-    if (index.has(candidate)) return index.get(candidate) ?? null;
+  const matches = new Set<ModelsDevModel>();
+  for (const candidate of new Set([name, dashed, name.replace(/\./g, "-"), dashed.replace(/\./g, "-")])) {
+    const model = index.get(candidate);
+    if (model === null) return null;
+    if (model) matches.add(model);
   }
-  return null;
+  return matches.size === 1 ? [...matches][0] : null;
 }
 
 /** Temporary display-metadata compatibility for current mapper. */

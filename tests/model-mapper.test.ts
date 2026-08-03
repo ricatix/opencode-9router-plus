@@ -10,7 +10,7 @@ describe("resolveModel", () => {
     });
     expect(calls).toEqual([["codex", "codex/gpt-5.6-sol"]]);
     expect(entry.id).toBe("cx/gpt-5.6-sol");
-    expect(entry.name).toBe("cx/gpt-5.6-sol");
+    expect(entry.name).toBe("Provider");
     expect(entry.variants).toEqual({ none: { reasoningEffort: "none" }, minimal: { reasoningEffort: "minimal" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" }, xhigh: { reasoningEffort: "xhigh" }, max: { reasoningEffort: "max" } });
   });
 
@@ -22,22 +22,132 @@ describe("resolveModel", () => {
     expect(entry.variants).toEqual({ none: { reasoningEffort: "none" }, minimal: { reasoningEffort: "minimal" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" }, xhigh: { reasoningEffort: "xhigh" }, max: { reasoningEffort: "max" } });
   });
 
+  test("merges provider and model-only metadata field by field", async () => {
+    const entry = await resolveModel("cx/gpt-5.6-sol", undefined, {
+      lookupModelsDev: async () => ({
+        providerModel: {
+          id: "x",
+          name: "Provider Name",
+          family: "provider-family",
+          limit: { context: 200000, output: 10000 },
+        },
+        modelOnly: {
+          id: "x",
+          name: "Global Name",
+          family: "global-family",
+          attachment: true,
+          reasoning: true,
+          temperature: false,
+          tool_call: false,
+          release_date: "2025-01-01",
+          cost: { input: 1, output: 2 },
+          modalities: { input: ["text", "image"], output: ["text"] },
+          limit: { context: 100000, output: 5000 },
+        },
+      }),
+    });
+    expect(entry).toMatchObject({
+      id: "cx/gpt-5.6-sol",
+      name: "Provider Name",
+      family: "provider-family",
+      attachment: true,
+      reasoning: true,
+      temperature: false,
+      tool_call: false,
+      release_date: "2025-01-01",
+      cost: { input: 1, output: 2 },
+      modalities: { input: ["text", "image"], output: ["text"] },
+      limit: { context: 200000, output: 10000 },
+    });
+  });
+
   test("uses model-only fallback", async () => {
     const entry = await resolveModel("cx/gpt-5.6-sol", undefined, { lookupModelsDev: async () => ({ providerModel: null, modelOnly: { id: "x", name: "x", family: "model" } }) });
     expect(entry.family).toBe("model");
   });
 
-  test("does not lookup opaque IDs or mutate discovery", async () => {
+  test("enriches uncatalogued provider/model IDs from unambiguous legacy metadata", async () => {
+    const entry = await resolveModel("private-provider/private-model", undefined, {
+      lookupModel: async (id) => id === "private-model"
+        ? {
+            id,
+            name: "Private Model",
+            family: "private",
+            release_date: "2025-01-01",
+            attachment: true,
+            reasoning: true,
+            temperature: false,
+            tool_call: false,
+            cost: { input: 1, output: 2 },
+            modalities: { input: ["image"], output: ["audio"] },
+            limit: { context: 131072, output: 8192 },
+          }
+        : null,
+    });
+    expect(entry).toMatchObject({
+      id: "private-provider/private-model",
+      name: "Private Model",
+      family: "private",
+      release_date: "2025-01-01",
+      attachment: true,
+      reasoning: true,
+      temperature: false,
+      tool_call: false,
+      cost: { input: 1, output: 2 },
+      modalities: { input: ["image"], output: ["audio"] },
+      limit: { context: 131072, output: 8192 },
+    });
+  });
+
+  test("enriches uncatalogued vision model from unambiguous legacy metadata", async () => {
+    const entry = await resolveModel("private/vision", undefined, {
+      lookupModel: async () => ({
+        id: "vision",
+        name: "Private Vision",
+        modalities: { input: ["text", "image"], output: ["text"] },
+      }),
+    });
+    expect(entry.id).toBe("private/vision");
+    expect(entry.name).toBe("Private Vision");
+    expect(entry.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
+  });
+
+  test("uses legacy lookup for uncatalogued slash IDs without mutating discovery", async () => {
     const discovery = { id: "openai-compatible-team/private-model", capabilities: { reasoning: true, thinkingFormat: "openai" } };
     let called = false;
     const entry = await resolveModel(discovery.id, discovery, {
-      lookupModelsDev: async () => { called = true; return { providerModel: null, modelOnly: null }; },
+      lookupModel: async (id) => { called = id === "private-model"; return null; },
     });
-    expect(called).toBe(false);
+    expect(called).toBe(true);
     expect(discovery).toEqual({ id: "openai-compatible-team/private-model", capabilities: { reasoning: true, thinkingFormat: "openai" } });
     expect(entry.variants).toEqual({});
     expect(entry).not.toHaveProperty("options.reasoningEffort");
     expect(entry).toMatchObject({ id: discovery.id, name: discovery.id, attachment: false, reasoning: false, temperature: true, tool_call: true });
+  });
+
+  test("does not use legacy lookup for opaque IDs", async () => {
+    let called = false;
+    await resolveModel("opaque", undefined, {
+      lookupModel: async () => { called = true; return null; },
+    });
+    expect(called).toBe(false);
+  });
+
+  test("does not restore incomplete legacy limits", async () => {
+    const entry = await resolveModel("private-provider/private-model", undefined, {
+      lookupModel: async () => ({ id: "private-model", name: "Private Model", limit: { context: 131072 } }),
+    });
+    expect(entry.limit).toBeUndefined();
+  });
+
+  test("catalogued routes use canonical lookup only", async () => {
+    let legacyCalled = false;
+    const entry = await resolveModel("cx/gpt-5.6-sol", undefined, {
+      lookupModelsDev: async () => ({ providerModel: null, modelOnly: null }),
+      lookupModel: async () => { legacyCalled = true; return null; },
+    });
+    expect(legacyCalled).toBe(false);
+    expect(entry.limit).toBeUndefined();
   });
 
   test("omits variants for nonreasoning models", async () => {
