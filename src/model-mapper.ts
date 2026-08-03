@@ -31,17 +31,40 @@ const TEMPLATE: OpenCodeModelEntry = {
   tool_call: true,
 };
 
-function mapModel(dev: ModelsDevModel): OpenCodeModelEntry {
+function first<T>(providerValue: T | undefined, modelValue: T | undefined): T | undefined {
+  return providerValue ?? modelValue;
+}
+
+function completeCost(model: ModelsDevModel | null): OpenCodeModelEntry["cost"] | undefined {
+  const cost = model?.cost;
+  return cost?.input !== undefined && cost.output !== undefined ? { input: cost.input, output: cost.output } : undefined;
+}
+
+function completeLimit(model: ModelsDevModel | null): OpenCodeModelEntry["limit"] | undefined {
+  const limit = model?.limit;
+  return limit?.context !== undefined && limit.output !== undefined ? { context: limit.context, output: limit.output } : undefined;
+}
+
+function completeModalities(model: ModelsDevModel | null): OpenCodeModelEntry["modalities"] | undefined {
+  const modalities = model?.modalities;
+  return modalities?.input && modalities.output ? { input: modalities.input, output: modalities.output } : undefined;
+}
+
+function mapModel(providerModel: ModelsDevModel | null, modelOnly: ModelsDevModel | null): OpenCodeModelEntry {
   const entry: OpenCodeModelEntry = {};
-  if (dev.family) entry.family = dev.family;
-  if (dev.release_date) entry.release_date = dev.release_date;
-  if (dev.attachment !== undefined) entry.attachment = dev.attachment;
-  if (dev.reasoning !== undefined) entry.reasoning = dev.reasoning;
-  if (dev.temperature !== undefined) entry.temperature = dev.temperature;
-  if (dev.tool_call !== undefined) entry.tool_call = dev.tool_call;
-  if (dev.cost?.input !== undefined && dev.cost?.output !== undefined) entry.cost = { input: dev.cost.input, output: dev.cost.output };
-  if (dev.limit?.context !== undefined && dev.limit?.output !== undefined) entry.limit = { context: dev.limit.context, output: dev.limit.output };
-  if (dev.modalities) entry.modalities = { input: dev.modalities.input ?? ["text"], output: dev.modalities.output ?? ["text"] };
+  const name = first(providerModel?.name, modelOnly?.name);
+  if (name) entry.name = name;
+  const family = first(providerModel?.family, modelOnly?.family);
+  if (family) entry.family = family;
+  const releaseDate = first(providerModel?.release_date, modelOnly?.release_date);
+  if (releaseDate) entry.release_date = releaseDate;
+  for (const field of ["attachment", "reasoning", "temperature", "tool_call"] as const) {
+    const value = first(providerModel?.[field], modelOnly?.[field]);
+    if (value !== undefined) entry[field] = value;
+  }
+  entry.cost = completeCost(providerModel) ?? completeCost(modelOnly);
+  entry.limit = completeLimit(providerModel) ?? completeLimit(modelOnly);
+  entry.modalities = completeModalities(providerModel) ?? completeModalities(modelOnly);
   return entry;
 }
 
@@ -59,14 +82,15 @@ export async function resolveModel(
   const legacyMetadata = !route && fullId.includes("/")
     ? await (dependencies.lookupModel ?? lookupModel)(fullId.slice(fullId.lastIndexOf("/") + 1))
     : null;
-  const selected = metadata?.providerModel ?? metadata?.modelOnly;
-  const entry = selected ? mapModel(selected) : { ...TEMPLATE };
-  if (!selected && legacyMetadata?.limit?.context !== undefined && legacyMetadata.limit.output !== undefined) {
+  const providerModel = metadata?.providerModel ?? null;
+  const modelOnly = metadata?.modelOnly ?? null;
+  const entry = providerModel || modelOnly ? { ...TEMPLATE, ...mapModel(providerModel, modelOnly) } : { ...TEMPLATE };
+  if (!providerModel && !modelOnly && legacyMetadata?.limit?.context !== undefined && legacyMetadata.limit.output !== undefined) {
     entry.limit = { context: legacyMetadata.limit.context, output: legacyMetadata.limit.output };
   }
   if (route?.model.reasoning?.reasoning === true) entry.variants = resolveCatalogVariants({ rawModelId: fullId, staticCapabilities: route.model.reasoning, picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker });
   else if (!route && discovery?.capabilities?.reasoning === true) entry.variants = {};
   entry.id = fullId;
-  entry.name = fullId;
+  if (!entry.name) entry.name = fullId;
   return entry;
 }

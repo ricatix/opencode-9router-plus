@@ -10,7 +10,7 @@ describe("resolveModel", () => {
     });
     expect(calls).toEqual([["codex", "codex/gpt-5.6-sol"]]);
     expect(entry.id).toBe("cx/gpt-5.6-sol");
-    expect(entry.name).toBe("cx/gpt-5.6-sol");
+    expect(entry.name).toBe("Provider");
     expect(entry.variants).toEqual({ none: { reasoningEffort: "none" }, minimal: { reasoningEffort: "minimal" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" }, xhigh: { reasoningEffort: "xhigh" }, max: { reasoningEffort: "max" } });
   });
 
@@ -20,6 +20,45 @@ describe("resolveModel", () => {
     });
     expect(entry.family).toBe("provider");
     expect(entry.variants).toEqual({ none: { reasoningEffort: "none" }, minimal: { reasoningEffort: "minimal" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" }, xhigh: { reasoningEffort: "xhigh" }, max: { reasoningEffort: "max" } });
+  });
+
+  test("merges provider and model-only metadata field by field", async () => {
+    const entry = await resolveModel("cx/gpt-5.6-sol", undefined, {
+      lookupModelsDev: async () => ({
+        providerModel: {
+          id: "x",
+          name: "Provider Name",
+          family: "provider-family",
+          limit: { context: 200000, output: 10000 },
+        },
+        modelOnly: {
+          id: "x",
+          name: "Global Name",
+          family: "global-family",
+          attachment: true,
+          reasoning: true,
+          temperature: false,
+          tool_call: false,
+          release_date: "2025-01-01",
+          cost: { input: 1, output: 2 },
+          modalities: { input: ["text", "image"], output: ["text"] },
+          limit: { context: 100000, output: 5000 },
+        },
+      }),
+    });
+    expect(entry).toMatchObject({
+      id: "cx/gpt-5.6-sol",
+      name: "Provider Name",
+      family: "provider-family",
+      attachment: true,
+      reasoning: true,
+      temperature: false,
+      tool_call: false,
+      release_date: "2025-01-01",
+      cost: { input: 1, output: 2 },
+      modalities: { input: ["text", "image"], output: ["text"] },
+      limit: { context: 200000, output: 10000 },
+    });
   });
 
   test("uses model-only fallback", async () => {
