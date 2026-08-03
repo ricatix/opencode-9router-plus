@@ -1,5 +1,5 @@
 import { resolveCatalogVariants, type CatalogModelVariants, type ModelVariants } from "./capability-resolver.js";
-import { lookupModelsDev, type ModelsDevModel } from "./models-dev.js";
+import { lookupModel, lookupModelsDev, type ModelsDevModel } from "./models-dev.js";
 import { NINE_ROUTER_LLM_CATALOG } from "./generated/9router-llm-catalog.js";
 import { matchLlmCatalogRoute } from "./llm-catalog.js";
 import type { NineRouterDiscoveryEntry } from "./route-types.js";
@@ -21,6 +21,7 @@ export interface OpenCodeModelEntry {
 
 export interface ModelMapperDependencies {
   lookupModelsDev?: typeof lookupModelsDev;
+  lookupModel?: typeof lookupModel;
 }
 
 const TEMPLATE: OpenCodeModelEntry = {
@@ -55,8 +56,14 @@ export async function resolveModel(
   const metadata = canonicalProvider && canonicalModelId
     ? await (dependencies.lookupModelsDev ?? lookupModelsDev)(canonicalProvider, `${canonicalProvider}/${canonicalModelId}`)
     : null;
-  const selected = metadata?.providerModel ?? metadata?.modelOnly ?? null;
+  const legacyMetadata = !route && fullId.includes("/")
+    ? await (dependencies.lookupModel ?? lookupModel)(fullId.slice(fullId.lastIndexOf("/") + 1))
+    : null;
+  const selected = metadata?.providerModel ?? metadata?.modelOnly;
   const entry = selected ? mapModel(selected) : { ...TEMPLATE };
+  if (!selected && legacyMetadata?.limit?.context !== undefined && legacyMetadata.limit.output !== undefined) {
+    entry.limit = { context: legacyMetadata.limit.context, output: legacyMetadata.limit.output };
+  }
   if (route?.model.reasoning?.reasoning === true) entry.variants = resolveCatalogVariants({ rawModelId: fullId, staticCapabilities: route.model.reasoning, picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker });
   else if (!route && discovery?.capabilities?.reasoning === true) entry.variants = {};
   entry.id = fullId;

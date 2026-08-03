@@ -86,10 +86,13 @@ export function resetModelsDevCatalogsForTest(): void {
 
 function legacyLookup(index: Map<string, ModelsDevModel | null>, name: string): ModelsDevModel | null {
   const dashed = name.replace(/([a-zA-Z])(\d)/, "$1-$2");
-  for (const candidate of [name, dashed, name.replace(/\./g, "-"), dashed.replace(/\./g, "-")]) {
-    if (index.has(candidate)) return index.get(candidate) ?? null;
+  const matches = new Set<ModelsDevModel>();
+  for (const candidate of new Set([name, dashed, name.replace(/\./g, "-"), dashed.replace(/\./g, "-")])) {
+    const model = index.get(candidate);
+    if (model === null) return null;
+    if (model) matches.add(model);
   }
-  return null;
+  return matches.size === 1 ? [...matches][0] : null;
 }
 
 /** Temporary display-metadata compatibility for current mapper. */

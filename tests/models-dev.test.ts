@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { setCacheDirForTest } from "../src/cache.js";
+import { resolveModel } from "../src/model-mapper.js";
 import { createModelsDevLookup, lookupModel, resetModelsDevCatalogsForTest } from "../src/models-dev.js";
 import { apiCatalog, modelCatalog } from "./fixtures/models-dev.js";
 
@@ -74,6 +75,15 @@ describe("legacy models.dev lookup", () => {
   test("keeps dash and dot normalization", async () => {
     mockApiCatalog({ only: { id: "only", name: "Only", models: { "gpt-5-5": { id: "gpt-5-5", name: "GPT 5.5" } } } });
     expect((await lookupModel("gpt5.5"))?.name).toBe("GPT 5.5");
+  });
+
+  test("rejects normalized alias collisions", async () => {
+    mockApiCatalog({
+      dashed: { id: "dashed", name: "Dashed", models: { "gpt-5-5": { id: "gpt-5-5", name: "GPT 5-5" } } },
+      dotted: { id: "dotted", name: "Dotted", models: { "gpt-5.5": { id: "gpt-5.5", name: "GPT 5.5" } } },
+    });
+    expect(await lookupModel("gpt5.5")).toBeNull();
+    expect((await resolveModel("private-provider/gpt5.5", undefined)).limit).toBeUndefined();
   });
 
   test("does not normalize past direct ambiguous ID", async () => {

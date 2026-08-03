@@ -27,17 +27,70 @@ describe("resolveModel", () => {
     expect(entry.family).toBe("model");
   });
 
-  test("does not lookup opaque IDs or mutate discovery", async () => {
+  test("uses ambiguity-safe legacy metadata only to restore limits for uncatalogued provider/model IDs", async () => {
+    const entry = await resolveModel("private-provider/private-model", undefined, {
+      lookupModel: async (id) => id === "private-model"
+        ? {
+            id,
+            name: "Private Model",
+            family: "private",
+            attachment: true,
+            reasoning: true,
+            temperature: false,
+            tool_call: false,
+            cost: { input: 1, output: 2 },
+            modalities: { input: ["image"], output: ["audio"] },
+            limit: { context: 131072, output: 8192 },
+          }
+        : null,
+    });
+    expect(entry).toEqual({
+      id: "private-provider/private-model",
+      name: "private-provider/private-model",
+      attachment: false,
+      reasoning: false,
+      temperature: true,
+      tool_call: true,
+      limit: { context: 131072, output: 8192 },
+    });
+  });
+
+  test("uses legacy lookup for uncatalogued slash IDs without mutating discovery", async () => {
     const discovery = { id: "openai-compatible-team/private-model", capabilities: { reasoning: true, thinkingFormat: "openai" } };
     let called = false;
     const entry = await resolveModel(discovery.id, discovery, {
-      lookupModelsDev: async () => { called = true; return { providerModel: null, modelOnly: null }; },
+      lookupModel: async (id) => { called = id === "private-model"; return null; },
     });
-    expect(called).toBe(false);
+    expect(called).toBe(true);
     expect(discovery).toEqual({ id: "openai-compatible-team/private-model", capabilities: { reasoning: true, thinkingFormat: "openai" } });
     expect(entry.variants).toEqual({});
     expect(entry).not.toHaveProperty("options.reasoningEffort");
     expect(entry).toMatchObject({ id: discovery.id, name: discovery.id, attachment: false, reasoning: false, temperature: true, tool_call: true });
+  });
+
+  test("does not use legacy lookup for opaque IDs", async () => {
+    let called = false;
+    await resolveModel("opaque", undefined, {
+      lookupModel: async () => { called = true; return null; },
+    });
+    expect(called).toBe(false);
+  });
+
+  test("does not restore incomplete legacy limits", async () => {
+    const entry = await resolveModel("private-provider/private-model", undefined, {
+      lookupModel: async () => ({ id: "private-model", name: "Private Model", limit: { context: 131072 } }),
+    });
+    expect(entry.limit).toBeUndefined();
+  });
+
+  test("catalogued routes use canonical lookup only", async () => {
+    let legacyCalled = false;
+    const entry = await resolveModel("cx/gpt-5.6-sol", undefined, {
+      lookupModelsDev: async () => ({ providerModel: null, modelOnly: null }),
+      lookupModel: async () => { legacyCalled = true; return null; },
+    });
+    expect(legacyCalled).toBe(false);
+    expect(entry.limit).toBeUndefined();
   });
 
   test("omits variants for nonreasoning models", async () => {
