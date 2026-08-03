@@ -22,9 +22,68 @@ describe("models.dev lookup", () => {
     expect(lookup.lookup(undefined, "shared-model").providerModel).toBeNull();
   });
 
-  test("uses model-only catalog only for canonical model key", () => {
+  test("uses exact canonical model key before fallback", () => {
     expect(lookup.lookup(undefined, "codex/gpt-5.6-sol").modelOnly?.id).toBe("codex/gpt-5.6-sol");
-    expect(lookup.lookup(undefined, "gpt-5.6-sol").modelOnly).toBeNull();
+    expect(lookup.lookup(undefined, "gpt-5.6-sol").modelOnly?.id).toBe("codex/gpt-5.6-sol");
+  });
+
+  test("finds unique model-only metadata by exact key leaf", () => {
+    const terra = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
+    const fallbackLookup = createModelsDevLookup({}, { "openai/gpt-5.6-terra": terra });
+
+    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBe(terra);
+  });
+
+  test("prefers exact model-only key over leaf fallback", () => {
+    const exact = { id: "codex/gpt-5.6-terra", name: "Codex Terra" };
+    const fallback = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
+    const fallbackLookup = createModelsDevLookup({}, {
+      "codex/gpt-5.6-terra": exact,
+      "openai/gpt-5.6-terra": fallback,
+    });
+
+    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBe(exact);
+  });
+
+  test("rejects ambiguous distinct model-only leaf matches", () => {
+    const fallbackLookup = createModelsDevLookup({}, {
+      "openai/gpt-5.6-terra": { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" },
+      "anthropic/gpt-5.6-terra": { id: "anthropic/gpt-5.6-terra", name: "Anthropic Terra" },
+    });
+
+    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBeNull();
+  });
+
+  test("returns provider exact and unique model-only leaf metadata", () => {
+    const provider = { id: "gpt-5.6-terra", name: "Codex Terra" };
+    const global = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
+    const fallbackLookup = createModelsDevLookup(
+      { codex: { id: "codex", name: "Codex", models: { "gpt-5.6-terra": provider } } },
+      { "openai/gpt-5.6-terra": global },
+    );
+
+    expect(fallbackLookup.lookup("codex", "codex/gpt-5.6-terra")).toEqual({ providerModel: provider, modelOnly: global });
+  });
+
+  test("keeps provider exact metadata when model-only leaf matches are ambiguous", () => {
+    const provider = { id: "gpt-5.6-terra", name: "Codex Terra" };
+    const fallbackLookup = createModelsDevLookup(
+      { codex: { id: "codex", name: "Codex", models: { "gpt-5.6-terra": provider } } },
+      {
+        "openai/gpt-5.6-terra": { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" },
+        "anthropic/gpt-5.6-terra": { id: "anthropic/gpt-5.6-terra", name: "Anthropic Terra" },
+      },
+    );
+
+    expect(fallbackLookup.lookup("codex", "codex/gpt-5.6-terra")).toEqual({ providerModel: provider, modelOnly: null });
+  });
+
+  test("does not normalize model-only leaf fallback", () => {
+    const fallbackLookup = createModelsDevLookup({}, {
+      "openai/gpt-5-6-terra": { id: "openai/gpt-5-6-terra", name: "OpenAI Terra" },
+    });
+
+    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBeNull();
   });
 });
 
