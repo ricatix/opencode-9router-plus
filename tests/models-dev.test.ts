@@ -83,7 +83,17 @@ describe("legacy models.dev lookup", () => {
       dotted: { id: "dotted", name: "Dotted", models: { "gpt-5.5": { id: "gpt-5.5", name: "GPT 5.5" } } },
     });
     expect(await lookupModel("gpt5.5")).toBeNull();
-    expect((await resolveModel("private-provider/gpt5.5", undefined)).limit).toBeUndefined();
+    const entry = await resolveModel("private-provider/gpt5.5", undefined);
+    expect(entry).toMatchObject({
+      id: "private-provider/gpt5.5",
+      name: "private-provider/gpt5.5",
+      attachment: false,
+      reasoning: false,
+      temperature: true,
+      tool_call: true,
+    });
+    expect(entry.limit).toBeUndefined();
+    expect(entry.modalities).toBeUndefined();
   });
 
   test("does not normalize past direct ambiguous ID", async () => {
