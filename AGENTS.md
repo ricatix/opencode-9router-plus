@@ -63,7 +63,7 @@ opencode-9router-plus/
 - TypeScript: ES2022, NodeNext, declarations, strict mode.
 - Runtime env: `OPENCODE_9ROUTER_URL`, `OPENCODE_9ROUTER_API_KEY`, `OPENCODE_9ROUTER_TIMEOUT_MS`.
 - Live discovery trusts only explicit valid `id`; `kind` is optional and ignored. Static reviewed catalog decides canonical identity, reasoning, and variants.
-- `models.dev` uses exact canonical/provider metadata lookup only. Non-catalog routes may use global metadata only when exactly one key shares its exact case-sensitive final path segment. It does not decide listing, capabilities, route ownership, reasoning, or variants. Unmatched models use all-false conservative fallback.
+- `models.dev` uses exact canonical/provider metadata lookup only. Reviewed Codex routes canonicalize to `openai` for metadata. Non-catalog routes may use global metadata only when exactly one key shares its exact case-sensitive final path segment. It does not decide listing, capabilities, route ownership, reasoning, or variants. Unmatched models use all-false conservative fallback.
 - CLI config writes back up existing files and write atomically. Commented `.jsonc` fallback edits are refused.
 - Prefer `bun run check` for deterministic tests plus build. Use `bun run test:live` only with `OPENCODE_9ROUTER_API_KEY`. Publish lifecycle retains `npm run clean && npm run build`.
 
@@ -82,7 +82,7 @@ opencode-9router-plus/
 - Catalog route matching runs before models.dev enrichment. Provider metadata is preferred field-by-field; global metadata fills missing fields. Exact lookup rejects ambiguity. Models without unambiguous metadata retain conservative fallback.
 - Catalog extractor, upstream watch renderer, runtime, and mapping are covered by Bun tests.
 - Upstream watch workflow reports changes only. It does not refresh catalog, publish, tag, or release.
-- `models.dev` cache: `~/.cache/opencode-9router-plus/models-dev-api.json` and `~/.cache/opencode-9router-plus/models-dev-models.json`.
+- `models.dev` cache: `~/.cache/opencode-9router-plus/models-dev-api.json` (5 MiB cap) and `~/.cache/opencode-9router-plus/models-dev-models.json` (1 MiB cap).
 - Both `bun.lock` and `package-lock.json` exist. Avoid dependency edits unless lockfile policy is explicit.
 
 ## COMMANDS

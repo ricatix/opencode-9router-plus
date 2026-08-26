@@ -45,6 +45,26 @@ test("catalog controls reasoning and projects safe provider/global metadata", as
   });
   expect(entry.variants).toBeDefined();
 });
+test("Codex catalog uses OpenAI canonical metadata and projects limit", async () => {
+  const calls: string[][] = [];
+  const entry = await resolveModel("cx/gpt-5.6-terra", {
+    lookupCanonical: async (...args: string[]) => {
+      calls.push(args);
+      return {
+        providerModel: {
+          id: "openai/gpt-5.6-terra",
+          name: "GPT 5.6 Terra",
+          limit: { context: 1_000, output: 100 },
+        },
+        modelOnly: null,
+      };
+    },
+    lookupExact: async () => null,
+    lookupUniqueLeaf: async () => null,
+  });
+  expect(calls).toEqual([["openai", "openai/gpt-5.6-terra"]]);
+  expect(entry.limit).toEqual({ context: 1_000, output: 100 });
+});
 test("unmatched uses unique leaf only, default false flags, rejects unsafe metadata", async () => {
   const entry = await resolveModel(
     "private/exact",

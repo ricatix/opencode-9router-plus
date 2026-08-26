@@ -63,6 +63,34 @@ test("oversize stream becomes empty and never writes", async () => {
   expect(writes).toBe(0);
 });
 
+test("API catalog uses 5 MiB cache, fetch, and write cap", async () => {
+  const caps: number[] = [];
+  const name = "x".repeat(1_048_577);
+  const client = createModelsDevClient({
+    apiUrl: "api",
+    modelsUrl: "models",
+    cache: {
+      read: async (_name, maxBytes) => {
+        caps.push(maxBytes);
+        return null;
+      },
+      write: async (_name, _data, maxBytes) => {
+        caps.push(maxBytes);
+      },
+    },
+    fetch: async (url) =>
+      new Response(
+        JSON.stringify(
+          url === "api" ? { p: { models: { m: { id: "m", name } } } } : {},
+        ),
+      ),
+  });
+  expect((await client.lookupCanonical("p", "p/m")).providerModel?.name).toBe(
+    name,
+  );
+  expect(caps).toEqual([5_242_880, 1_048_576, 5_242_880]);
+});
+
 test("invalid parseable cache misses then fetches valid catalog", async () => {
   let requests = 0;
   const client = createModelsDevClient({

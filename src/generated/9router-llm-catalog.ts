@@ -1369,7 +1369,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.6-sol"
         },
         {
           "id": "gpt-5.6-sol-review",
@@ -1381,7 +1383,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.6-sol"
         },
         {
           "id": "gpt-5.6-terra",
@@ -1392,7 +1396,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.6-terra"
         },
         {
           "id": "gpt-5.6-terra-review",
@@ -1404,7 +1410,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.6-terra"
         },
         {
           "id": "gpt-5.6-luna",
@@ -1415,7 +1423,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.6-luna"
         },
         {
           "id": "gpt-5.6-luna-review",
@@ -1427,7 +1437,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.6-luna"
         },
         {
           "id": "gpt-5.5",
@@ -1438,7 +1450,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.5"
         },
         {
           "id": "gpt-5.5-review",
@@ -1450,7 +1464,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.5"
         },
         {
           "id": "gpt-5.4",
@@ -1461,7 +1477,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.4"
         },
         {
           "id": "gpt-5.4-review",
@@ -1473,7 +1491,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.4"
         },
         {
           "id": "gpt-5.4-mini",
@@ -1484,7 +1504,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.4-mini"
         },
         {
           "id": "gpt-5.4-mini-review",
@@ -1496,7 +1518,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.4-mini"
         },
         {
           "id": "gpt-5.3-codex-spark",
@@ -1507,7 +1531,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.3-codex-spark"
         },
         {
           "id": "gpt-5.3-codex-spark-review",
@@ -1519,7 +1545,9 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
             "thinkingFormat": "openai",
             "thinkingCanDisable": true,
             "thinkingRange": null
-          }
+          },
+          "canonicalProvider": "openai",
+          "canonicalModelId": "gpt-5.3-codex-spark"
         }
       ]
     },

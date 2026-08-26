@@ -63,7 +63,7 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
         });
       if (url.pathname === "/api.json")
         return Response.json({
-          codex: {
+          openai: {
             models: {
               "gpt-5.6-sol": {
                 id: "provider-lie",
@@ -80,7 +80,7 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
         });
       if (url.pathname === "/models.json")
         return Response.json({
-          "codex/gpt-5.6-sol": {
+          "openai/gpt-5.6-sol": {
             id: "global-lie",
             name: "GLOBAL_CONFLICT",
             family: "global-family",

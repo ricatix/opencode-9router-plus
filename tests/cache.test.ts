@@ -36,6 +36,16 @@ test("roundtrips payload at network boundary inside cache envelope", async () =>
   ).toBe(payload);
 });
 
+test("API cache write accepts 5 MiB cap", async () => {
+  dir = await fs.mkdtemp(path.join(os.tmpdir(), "cache-"));
+  setCacheDirForTest(dir);
+  const payload = "x".repeat(1_048_576);
+  await writeCache("models-dev-api", { payload }, 5_242_880);
+  expect(
+    ((await readCacheBounded("models-dev-api", 5_242_880)) as any)?.payload,
+  ).toBe(payload);
+});
+
 test("malformed and expired envelopes miss; exact serialized boundaries", async () => {
   dir = await fs.mkdtemp(path.join(os.tmpdir(), "cache-"));
   setCacheDirForTest(dir);

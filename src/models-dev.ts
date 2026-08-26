@@ -2,7 +2,8 @@ import { readCacheBounded, writeCache } from "./cache.js";
 
 const API_URL = "https://models.dev/api.json";
 const MODELS_URL = "https://models.dev/models.json";
-const MAX_BYTES = 1_048_576;
+const MAX_API_BYTES = 5 * 1_048_576;
+const MAX_MODELS_BYTES = 1_048_576;
 type CacheName = "models-dev-api" | "models-dev-models";
 
 export interface ReasoningOption {
@@ -25,7 +26,7 @@ export interface ModelsDevLookup {
 }
 export interface ModelsDevCache {
   read(name: CacheName, maxBytes: number): Promise<unknown | null>;
-  write(name: CacheName, data: unknown): Promise<void>;
+  write(name: CacheName, data: unknown, maxBytes: number): Promise<void>;
 }
 export interface ModelsDevClient {
   lookupCanonical(provider: string, modelRef: string): Promise<ModelsDevLookup>;
@@ -71,7 +72,10 @@ function validateModels(v: unknown): ModelCatalog {
     return {};
   return v as ModelCatalog;
 }
-async function body(response: Response): Promise<unknown | null> {
+async function body(
+  response: Response,
+  maxBytes: number,
+): Promise<unknown | null> {
   if (!response.ok || !response.body) return null;
   const reader = response.body.getReader();
   let total = 0;
@@ -81,7 +85,7 @@ async function body(response: Response): Promise<unknown | null> {
       const next = await reader.read();
       if (next.done) break;
       total += next.value.byteLength;
-      if (total > MAX_BYTES) {
+      if (total > maxBytes) {
         await reader.cancel();
         return null;
       }
@@ -103,12 +107,13 @@ export function createModelsDevClient(input: {
   const load = <T extends object>(
     name: CacheName,
     url: string,
+    maxBytes: number,
     validate: (v: unknown) => T,
   ) => {
     let promise: Promise<T> | null = null;
     return () =>
       (promise ??= (async () => {
-        const cached = await input.cache.read(name, MAX_BYTES);
+        const cached = await input.cache.read(name, maxBytes);
         const cachedValid = validate(cached);
         if (
           cached !== null &&
@@ -119,18 +124,24 @@ export function createModelsDevClient(input: {
         try {
           const data = await body(
             await input.fetch(url, { signal: AbortSignal.timeout(15000) }),
+            maxBytes,
           );
           const valid = validate(data);
           if (data !== null && Object.keys(valid).length)
-            await input.cache.write(name, data);
+            await input.cache.write(name, data, maxBytes);
           return valid;
         } catch {
           return {} as T;
         }
       })());
   };
-  const api = load("models-dev-api", input.apiUrl, validateApi),
-    models = load("models-dev-models", input.modelsUrl, validateModels);
+  const api = load("models-dev-api", input.apiUrl, MAX_API_BYTES, validateApi),
+    models = load(
+      "models-dev-models",
+      input.modelsUrl,
+      MAX_MODELS_BYTES,
+      validateModels,
+    );
   return {
     async lookupCanonical(provider, modelRef) {
       const [a, m] = await Promise.all([api(), models()]);

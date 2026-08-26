@@ -70,9 +70,10 @@ export function readCache(name: CacheName): Promise<unknown | null> {
 export async function writeCache(
   name: CacheName,
   data: unknown,
+  maxBytes = 1_048_576,
 ): Promise<void> {
   const content = JSON.stringify({ timestamp: Date.now(), data });
-  if (Buffer.byteLength(content) > 1_048_576) return;
+  if (Buffer.byteLength(content) > maxBytes) return;
   await fs.mkdir(cacheDir, { recursive: true });
   const tmp = path.join(
     cacheDir,
