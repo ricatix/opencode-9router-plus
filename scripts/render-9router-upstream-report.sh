@@ -42,7 +42,20 @@ ruby -rjson -e '
   abort "truncated compare" if data["truncated"] == true
   files = data["files"]
   abort "files must be an array" unless files.is_a?(Array)
-  abort "compare files list may be incomplete (300 or more files)" if files.length >= 300
+  if files.length >= 300
+    puts "# 9router upstream change report"
+    puts
+    puts "Previous upstream SHA: `#{ARGV[1]}`"
+    puts "Current upstream SHA: `#{ARGV[2]}`"
+    puts
+    puts "Detector/report-only: never refreshes catalog, alters runtime, publishes, tags, or releases."
+    puts
+    puts "## Incomplete comparison"
+    puts
+    puts "GitHub Compare files list is incomplete at 300 or more files. Manual audit required."
+    puts "Files list cannot be trusted for catalog refresh. Never execute upstream."
+    exit
+  end
   paths = files.map { |file| abort "file must be an object" unless file.is_a?(Hash); name = file["filename"]; abort "filename must be a string" unless name.is_a?(String); name }.select { |name| allowed.include?(name) || name.match?(%r{\Aopen-sse/providers/registry/[^/]+\.js\z}) }.uniq.sort
   puts "# 9router upstream change report"
   puts
