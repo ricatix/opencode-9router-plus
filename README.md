@@ -12,6 +12,7 @@ It discovers available models from your 9router endpoint at startup and injects 
 - Registers provider `9router` using `@ai-sdk/openai-compatible`
 - Sends `OPENCODE_9ROUTER_API_KEY` as Bearer auth when discovering models
 - Injects dynamically discovered models into opencode config at runtime
+- Accepts every valid live model ID; `kind` is optional and ignored during discovery
 - Uses reviewed static catalog capabilities and supported reasoning variants for known LLM routes
 - Uses `models.dev` for metadata enrichment only; unmatched models receive safe template
 - Does not write opencode config from the runtime plugin
@@ -136,11 +137,16 @@ Do not hardcode model lists. The plugin lists them dynamically from the live `/v
 - `OPENCODE_9ROUTER_API_KEY` (recommended): API key used by provider options and model discovery requests
 - `OPENCODE_9ROUTER_TIMEOUT_MS` (optional): fetch timeout in ms. Default `5000`
 
+## Discovery Policy
+
+Runtime discovery accepts first occurrence of every explicit, valid model `id` from live array, `models`, or `data` responses. It ignores all other response metadata, including optional `kind`; missing and non-LLM `kind` values do not reject an ID. Invalid, control-character, whitespace-padded, and dangerous object-key IDs remain rejected. This compatibility policy means non-LLM routes may appear in `opencode models 9router` when endpoint exposes them.
+
 ## Development
 
 ```bash
 bun install
-bun test
+bun run check
+bun run test:deterministic
 bun run build
 bun run clean
 bun run prepublishOnly
@@ -148,9 +154,17 @@ bun run prepublishOnly
 
 `prepublishOnly` intentionally uses npm lifecycle commands internally: `npm run clean && npm run build`.
 
+`bun run check` runs deterministic tests, then builds the package. Run opt-in live smoke only against a reachable 9router endpoint with an API key:
+
+```bash
+OPENCODE_9ROUTER_API_KEY="sk-..." bun run test:live
+```
+
+`test:live` requires `OPENCODE_9ROUTER_API_KEY`; it is not part of `check` and has no claimed pass result here.
+
 ## Upstream Catalog Review
 
-`/v1/models` controls runtime listing. Reviewed static catalog supplies capabilities and supported reasoning variants for known LLM routes. `models.dev` enriches metadata only. Dynamic or unmatched models receive safe template.
+`/v1/models` controls runtime listing by valid ID, regardless of `kind`. Reviewed static catalog supplies capabilities and supported reasoning variants for known LLM routes. `models.dev` enriches metadata only. For non-catalog routes, metadata applies only when exactly one global catalog key has an exact, case-sensitive final path segment matching route final path segment; no provider guessing, normalization, or route-ID rewrite occurs. Dynamic or unmatched models receive safe template.
 
 Scheduled upstream watch reports only whitelisted catalog-input paths. It never runs upstream source, applies detector output, refreshes catalog, publishes, tags, or releases.
 
@@ -171,7 +185,9 @@ Project notes:
 - If plugin loads twice, remove duplicate `opencode-9router-plus` entries from your OpenCode config before restarting.
 
 ## Github Repository
+
 https://github.com/ricatix/opencode-9router-plus
 
 ## Credits
+
 Forked from the original [opencode-9router-plugin](https://github.com/mdhb2/opencode-9router-plugin) by [mdhb2](https://github.com/mdhb2).

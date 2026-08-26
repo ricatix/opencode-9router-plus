@@ -28,6 +28,9 @@
     "extract:9router-catalog": "bun scripts/extract-9router-llm-catalog.ts",
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
+    "test:deterministic": "bun test tests/*.test.ts",
+    "test:live": "bun tests/live-model-translation.smoke.ts",
+    "check": "bun run test:deterministic && bun run build",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [

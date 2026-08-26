@@ -1,176 +1,339 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, expect, test } from "bun:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { setCacheDirForTest } from "../src/cache.js";
-import { resolveModel } from "../src/model-mapper.js";
-import { createModelsDevLookup, lookupModel, resetModelsDevCatalogsForTest } from "../src/models-dev.js";
-import { apiCatalog, modelCatalog } from "./fixtures/models-dev.js";
+import {
+  readCacheBounded,
+  setCacheDirForTest,
+  writeCache,
+} from "../src/cache.js";
+import { createModelsDevClient } from "../src/models-dev.js";
 
-const lookup = createModelsDevLookup(apiCatalog, modelCatalog);
-
-describe("models.dev lookup", () => {
-  test("uses canonical provider entry before model-only metadata", () => {
-    expect(lookup.lookup("codex", "gpt-5.6-sol").providerModel?.reasoning_options).toEqual([
-      { type: "effort", values: ["none", "low", "medium", "high", "xhigh", "max"] },
-    ]);
+const cache = { read: async () => null, write: async () => {} };
+test("client caches catalogs, canonical and exact lookups only", async () => {
+  const calls: string[] = [];
+  const client = createModelsDevClient({
+    apiUrl: "api",
+    modelsUrl: "models",
+    cache,
+    fetch: async (url) => {
+      calls.push(url);
+      return new Response(
+        JSON.stringify(
+          url === "api"
+            ? {
+                p: {
+                  id: "p",
+                  name: "P",
+                  models: { m: { id: "m", name: "provider" } },
+                },
+              }
+            : {
+                "p/m": { id: "p/m", name: "global" },
+                "private/exact": { id: "private/exact", name: "exact" },
+              },
+        ),
+      );
+    },
   });
-
-  test("keeps provider collisions isolated", () => {
-    expect(lookup.lookup("provider-a", "shared-model").providerModel?.name).toBe("Provider A Shared");
-    expect(lookup.lookup("provider-b", "shared-model").providerModel?.name).toBe("Provider B Shared");
-    expect(lookup.lookup(undefined, "shared-model").providerModel).toBeNull();
+  expect(await client.lookupCanonical("p", "p/m")).toMatchObject({
+    providerModel: { name: "provider" },
+    modelOnly: { name: "global" },
   });
-
-  test("uses exact canonical model key before fallback", () => {
-    expect(lookup.lookup(undefined, "codex/gpt-5.6-sol").modelOnly?.id).toBe("codex/gpt-5.6-sol");
-    expect(lookup.lookup(undefined, "gpt-5.6-sol").modelOnly?.id).toBe("codex/gpt-5.6-sol");
+  expect(await client.lookupCanonical("p", "p/m")).toBeDefined();
+  expect(await client.lookupExact("private/exact")).toMatchObject({
+    name: "exact",
   });
-
-  test("finds unique model-only metadata by exact key leaf", () => {
-    const terra = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
-    const fallbackLookup = createModelsDevLookup({}, { "openai/gpt-5.6-terra": terra });
-
-    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBe(terra);
-  });
-
-  test("prefers exact model-only key over leaf fallback", () => {
-    const exact = { id: "codex/gpt-5.6-terra", name: "Codex Terra" };
-    const fallback = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
-    const fallbackLookup = createModelsDevLookup({}, {
-      "codex/gpt-5.6-terra": exact,
-      "openai/gpt-5.6-terra": fallback,
-    });
-
-    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBe(exact);
-  });
-
-  test("rejects ambiguous distinct model-only leaf matches", () => {
-    const fallbackLookup = createModelsDevLookup({}, {
-      "openai/gpt-5.6-terra": { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" },
-      "anthropic/gpt-5.6-terra": { id: "anthropic/gpt-5.6-terra", name: "Anthropic Terra" },
-    });
-
-    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBeNull();
-  });
-
-  test("accepts shared model-only metadata aliases", () => {
-    const terra = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
-    const fallbackLookup = createModelsDevLookup({}, {
-      "openai/gpt-5.6-terra": terra,
-      "openai-legacy/gpt-5.6-terra": terra,
-    });
-
-    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBe(terra);
-  });
-
-  test("returns provider exact and unique model-only leaf metadata", () => {
-    const provider = { id: "gpt-5.6-terra", name: "Codex Terra" };
-    const global = { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" };
-    const fallbackLookup = createModelsDevLookup(
-      { codex: { id: "codex", name: "Codex", models: { "gpt-5.6-terra": provider } } },
-      { "openai/gpt-5.6-terra": global },
-    );
-
-    expect(fallbackLookup.lookup("codex", "codex/gpt-5.6-terra")).toEqual({ providerModel: provider, modelOnly: global });
-  });
-
-  test("keeps provider exact metadata when model-only leaf matches are ambiguous", () => {
-    const provider = { id: "gpt-5.6-terra", name: "Codex Terra" };
-    const fallbackLookup = createModelsDevLookup(
-      { codex: { id: "codex", name: "Codex", models: { "gpt-5.6-terra": provider } } },
-      {
-        "openai/gpt-5.6-terra": { id: "openai/gpt-5.6-terra", name: "OpenAI Terra" },
-        "anthropic/gpt-5.6-terra": { id: "anthropic/gpt-5.6-terra", name: "Anthropic Terra" },
+  expect(calls).toEqual(["api", "models"]);
+});
+test("oversize stream becomes empty and never writes", async () => {
+  let writes = 0;
+  const client = createModelsDevClient({
+    apiUrl: "api",
+    modelsUrl: "models",
+    cache: {
+      read: async () => null,
+      write: async () => {
+        writes++;
       },
-    );
-
-    expect(fallbackLookup.lookup("codex", "codex/gpt-5.6-terra")).toEqual({ providerModel: provider, modelOnly: null });
+    },
+    fetch: async () => new Response("x".repeat(1_048_577)),
   });
-
-  test("does not normalize model-only leaf fallback", () => {
-    const fallbackLookup = createModelsDevLookup({}, {
-      "openai/gpt-5-6-terra": { id: "openai/gpt-5-6-terra", name: "OpenAI Terra" },
-    });
-
-    expect(fallbackLookup.lookup(undefined, "codex/gpt-5.6-terra").modelOnly).toBeNull();
-  });
+  expect(await client.lookupExact("x")).toBeNull();
+  expect(writes).toBe(0);
 });
 
-function mockApiCatalog(catalog: typeof apiCatalog): void {
-  globalThis.fetch = async () => new Response(JSON.stringify(catalog), { status: 200 });
-}
-
-describe("legacy models.dev lookup", () => {
-  const originalFetch = globalThis.fetch;
-  let cacheDir: string;
-
-  beforeEach(async () => {
-    cacheDir = await fs.mkdtemp(path.join(os.tmpdir(), "models-dev-test-"));
-    setCacheDirForTest(cacheDir);
-    resetModelsDevCatalogsForTest();
+test("invalid parseable cache misses then fetches valid catalog", async () => {
+  let requests = 0;
+  const client = createModelsDevClient({
+    apiUrl: "api",
+    modelsUrl: "models",
+    cache: { read: async () => ({ bad: true }), write: async () => {} },
+    fetch: async () => {
+      requests++;
+      return new Response(
+        JSON.stringify({
+          "private/exact": { id: "private/exact", name: "Exact" },
+        }),
+      );
+    },
   });
+  expect(await client.lookupExact("private/exact")).toMatchObject({
+    name: "Exact",
+  });
+  expect(requests).toBe(1);
+});
 
-  afterEach(async () => {
-    resetModelsDevCatalogsForTest();
+test("exact lookup has no leaf fallback and provider canonical ref fallback works", async () => {
+  const client = createModelsDevClient({
+    apiUrl: "api",
+    modelsUrl: "models",
+    cache,
+    fetch: async (url) =>
+      new Response(
+        JSON.stringify(
+          url === "api"
+            ? { p: { models: { "p/m": { id: "p/m", name: "fallback" } } } }
+            : { "other/m": { id: "other/m", name: "leaf" } },
+        ),
+      ),
+  });
+  expect(await client.lookupExact("p/m")).toBeNull();
+  expect((await client.lookupCanonical("p", "p/m")).providerModel?.name).toBe(
+    "fallback",
+  );
+});
+
+test("unique global canonical leaf lookup accepts nested route only once", async () => {
+  const client = createModelsDevClient({
+    apiUrl: "api",
+    modelsUrl: "models",
+    cache,
+    fetch: async () =>
+      new Response(
+        JSON.stringify({
+          "openai/gpt-5.6": { id: "openai/gpt-5.6", name: "Leaf" },
+        }),
+      ),
+  });
+  expect(await client.lookupUniqueLeaf("private/nested/gpt-5.6")).toMatchObject(
+    {
+      name: "Leaf",
+    },
+  );
+});
+
+test("unique global canonical leaf lookup rejects absent, collision, and case mismatch", async () => {
+  const client = createModelsDevClient({
+    apiUrl: "api",
+    modelsUrl: "models",
+    cache,
+    fetch: async () =>
+      new Response(
+        JSON.stringify({
+          "a/gpt-5.6": { id: "a/gpt-5.6", name: "one" },
+          "b/gpt-5.6": { id: "b/gpt-5.6", name: "two" },
+          "c/GPT-5.7": { id: "c/GPT-5.7", name: "case" },
+        }),
+      ),
+  });
+  expect(await client.lookupUniqueLeaf("private/missing")).toBeNull();
+  expect(await client.lookupUniqueLeaf("private/gpt-5.6")).toBeNull();
+  expect(await client.lookupUniqueLeaf("private/gpt-5.7")).toBeNull();
+});
+
+test("client isolation, cache hit, concurrency, limits, and HTTP boundary", async () => {
+  let fetches = 0,
+    writes = 0;
+  const valid = { "p/m": { id: "p/m", name: "ok" } };
+  const make = (cached: any = null) =>
+    createModelsDevClient({
+      apiUrl: "api",
+      modelsUrl: "models",
+      cache: {
+        read: async () => cached,
+        write: async () => {
+          writes++;
+        },
+      },
+      fetch: async () => {
+        fetches++;
+        return new Response(JSON.stringify(valid));
+      },
+    });
+  const cached = make(valid);
+  await cached.lookupExact("p/m");
+  expect(fetches).toBe(0);
+  expect(writes).toBe(0);
+  const one = make();
+  await Promise.all([one.lookupExact("p/m"), one.lookupExact("p/m")]);
+  expect(fetches).toBe(1);
+  const two = make();
+  await two.lookupExact("p/m");
+  expect(fetches).toBe(2);
+  for (const huge of [
+    {
+      ...Object.fromEntries(
+        Array.from({ length: 20_001 }, (_, i) => [
+          `p/${i}`,
+          { id: "x", name: "x" },
+        ]),
+      ),
+    },
+    Object.fromEntries(
+      Array.from({ length: 501 }, (_, i) => [`p${i}`, { models: {} }]),
+    ),
+  ]) {
+    const c = createModelsDevClient({
+      apiUrl: "api",
+      modelsUrl: "models",
+      cache,
+      fetch: async () => new Response(JSON.stringify(huge)),
+    });
+    expect(await c.lookupExact("p/0")).toBeNull();
+  }
+  for (const size of [1_048_576, 1_048_577]) {
+    const c = createModelsDevClient({
+      apiUrl: "api",
+      modelsUrl: "models",
+      cache,
+      fetch: async () => new Response(" ".repeat(size)),
+    });
+    expect(await c.lookupExact("x")).toBeNull();
+  }
+});
+
+test("physical cache roundtrip and catalog record limits", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "models-cache-"));
+  setCacheDirForTest(dir);
+  try {
+    let firstFetch = 0,
+      secondFetch = 0,
+      writes = 0;
+    const cache = {
+      read: readCacheBounded,
+      write: async (...args: Parameters<typeof writeCache>) => {
+        writes++;
+        await writeCache(...args);
+      },
+    };
+    const first = createModelsDevClient({
+      apiUrl: "api",
+      modelsUrl: "models",
+      cache,
+      fetch: async () => {
+        firstFetch++;
+        return new Response(
+          JSON.stringify({ "p/m": { id: "p/m", name: "Cached" } }),
+        );
+      },
+    });
+    expect((await first.lookupExact("p/m"))?.name).toBe("Cached");
+    expect(firstFetch).toBe(1);
+    expect(writes).toBe(1);
+    const second = createModelsDevClient({
+      apiUrl: "api",
+      modelsUrl: "models",
+      cache,
+      fetch: async () => {
+        secondFetch++;
+        return new Response("{}");
+      },
+    });
+    expect((await second.lookupExact("p/m"))?.name).toBe("Cached");
+    expect(secondFetch).toBe(0);
+    for (const catalog of [
+      {
+        p: {
+          models: Object.fromEntries(
+            Array.from({ length: 5_001 }, (_, i) => [
+              `m${i}`,
+              { id: "x", name: "x" },
+            ]),
+          ),
+        },
+      },
+      {
+        "p/m": Object.fromEntries(
+          Array.from({ length: 33 }, (_, i) => [`x${i}`, i]),
+        ),
+      },
+    ]) {
+      const c = createModelsDevClient({
+        apiUrl: "api",
+        modelsUrl: "models",
+        cache: { read: async () => null, write: async () => {} },
+        fetch: async () => new Response(JSON.stringify(catalog)),
+      });
+      expect(await c.lookupExact("p/m")).toBeNull();
+    }
+  } finally {
     setCacheDirForTest();
-    globalThis.fetch = originalFetch;
-    await fs.rm(cacheDir, { recursive: true, force: true });
-  });
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
 
-  test("returns null for two-provider ID collision", async () => {
-    mockApiCatalog(apiCatalog);
-    expect(await lookupModel("shared-model")).toBeNull();
-  });
-
-  test("keeps unique model metadata", async () => {
-    mockApiCatalog(apiCatalog);
-    expect((await lookupModel("gpt-5.6-sol"))?.name).toBe("GPT 5.6 Sol");
-  });
-
-  test("keeps collision tombstoned after third provider", async () => {
-    mockApiCatalog({
-      ...apiCatalog,
-      "provider-c": { id: "provider-c", name: "Provider C", models: { "shared-model": { id: "shared-model", name: "Provider C Shared" } } },
+test("valid JSON byte boundary accepts then rejects without cache write", async () => {
+  for (const [size, accepted] of [
+    [1_048_576, true],
+    [1_048_577, false],
+  ] as const) {
+    let writes = 0;
+    const base = JSON.stringify({ "p/m": { id: "p/m", name: "ok" } });
+    const padded = base + " ".repeat(size - Buffer.byteLength(base));
+    const c = createModelsDevClient({
+      apiUrl: "api",
+      modelsUrl: "models",
+      cache: {
+        read: async () => null,
+        write: async () => {
+          writes++;
+        },
+      },
+      fetch: async () => new Response(padded),
     });
-    expect(await lookupModel("shared-model")).toBeNull();
-  });
+    expect((await c.lookupExact("p/m"))?.name === "ok").toBe(accepted);
+    expect(writes === 1).toBe(accepted);
+  }
+});
 
-  test("returns null for collision in reversed provider order", async () => {
-    mockApiCatalog({ "provider-b": apiCatalog["provider-b"], "provider-a": apiCatalog["provider-a"] });
-    expect(await lookupModel("shared-model")).toBeNull();
-  });
-
-  test("keeps dash and dot normalization", async () => {
-    mockApiCatalog({ only: { id: "only", name: "Only", models: { "gpt-5-5": { id: "gpt-5-5", name: "GPT 5.5" } } } });
-    expect((await lookupModel("gpt5.5"))?.name).toBe("GPT 5.5");
-  });
-
-  test("rejects normalized alias collisions", async () => {
-    mockApiCatalog({
-      dashed: { id: "dashed", name: "Dashed", models: { "gpt-5-5": { id: "gpt-5-5", name: "GPT 5-5" } } },
-      dotted: { id: "dotted", name: "Dotted", models: { "gpt-5.5": { id: "gpt-5.5", name: "GPT 5.5" } } },
+test("API provider and provider-model limits reject canonical lookup", async () => {
+  for (const api of [
+    Object.fromEntries(
+      Array.from({ length: 501 }, (_, i) => [`p${i}`, { models: {} }]),
+    ),
+    {
+      p: {
+        models: Object.fromEntries(
+          Array.from({ length: 5_001 }, (_, i) => [
+            `m${i}`,
+            { id: "x", name: "x" },
+          ]),
+        ),
+      },
+    },
+  ]) {
+    const requests: string[] = [];
+    let writes = 0;
+    const client = createModelsDevClient({
+      apiUrl: "api",
+      modelsUrl: "models",
+      cache: {
+        read: async () => null,
+        write: async () => {
+          writes++;
+        },
+      },
+      fetch: async (url) => {
+        requests.push(url);
+        return new Response(JSON.stringify(url === "api" ? api : {}));
+      },
     });
-    expect(await lookupModel("gpt5.5")).toBeNull();
-    const entry = await resolveModel("private-provider/gpt5.5", undefined);
-    expect(entry).toMatchObject({
-      id: "private-provider/gpt5.5",
-      name: "private-provider/gpt5.5",
-      attachment: false,
-      reasoning: false,
-      temperature: true,
-      tool_call: true,
+    expect(await client.lookupCanonical("p", "p/m")).toEqual({
+      providerModel: null,
+      modelOnly: null,
     });
-    expect(entry.limit).toBeUndefined();
-    expect(entry.modalities).toBeUndefined();
-  });
-
-  test("does not normalize past direct ambiguous ID", async () => {
-    mockApiCatalog({
-      "provider-a": { id: "provider-a", name: "Provider A", models: { "gpt5.5": { id: "gpt5.5", name: "Provider A GPT 5.5" } } },
-      "provider-b": { id: "provider-b", name: "Provider B", models: { "gpt5.5": { id: "gpt5.5", name: "Provider B GPT 5.5" } } },
-      only: { id: "only", name: "Only", models: { "gpt-5-5": { id: "gpt-5-5", name: "GPT 5.5" } } },
-    });
-    expect(await lookupModel("gpt5.5")).toBeNull();
-  });
+    expect(requests).toEqual(["api", "models"]);
+    expect(writes).toBe(0);
+  }
 });

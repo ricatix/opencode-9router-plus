@@ -1,114 +1,172 @@
-import { readCache, writeCache } from "./cache.js";
+import { readCacheBounded, writeCache } from "./cache.js";
 
 const API_URL = "https://models.dev/api.json";
 const MODELS_URL = "https://models.dev/models.json";
+const MAX_BYTES = 1_048_576;
+type CacheName = "models-dev-api" | "models-dev-models";
 
 export interface ReasoningOption {
   type: string;
   values: string[];
 }
-
-export interface ModelsDevProvider {
-  id: string;
-  name: string;
-  npm?: string;
-  models: Record<string, ModelsDevModel>;
-}
-
 export interface ModelsDevModel {
   id: string;
   name: string;
   family?: string;
-  attachment?: boolean;
-  reasoning?: boolean;
-  reasoning_options?: ReasoningOption[];
-  tool_call?: boolean;
-  temperature?: boolean;
-  knowledge?: string;
   release_date?: string;
-  last_updated?: string;
   modalities?: { input?: string[]; output?: string[] };
-  open_weights?: boolean;
   limit?: { context?: number; output?: number };
   cost?: { input?: number; output?: number };
+  [key: string]: unknown;
 }
-
 export interface ModelsDevLookup {
   providerModel: ModelsDevModel | null;
   modelOnly: ModelsDevModel | null;
 }
-
-type ApiCatalog = Record<string, ModelsDevProvider>;
+export interface ModelsDevCache {
+  read(name: CacheName, maxBytes: number): Promise<unknown | null>;
+  write(name: CacheName, data: unknown): Promise<void>;
+}
+export interface ModelsDevClient {
+  lookupCanonical(provider: string, modelRef: string): Promise<ModelsDevLookup>;
+  lookupExact(modelRef: string): Promise<ModelsDevModel | null>;
+  lookupUniqueLeaf(modelRef: string): Promise<ModelsDevModel | null>;
+}
+type ApiCatalog = Record<string, { models: Record<string, ModelsDevModel> }>;
 type ModelCatalog = Record<string, ModelsDevModel>;
-
-export function createModelsDevLookup(apiCatalog: ApiCatalog, modelCatalog: ModelCatalog) {
-  return {
-    lookup(provider: string | undefined, canonicalModelRef: string): ModelsDevLookup {
-      const slash = canonicalModelRef.indexOf("/");
-      const localModelId = slash === -1 ? canonicalModelRef : canonicalModelRef.slice(slash + 1);
-      const providerModel = provider
-        ? apiCatalog[provider]?.models[localModelId] ?? apiCatalog[provider]?.models[canonicalModelRef] ?? null
-        : null;
-      const exactModel = modelCatalog[canonicalModelRef];
-      if (exactModel) return { providerModel, modelOnly: exactModel };
-
-      const modelLeaf = canonicalModelRef.slice(canonicalModelRef.lastIndexOf("/") + 1);
-      const matches = new Set<ModelsDevModel>();
-      for (const [key, model] of Object.entries(modelCatalog)) {
-        if (key.slice(key.lastIndexOf("/") + 1) === modelLeaf) matches.add(model);
+const plain = (v: unknown): v is Record<string, unknown> =>
+  !!v &&
+  typeof v === "object" &&
+  !Array.isArray(v) &&
+  Object.getPrototypeOf(v) === Object.prototype;
+const safeId = (v: unknown) =>
+  typeof v === "string" &&
+  v.length > 0 &&
+  v.length <= 512 &&
+  ![...v].some((c) => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127);
+function validModel(v: unknown): v is ModelsDevModel {
+  return plain(v) && Object.keys(v).length <= 32;
+}
+function validateApi(v: unknown): ApiCatalog {
+  if (!plain(v) || Object.keys(v).length > 500) return {};
+  for (const [id, provider] of Object.entries(v))
+    if (
+      !safeId(id) ||
+      !plain(provider) ||
+      !plain(provider.models) ||
+      Object.keys(provider.models).length > 5000 ||
+      Object.entries(provider.models).some(
+        ([key, model]) => !safeId(key) || !validModel(model),
+      )
+    )
+      return {};
+  return v as ApiCatalog;
+}
+function validateModels(v: unknown): ModelCatalog {
+  if (
+    !plain(v) ||
+    Object.keys(v).length > 20000 ||
+    Object.entries(v).some(([id, model]) => !safeId(id) || !validModel(model))
+  )
+    return {};
+  return v as ModelCatalog;
+}
+async function body(response: Response): Promise<unknown | null> {
+  if (!response.ok || !response.body) return null;
+  const reader = response.body.getReader();
+  let total = 0;
+  const chunks: Uint8Array[] = [];
+  try {
+    for (;;) {
+      const next = await reader.read();
+      if (next.done) break;
+      total += next.value.byteLength;
+      if (total > MAX_BYTES) {
+        await reader.cancel();
+        return null;
       }
-      const modelOnly = matches.size === 1 ? [...matches][0] : null;
-      return { providerModel, modelOnly };
+      chunks.push(next.value);
+    }
+    return JSON.parse(new TextDecoder().decode(Buffer.concat(chunks)));
+  } catch {
+    return null;
+  } finally {
+    reader.releaseLock();
+  }
+}
+export function createModelsDevClient(input: {
+  fetch: typeof fetch;
+  apiUrl: string;
+  modelsUrl: string;
+  cache: ModelsDevCache;
+}): ModelsDevClient {
+  const load = <T extends object>(
+    name: CacheName,
+    url: string,
+    validate: (v: unknown) => T,
+  ) => {
+    let promise: Promise<T> | null = null;
+    return () =>
+      (promise ??= (async () => {
+        const cached = await input.cache.read(name, MAX_BYTES);
+        const cachedValid = validate(cached);
+        if (
+          cached !== null &&
+          (Object.keys(cachedValid).length > 0 ||
+            (plain(cached) && Object.keys(cached).length === 0))
+        )
+          return cachedValid;
+        try {
+          const data = await body(
+            await input.fetch(url, { signal: AbortSignal.timeout(15000) }),
+          );
+          const valid = validate(data);
+          if (data !== null && Object.keys(valid).length)
+            await input.cache.write(name, data);
+          return valid;
+        } catch {
+          return {} as T;
+        }
+      })());
+  };
+  const api = load("models-dev-api", input.apiUrl, validateApi),
+    models = load("models-dev-models", input.modelsUrl, validateModels);
+  return {
+    async lookupCanonical(provider, modelRef) {
+      const [a, m] = await Promise.all([api(), models()]);
+      const local = modelRef.slice(modelRef.indexOf("/") + 1);
+      return {
+        providerModel:
+          a[provider]?.models[local] ?? a[provider]?.models[modelRef] ?? null,
+        modelOnly: m[modelRef] ?? null,
+      };
+    },
+    async lookupExact(modelRef) {
+      return (await models())[modelRef] ?? null;
+    },
+    async lookupUniqueLeaf(modelRef) {
+      const leaf = modelRef.slice(modelRef.lastIndexOf("/") + 1);
+      const matches = Object.entries(await models()).filter(
+        ([key]) => key.slice(key.lastIndexOf("/") + 1) === leaf,
+      );
+      return matches.length === 1 ? matches[0]![1] : null;
     },
   };
 }
-
-let apiCatalogPromise: Promise<ApiCatalog> | null = null;
-let modelCatalogPromise: Promise<ModelCatalog> | null = null;
-
-async function loadCatalog<T extends object>(name: "models-dev-api" | "models-dev-models", url: string): Promise<T> {
-  const cached = await readCache(name);
-  if (cached && typeof cached === "object") return cached as T;
-  try {
-    const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json() as T;
-    await writeCache(name, data);
-    return data;
-  } catch (err) {
-    console.warn("opencode-9router: failed to fetch models.dev, using empty catalog:", (err as Error).message);
-    return {} as T;
-  }
+const production = createModelsDevClient({
+  fetch: globalThis.fetch,
+  apiUrl: API_URL,
+  modelsUrl: MODELS_URL,
+  cache: { read: readCacheBounded, write: writeCache },
+});
+export async function lookupModelsDev(
+  provider: string | undefined,
+  ref: string,
+): Promise<ModelsDevLookup> {
+  return provider
+    ? production.lookupCanonical(provider, ref)
+    : { providerModel: null, modelOnly: await production.lookupExact(ref) };
 }
-
-export async function lookupModelsDev(provider: string | undefined, canonicalModelRef: string): Promise<ModelsDevLookup> {
-  apiCatalogPromise ??= loadCatalog<ApiCatalog>("models-dev-api", API_URL);
-  modelCatalogPromise ??= loadCatalog<ModelCatalog>("models-dev-models", MODELS_URL);
-  return createModelsDevLookup(await apiCatalogPromise, await modelCatalogPromise).lookup(provider, canonicalModelRef);
-}
-
-export function resetModelsDevCatalogsForTest(): void {
-  apiCatalogPromise = null;
-  modelCatalogPromise = null;
-}
-
-function legacyLookup(index: Map<string, ModelsDevModel | null>, name: string): ModelsDevModel | null {
-  const dashed = name.replace(/([a-zA-Z])(\d)/, "$1-$2");
-  const matches = new Set<ModelsDevModel>();
-  for (const candidate of new Set([name, dashed, name.replace(/\./g, "-"), dashed.replace(/\./g, "-")])) {
-    const model = index.get(candidate);
-    if (model === null) return null;
-    if (model) matches.add(model);
-  }
-  return matches.size === 1 ? [...matches][0] : null;
-}
-
-/** Temporary display-metadata compatibility for current mapper. */
-export async function lookupModel(modelName: string): Promise<ModelsDevModel | null> {
-  apiCatalogPromise ??= loadCatalog<ApiCatalog>("models-dev-api", API_URL);
-  const index = new Map<string, ModelsDevModel | null>();
-  for (const provider of Object.values(await apiCatalogPromise)) {
-    for (const [id, model] of Object.entries(provider.models ?? {})) index.set(id, index.has(id) ? null : model);
-  }
-  return legacyLookup(index, modelName);
+export async function lookupModel(ref: string): Promise<ModelsDevModel | null> {
+  return production.lookupUniqueLeaf(ref);
 }
