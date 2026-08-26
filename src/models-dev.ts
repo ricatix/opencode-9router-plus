@@ -160,7 +160,7 @@ export function createModelsDevClient(input: {
       const matches = Object.entries(await models()).filter(
         ([key]) => key.slice(key.lastIndexOf("/") + 1) === leaf,
       );
-      return matches.length === 1 ? matches[0]![1] : null;
+      return matches.length === 1 ? matches[0]?.[1] : null;
     },
   };
 }

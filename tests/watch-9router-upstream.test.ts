@@ -158,10 +158,10 @@ describe("watch 9router upstream", () => {
       join(root, ".github/workflows/watch-9router-upstream.yml"),
       "utf8",
     );
-    expect(workflow.match(/^permissions:\n((?:  [^\n]+\n)+)/m)?.[1]).toBe(
+    expect(workflow.match(/^permissions:\n((?: {2}[^\n]+\n)+)/m)?.[1]).toBe(
       "  contents: write\n  pull-requests: write\n",
     );
-    expect(workflow).toMatch(/^on:\n  schedule:/m);
+    expect(workflow).toMatch(/^on:\n {2}schedule:/m);
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).toContain(
       "gh api repos/decolua/9router/git/ref/heads/master",

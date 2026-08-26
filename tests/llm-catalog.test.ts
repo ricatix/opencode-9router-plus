@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { renderCatalogModule } from "../scripts/extract-9router-llm-catalog.js";
+import { NINE_ROUTER_LLM_CATALOG } from "../src/generated/9router-llm-catalog.js";
 import {
   matchLlmCatalogRoute,
   validateLlmCatalog,
 } from "../src/llm-catalog.js";
 import { CATALOG_FIXTURE } from "./fixtures/9router-llm-catalog.js";
-import { NINE_ROUTER_LLM_CATALOG } from "../src/generated/9router-llm-catalog.js";
-import { renderCatalogModule } from "../scripts/extract-9router-llm-catalog.js";
 
 describe("LLM catalog", () => {
   test("reviews pinned static snapshot gate", () => {

@@ -4,10 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import {
   readCacheBounded,
-  setCacheOpenForTest,
   setCacheDirForTest,
+  setCacheOpenForTest,
   writeCache,
 } from "../src/cache.js";
+
 let dir = "";
 afterEach(async () => {
   setCacheOpenForTest();

@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFile, rename, rm, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import ts from "typescript";
 import { validateLlmCatalog } from "../src/llm-catalog.js";
 
@@ -706,7 +706,7 @@ export function validateProductionGoldens(
   );
   const grok = catalog.providers["grok-cli"];
   const high = grok?.models.find((model) => model.id === "grok-4.5-high");
-  const build = grok?.models.find((model) => model.id === "grok-build");
+  const _build = grok?.models.find((model) => model.id === "grok-build");
   const zai = Object.values(catalog.providers)
     .flatMap((provider) => provider.models)
     .find(
@@ -727,13 +727,15 @@ export function validateProductionGoldens(
     !review ||
     (
       sol.reasoning as
-        { reasoning?: unknown; thinkingFormat?: unknown } | undefined
+        | { reasoning?: unknown; thinkingFormat?: unknown }
+        | undefined
     )?.reasoning !== true ||
     (sol.reasoning as { thinkingFormat?: unknown } | undefined)
       ?.thinkingFormat !== "openai" ||
     (
       high?.reasoning as
-        { reasoning?: unknown; thinkingFormat?: unknown } | undefined
+        | { reasoning?: unknown; thinkingFormat?: unknown }
+        | undefined
     )?.reasoning !== true ||
     (high?.reasoning as { thinkingFormat?: unknown } | undefined)
       ?.thinkingFormat !== "openai" ||

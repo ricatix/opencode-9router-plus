@@ -22,6 +22,8 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run build
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun run check
 
       - run: npm publish --access public

@@ -1,17 +1,17 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtemp, mkdir, writeFile, readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
-import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { mkdir, mkdtemp, readdir, readFile, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
-  CATALOG_PROJECTIONS,
   CATALOG_PROJECTION_VERSION,
+  CATALOG_PROJECTIONS,
   extractCatalog,
   extractFixtureCatalog,
   isGrokCliReasoningProjectionModel,
-  parseCliArgs,
   PINNED_9ROUTER_COMMIT,
+  parseCliArgs,
   renderCatalogModule,
   renderReviewMetadata,
   verifyWhitelistedCleanForTest,

@@ -146,6 +146,11 @@ Runtime discovery accepts first occurrence of every explicit, valid model `id` f
 ```bash
 bun install
 bun run check
+bun run typecheck
+bun run lint
+bun run format:check
+bun run format
+bun run knip
 bun run test:deterministic
 bun run build
 bun run clean
@@ -154,7 +159,7 @@ bun run prepublishOnly
 
 `prepublishOnly` intentionally uses npm lifecycle commands internally: `npm run clean && npm run build`.
 
-`bun run check` runs deterministic tests, then builds the package. Run opt-in live smoke only against a reachable 9router endpoint with an API key:
+`bun run check` runs Prettier format check, Biome lint, unused-code, typecheck, and deterministic tests. `bun run format` writes Prettier formatting for tracked source, config, and docs files, excluding lockfiles and `dist/`. Pull requests and pushes to `main` run this same gate. Release tags run it before npm publish. Run `bun run build` to produce `dist/`. Run opt-in live smoke only against a reachable 9router endpoint with an API key:
 
 ```bash
 OPENCODE_9ROUTER_API_KEY="sk-..." bun run test:live

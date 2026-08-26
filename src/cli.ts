@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
-import { createInterface } from "node:readline/promises";
-import { stdin as input, stdout as output } from "node:process";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { stdin as input, stdout as output } from "node:process";
+import { createInterface } from "node:readline/promises";
 import { getCacheAge } from "./cache.js";
 
 const PACKAGE_NAME = "opencode-9router-plus";
@@ -38,7 +38,9 @@ function parseArgs(argv: string[]): Args {
   }
   const configIndex = argv.indexOf("--config");
   return {
-    command: ["install", "check", "uninstall"].includes(command) ? command : "help",
+    command: ["install", "check", "uninstall"].includes(command)
+      ? command
+      : "help",
     config: configIndex >= 0 ? argv[configIndex + 1] : undefined,
     global: argv.includes("--global"),
     project: argv.includes("--project"),
@@ -91,20 +93,38 @@ function projectConfigCreatePath(cwd = process.cwd()): string {
   return path.join(path.resolve(cwd), ".opencode", "opencode.json");
 }
 
-function resolveTargetConfig(args: Args): { file: string; warnings: string[]; created: boolean } {
+function resolveTargetConfig(args: Args): {
+  file: string;
+  warnings: string[];
+  created: boolean;
+} {
   const warnings: string[] = [];
   if (process.env.OPENCODE_CONFIG_CONTENT) {
-    warnings.push("OPENCODE_CONFIG_CONTENT is set; file-based changes may not affect the current opencode process.");
+    warnings.push(
+      "OPENCODE_CONFIG_CONTENT is set; file-based changes may not affect the current opencode process.",
+    );
   }
 
-  if (args.config) return { file: path.resolve(args.config), warnings, created: false };
+  if (args.config)
+    return { file: path.resolve(args.config), warnings, created: false };
 
   if (process.env.OPENCODE_CONFIG) {
-    warnings.push(`OPENCODE_CONFIG is set; using ${process.env.OPENCODE_CONFIG}`);
-    return { file: path.resolve(process.env.OPENCODE_CONFIG), warnings, created: false };
+    warnings.push(
+      `OPENCODE_CONFIG is set; using ${process.env.OPENCODE_CONFIG}`,
+    );
+    return {
+      file: path.resolve(process.env.OPENCODE_CONFIG),
+      warnings,
+      created: false,
+    };
   }
 
-  if (args.global) return { file: globalConfigPath(), warnings, created: !existsSync(globalConfigPath()) };
+  if (args.global)
+    return {
+      file: globalConfigPath(),
+      warnings,
+      created: !existsSync(globalConfigPath()),
+    };
 
   if (args.project) {
     const found = findProjectConfig();
@@ -140,7 +160,9 @@ async function readConfig(file: string): Promise<JsonObject> {
   if (!existsSync(file)) return { ...DEFAULT_CONFIG };
   const raw = await fs.readFile(file, "utf8");
   if (file.endsWith(".jsonc") && hasJsoncComments(raw)) {
-    throw new Error(`Refusing to edit JSONC with comments safely: ${file}. Use 'opencode plugin ${PACKAGE_NAME}' or pass --config to a JSON file.`);
+    throw new Error(
+      `Refusing to edit JSONC with comments safely: ${file}. Use 'opencode plugin ${PACKAGE_NAME}' or pass --config to a JSON file.`,
+    );
   }
   const parsed = JSON.parse(raw) as JsonObject;
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
@@ -156,12 +178,16 @@ function pluginName(entry: unknown): string | undefined {
 }
 
 function hasPlugin(cfg: JsonObject): boolean {
-  return Array.isArray(cfg.plugin) && cfg.plugin.some((entry) => pluginName(entry) === PACKAGE_NAME);
+  return (
+    Array.isArray(cfg.plugin) &&
+    cfg.plugin.some((entry) => pluginName(entry) === PACKAGE_NAME)
+  );
 }
 
 function addPlugin(cfg: JsonObject): { cfg: JsonObject; changed: boolean } {
   if (cfg.plugin === undefined) cfg.plugin = [];
-  if (!Array.isArray(cfg.plugin)) throw new Error("Config field 'plugin' exists but is not an array.");
+  if (!Array.isArray(cfg.plugin))
+    throw new Error("Config field 'plugin' exists but is not an array.");
   if (hasPlugin(cfg)) return { cfg, changed: false };
   cfg.plugin.push(PACKAGE_NAME);
   return { cfg, changed: true };
@@ -169,9 +195,12 @@ function addPlugin(cfg: JsonObject): { cfg: JsonObject; changed: boolean } {
 
 function removePlugin(cfg: JsonObject): { cfg: JsonObject; changed: boolean } {
   if (cfg.plugin === undefined) return { cfg, changed: false };
-  if (!Array.isArray(cfg.plugin)) throw new Error("Config field 'plugin' exists but is not an array.");
+  if (!Array.isArray(cfg.plugin))
+    throw new Error("Config field 'plugin' exists but is not an array.");
   const before = cfg.plugin.length;
-  cfg.plugin = cfg.plugin.filter((entry: unknown) => pluginName(entry) !== PACKAGE_NAME);
+  cfg.plugin = cfg.plugin.filter(
+    (entry: unknown) => pluginName(entry) !== PACKAGE_NAME,
+  );
   return { cfg, changed: cfg.plugin.length !== before };
 }
 
@@ -184,35 +213,59 @@ async function confirm(message: string, yes: boolean): Promise<boolean> {
 }
 
 function timestamp(): string {
-  return new Date().toISOString().replace(/[-:]/g, "").replace(/\..+$/, "").replace("T", "-");
+  return new Date()
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\..+$/, "")
+    .replace("T", "-");
 }
 
-async function writeConfig(file: string, cfg: JsonObject, createBackup: boolean): Promise<string | undefined> {
+async function writeConfig(
+  file: string,
+  cfg: JsonObject,
+  createBackup: boolean,
+): Promise<string | undefined> {
   await fs.mkdir(path.dirname(file), { recursive: true });
   let backup: string | undefined;
   if (createBackup && existsSync(file)) {
     backup = `${file}.bak-${timestamp()}`;
     await fs.copyFile(file, backup);
   }
-  const tmp = path.join(path.dirname(file), `.opencode-9router-${process.pid}-${Date.now()}.tmp`);
+  const tmp = path.join(
+    path.dirname(file),
+    `.opencode-9router-${process.pid}-${Date.now()}.tmp`,
+  );
   await fs.writeFile(tmp, `${JSON.stringify(cfg, null, 2)}\n`, "utf8");
   await fs.rename(tmp, file);
   return backup;
 }
 
 function tryNativeInstall(): boolean {
-  const result = spawnSync("opencode", ["plugin", PACKAGE_NAME], { stdio: "inherit", shell: process.platform === "win32" });
+  const result = spawnSync("opencode", ["plugin", PACKAGE_NAME], {
+    stdio: "inherit",
+    shell: process.platform === "win32",
+  });
   return result.status === 0;
 }
 
 async function install(args: Args): Promise<void> {
-  if (!args.manual && !args.config && !args.project && !args.global && !args.dryRun) {
+  if (
+    !args.manual &&
+    !args.config &&
+    !args.project &&
+    !args.global &&
+    !args.dryRun
+  ) {
     console.log(`Trying native install: opencode plugin ${PACKAGE_NAME}`);
     if (tryNativeInstall()) {
-      console.log("Installed with opencode's native plugin installer. Restart opencode to load the plugin.");
+      console.log(
+        "Installed with opencode's native plugin installer. Restart opencode to load the plugin.",
+      );
       return;
     }
-    console.log("Native installer failed or is unavailable; falling back to safe config edit.");
+    console.log(
+      "Native installer failed or is unavailable; falling back to safe config edit.",
+    );
   }
 
   const target = resolveTargetConfig(args);
@@ -283,15 +336,23 @@ async function check(args: Args): Promise<void> {
     console.log(`Config parse: failed - ${(err as Error).message}`);
   }
 
-  console.log(`OPENCODE_9ROUTER_URL: ${process.env.OPENCODE_9ROUTER_URL || "http://localhost:20128/v1 (default)"}`);
-  console.log(`OPENCODE_9ROUTER_API_KEY: ${process.env.OPENCODE_9ROUTER_API_KEY ? "set" : "missing"}`);
+  console.log(
+    `OPENCODE_9ROUTER_URL: ${process.env.OPENCODE_9ROUTER_URL || "http://localhost:20128/v1 (default)"}`,
+  );
+  console.log(
+    `OPENCODE_9ROUTER_API_KEY: ${process.env.OPENCODE_9ROUTER_API_KEY ? "set" : "missing"}`,
+  );
 
-  const result = spawnSync("opencode", ["models", "9router"], { encoding: "utf8", shell: process.platform === "win32" });
+  const result = spawnSync("opencode", ["models", "9router"], {
+    encoding: "utf8",
+    shell: process.platform === "win32",
+  });
   if (result.status === 0) {
     const lines = result.stdout.trim().split(/\r?\n/).filter(Boolean);
     console.log(`opencode models 9router: ok (${lines.length} models)`);
   } else {
-    const stderr = result.stderr?.trim() || "command failed or opencode is not on PATH";
+    const stderr =
+      result.stderr?.trim() || "command failed or opencode is not on PATH";
     console.log(`opencode models 9router: failed - ${stderr}`);
   }
 
@@ -300,7 +361,9 @@ async function check(args: Args): Promise<void> {
   if (cache.exists && cache.ageMs !== undefined) {
     const hours = Math.floor(cache.ageMs / (1000 * 60 * 60));
     const minutes = Math.floor((cache.ageMs % (1000 * 60 * 60)) / (1000 * 60));
-    console.log(`models.dev cache: present (${hours}h${minutes}m old, TTL 24h)`);
+    console.log(
+      `models.dev cache: present (${hours}h${minutes}m old, TTL 24h)`,
+    );
   } else {
     console.log("models.dev cache: not found (will fetch on startup)");
   }

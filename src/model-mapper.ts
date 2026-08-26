@@ -1,11 +1,11 @@
 import {
-  resolveCatalogVariants,
   type CatalogModelVariants,
   type ModelVariants,
+  resolveCatalogVariants,
 } from "./capability-resolver.js";
-import type { ModelsDevClient, ModelsDevModel } from "./models-dev.js";
 import { NINE_ROUTER_LLM_CATALOG } from "./generated/9router-llm-catalog.js";
 import { matchLlmCatalogRoute } from "./llm-catalog.js";
+import type { ModelsDevClient, ModelsDevModel } from "./models-dev.js";
 export interface OpenCodeModelEntry {
   id?: string;
   name?: string;
@@ -115,7 +115,7 @@ export async function resolveModel(
   if (entry.reasoning) {
     const variants = resolveCatalogVariants({
       rawModelId: fullId,
-      staticCapabilities: route!.model.reasoning,
+      staticCapabilities: route?.model.reasoning,
       picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker,
     });
     if (Object.keys(variants).length) entry.variants = variants;

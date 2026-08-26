@@ -62,7 +62,7 @@ test("factory preserves own user entries and never resolves them", async () => {
     model: "keep",
     provider: { "9router": { models: { fresh: { id: "user" } } } },
   };
-  await hooks.config!(cfg);
+  await hooks.config?.(cfg);
   expect(calls).toBe(0);
   expect(cfg.provider["9router"].models.fresh).toEqual({ id: "user" });
   expect(cfg.model).toBe("keep");
@@ -90,7 +90,7 @@ test("factory preserves user model reference without reading getters", async () 
     },
   });
   const hooks = await plugin({} as never);
-  await hooks.config!({ provider: { "9router": { models } } } as any);
+  await hooks.config?.({ provider: { "9router": { models } } } as any);
   expect(Object.getOwnPropertyDescriptor(models, "fresh")?.get).toBeDefined();
   expect(user).toEqual({ id: "user" });
 });
@@ -131,7 +131,7 @@ test("reject matrix and valid-ID default", async () => {
   });
   const hooks = await plugin({} as never);
   const cfg: any = {};
-  await hooks.config!(cfg);
+  await hooks.config?.(cfg);
   expect(Object.getPrototypeOf(cfg.provider["9router"].models)).toBeNull();
   expect(cfg.model).toBe("9router/later/gpt");
 });
@@ -148,7 +148,7 @@ test("truthy non-object models fails safely", async () => {
   });
   const hooks = await plugin({} as never);
   await expect(
-    hooks.config!({ provider: { "9router": { models: [] } } } as any),
+    hooks.config?.({ provider: { "9router": { models: [] } } } as any),
   ).rejects.toThrow();
 });
 

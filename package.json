@@ -30,7 +30,12 @@
     "clean": "rimraf dist",
     "test:deterministic": "bun test tests/*.test.ts",
     "test:live": "bun tests/live-model-translation.smoke.ts",
-    "check": "bun run test:deterministic && bun run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "biome check --linter-enabled=true --formatter-enabled=false .",
+    "format:check": "prettier --check --ignore-path .prettierignore \"**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc,css,scss,less,html,md,mdx,yaml,yml}\"",
+    "format": "prettier --write --ignore-path .prettierignore \"**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc,css,scss,less,html,md,mdx,yaml,yml}\"",
+    "knip": "knip --exclude exports,types,duplicates",
+    "check": "bun run format:check && bun run lint && bun run knip && bun run typecheck && bun run test:deterministic",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
@@ -45,8 +50,11 @@
     "@opencode-ai/plugin": ">=1.14.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.10",
     "@opencode-ai/plugin": "^1.14.48",
     "@types/node": "^24.10.1",
+    "knip": "^6.32.2",
+    "prettier": "3.7.4",
     "rimraf": "^6.1.0",
     "typescript": "^5.8.2"
   }

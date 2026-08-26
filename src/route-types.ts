@@ -5,7 +5,14 @@ export interface NineRouterCapabilities {
   thinkingRange?: unknown;
 }
 
-export type NineRouterModelKind = "llm" | "image" | "tts" | "stt" | "embedding" | "image-to-text" | "web";
+export type NineRouterModelKind =
+  | "llm"
+  | "image"
+  | "tts"
+  | "stt"
+  | "embedding"
+  | "image-to-text"
+  | "web";
 
 export interface StaticLlmModel {
   id: string;

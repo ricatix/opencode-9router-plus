@@ -81,7 +81,7 @@ else {
   });
   const hooks = await plugin({} as never),
     config: any = {};
-  await hooks.config!(config);
+  await hooks.config?.(config);
   const accepted = acceptDiscoveryEntries(captured),
     models = config.provider?.["9router"]?.models ?? {};
   if (!accepted.length)

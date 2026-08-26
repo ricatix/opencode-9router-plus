@@ -5,7 +5,7 @@ const client = (
   canonical: any = { providerModel: null, modelOnly: null },
   exact: any = null,
 ) => ({
-  lookupCanonical: async (...args: string[]) => canonical,
+  lookupCanonical: async (..._args: string[]) => canonical,
   lookupExact: async (id: string) => (id === "private/exact" ? exact : null),
   lookupUniqueLeaf: async (id: string) =>
     id === "private/exact" ? exact : null,

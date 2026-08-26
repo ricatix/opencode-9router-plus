@@ -1,10 +1,10 @@
 import type { Plugin } from "@opencode-ai/plugin";
+import { readCacheBounded, writeCache } from "./cache.js";
 import {
   resolveModel as defaultResolveModel,
   type OpenCodeModelEntry,
 } from "./model-mapper.js";
 import { createModelsDevClient, type ModelsDevClient } from "./models-dev.js";
-import { readCacheBounded, writeCache } from "./cache.js";
 export type AcceptedDiscoveryEntry = { id: string; kind: "llm" };
 type AnyCfg = Record<string, any>;
 export interface PluginDependencies {

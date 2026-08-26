@@ -60,12 +60,12 @@ opencode-9router-plus/
 ## CONVENTIONS
 
 - ESM package: local TypeScript imports use `.js` suffix.
-- TypeScript: ES2022, NodeNext, declarations, strict mode.
+- TypeScript: ES2022, NodeNext, declarations, strict mode, unused local and parameter checks.
 - Runtime env: `OPENCODE_9ROUTER_URL`, `OPENCODE_9ROUTER_API_KEY`, `OPENCODE_9ROUTER_TIMEOUT_MS`.
 - Live discovery trusts only explicit valid `id`; `kind` is optional and ignored. Static reviewed catalog decides canonical identity, reasoning, and variants.
 - `models.dev` uses exact canonical/provider metadata lookup only. Reviewed Codex routes canonicalize to `openai` for metadata. Non-catalog routes may use global metadata only when exactly one key shares its exact case-sensitive final path segment. It does not decide listing, capabilities, route ownership, reasoning, or variants. Unmatched models use all-false conservative fallback.
 - CLI config writes back up existing files and write atomically. Commented `.jsonc` fallback edits are refused.
-- Prefer `bun run check` for deterministic tests plus build. Use `bun run test:live` only with `OPENCODE_9ROUTER_API_KEY`. Publish lifecycle retains `npm run clean && npm run build`.
+- Prefer `bun run check` for Prettier format check, Biome lint, unused-code, typecheck, and deterministic tests. `bun run format` writes source, config, and docs formatting without lockfiles or `dist/`. `bun run build` creates `dist/`. Use `bun run test:live` only with `OPENCODE_9ROUTER_API_KEY`. Release runs `bun run check` before `npm publish`; `prepublishOnly` retains `npm run clean && npm run build`.
 
 ## ANTI-PATTERNS
 
@@ -90,6 +90,12 @@ opencode-9router-plus/
 ```bash
 bun install
 bun test
+bun run check
+bun run typecheck
+bun run lint
+bun run format:check
+bun run format
+bun run knip
 bun run build
 bun run clean
 bun run prepublishOnly

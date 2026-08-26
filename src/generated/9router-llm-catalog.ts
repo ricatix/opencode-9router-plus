@@ -1,8 +1,8 @@
 import type { NineRouterLlmCatalog } from "../route-types.js";
 
 export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
-  "sourceCommit": "79918c7830695bbca4a45c9fea4a42c3e9fd73d1",
-  "sourceFiles": [
+  sourceCommit: "79918c7830695bbca4a45c9fea4a42c3e9fd73d1",
+  sourceFiles: [
     "open-sse/config/grokCli.js",
     "open-sse/config/providerModels.js",
     "open-sse/providers/capabilities.js",
@@ -111,5734 +111,5597 @@ export const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = {
     "open-sse/providers/registry/xiaomi-tokenplan.js",
     "open-sse/providers/registry/youcom.js",
     "open-sse/providers/schema.js",
-    "open-sse/providers/thinkingLevels.js"
+    "open-sse/providers/thinkingLevels.js",
   ],
-  "providers": {
-    "alicode": {
-      "id": "alicode",
-      "catalogKey": "alicode",
-      "aliases": [],
-      "models": [
+  providers: {
+    alicode: {
+      id: "alicode",
+      catalogKey: "alicode",
+      aliases: [],
+      models: [
         {
-          "id": "qwen3.5-plus",
-          "kind": "llm",
-          "name": "Qwen3.5 Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3.5-plus",
+          kind: "llm",
+          name: "Qwen3.5 Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-max-2026-01-23",
-          "kind": "llm",
-          "name": "Qwen3 Max",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-max-2026-01-23",
+          kind: "llm",
+          name: "Qwen3 Max",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-coder-next",
-          "kind": "llm",
-          "name": "Qwen3 Coder Next",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-coder-next",
+          kind: "llm",
+          name: "Qwen3 Coder Next",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-coder-plus",
-          "kind": "llm",
-          "name": "Qwen3 Coder Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-coder-plus",
+          kind: "llm",
+          name: "Qwen3 Coder Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.7",
-          "kind": "llm",
-          "name": "GLM 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "glm-4.7",
+          kind: "llm",
+          name: "GLM 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "alicode-intl": {
-      "id": "alicode-intl",
-      "catalogKey": "alicode-intl",
-      "aliases": [],
-      "models": [
+      id: "alicode-intl",
+      catalogKey: "alicode-intl",
+      aliases: [],
+      models: [
         {
-          "id": "qwen3.5-plus",
-          "kind": "llm",
-          "name": "Qwen3.5 Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3.5-plus",
+          kind: "llm",
+          name: "Qwen3.5 Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-coder-next",
-          "kind": "llm",
-          "name": "Qwen3 Coder Next",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-coder-next",
+          kind: "llm",
+          name: "Qwen3 Coder Next",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-coder-plus",
-          "kind": "llm",
-          "name": "Qwen3 Coder Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-coder-plus",
+          kind: "llm",
+          name: "Qwen3 Coder Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.7",
-          "kind": "llm",
-          "name": "GLM 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "glm-4.7",
+          kind: "llm",
+          name: "GLM 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "alims-intl": {
-      "id": "alims-intl",
-      "catalogKey": "alims-intl",
-      "aliases": [],
-      "models": [
+      id: "alims-intl",
+      catalogKey: "alims-intl",
+      aliases: [],
+      models: [
         {
-          "id": "qwen3.5-plus",
-          "kind": "llm",
-          "name": "Qwen3.5 Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3.5-plus",
+          kind: "llm",
+          name: "Qwen3.5 Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-coder-next",
-          "kind": "llm",
-          "name": "Qwen3 Coder Next",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-coder-next",
+          kind: "llm",
+          name: "Qwen3 Coder Next",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-coder-plus",
-          "kind": "llm",
-          "name": "Qwen3 Coder Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-coder-plus",
+          kind: "llm",
+          name: "Qwen3 Coder Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.7",
-          "kind": "llm",
-          "name": "GLM 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "anthropic": {
-      "id": "anthropic",
-      "catalogKey": "anthropic",
-      "aliases": [],
-      "models": [
-        {
-          "id": "claude-sonnet-4-20250514",
-          "kind": "llm",
-          "name": "Claude Sonnet 4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-4.7",
+          kind: "llm",
+          name: "GLM 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
-        {
-          "id": "claude-opus-4-20250514",
-          "kind": "llm",
-          "name": "Claude Opus 4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-3-5-sonnet-20241022",
-          "kind": "llm",
-          "name": "Claude 3.5 Sonnet",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "antigravity": {
-      "id": "antigravity",
-      "catalogKey": "ag",
-      "aliases": [],
-      "models": [
-        {
-          "id": "gemini-3-flash-agent",
-          "kind": "llm",
-          "name": "Gemini 3.5 Flash (High)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gemini-3.5-flash-low",
-          "kind": "llm",
-          "name": "Gemini 3.5 Flash (Medium)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gemini-3.5-flash-extra-low",
-          "kind": "llm",
-          "name": "Gemini 3.5 Flash (Low)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gemini-pro-agent",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro (High)"
-        },
-        {
-          "id": "gemini-3.1-pro-low",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro (Low)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-sonnet-4-6",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.6 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-opus-4-6-thinking",
-          "kind": "llm",
-          "name": "Claude Opus 4.6 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gpt-oss-120b-medium",
-          "kind": "llm",
-          "name": "GPT-OSS 120B (Medium)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gemini-3-flash",
-          "kind": "llm",
-          "name": "Gemini 3 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "assemblyai": {
-      "id": "assemblyai",
-      "catalogKey": "assemblyai",
-      "aliases": [
-        "aai"
       ],
-      "models": []
+    },
+    anthropic: {
+      id: "anthropic",
+      catalogKey: "anthropic",
+      aliases: [],
+      models: [
+        {
+          id: "claude-sonnet-4-20250514",
+          kind: "llm",
+          name: "Claude Sonnet 4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-opus-4-20250514",
+          kind: "llm",
+          name: "Claude Opus 4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-3-5-sonnet-20241022",
+          kind: "llm",
+          name: "Claude 3.5 Sonnet",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
+    },
+    antigravity: {
+      id: "antigravity",
+      catalogKey: "ag",
+      aliases: [],
+      models: [
+        {
+          id: "gemini-3-flash-agent",
+          kind: "llm",
+          name: "Gemini 3.5 Flash (High)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-3.5-flash-low",
+          kind: "llm",
+          name: "Gemini 3.5 Flash (Medium)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-3.5-flash-extra-low",
+          kind: "llm",
+          name: "Gemini 3.5 Flash (Low)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-pro-agent",
+          kind: "llm",
+          name: "Gemini 3.1 Pro (High)",
+        },
+        {
+          id: "gemini-3.1-pro-low",
+          kind: "llm",
+          name: "Gemini 3.1 Pro (Low)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-sonnet-4-6",
+          kind: "llm",
+          name: "Claude Sonnet 4.6 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-opus-4-6-thinking",
+          kind: "llm",
+          name: "Claude Opus 4.6 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-oss-120b-medium",
+          kind: "llm",
+          name: "GPT-OSS 120B (Medium)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-3-flash",
+          kind: "llm",
+          name: "Gemini 3 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+      ],
+    },
+    assemblyai: {
+      id: "assemblyai",
+      catalogKey: "assemblyai",
+      aliases: ["aai"],
+      models: [],
     },
     "aws-polly": {
-      "id": "aws-polly",
-      "catalogKey": "polly",
-      "aliases": [],
-      "models": []
+      id: "aws-polly",
+      catalogKey: "polly",
+      aliases: [],
+      models: [],
     },
-    "azure": {
-      "id": "azure",
-      "catalogKey": "azure",
-      "aliases": [],
-      "models": []
+    azure: {
+      id: "azure",
+      catalogKey: "azure",
+      aliases: [],
+      models: [],
     },
     "black-forest-labs": {
-      "id": "black-forest-labs",
-      "catalogKey": "black-forest-labs",
-      "aliases": [
-        "bfl"
-      ],
-      "models": []
+      id: "black-forest-labs",
+      catalogKey: "black-forest-labs",
+      aliases: ["bfl"],
+      models: [],
     },
-    "blackbox": {
-      "id": "blackbox",
-      "catalogKey": "blackbox",
-      "aliases": [
-        "bb"
+    blackbox: {
+      id: "blackbox",
+      catalogKey: "blackbox",
+      aliases: ["bb"],
+      models: [
+        {
+          id: "claude-fable-5",
+          kind: "llm",
+          name: "Claude Fable 5",
+          upstreamModelId: "blackboxai/anthropic/claude-fable-5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-opus-4.8",
+          kind: "llm",
+          name: "Claude Opus 4.8",
+          upstreamModelId: "blackboxai/anthropic/claude-opus-4.8",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-sonnet-4.6",
+          kind: "llm",
+          name: "Claude Sonnet 4.6",
+          upstreamModelId: "blackboxai/anthropic/claude-sonnet-4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.5",
+          kind: "llm",
+          name: "GPT-5.5",
+          upstreamModelId: "blackboxai/openai/gpt-5.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.4-pro",
+          kind: "llm",
+          name: "GPT-5.4 Pro",
+          upstreamModelId: "blackboxai/openai/gpt-5.4-pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.4",
+          kind: "llm",
+          name: "GPT-5.4",
+          upstreamModelId: "blackboxai/openai/gpt-5.4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.3-codex",
+          kind: "llm",
+          name: "GPT-5.3 Codex",
+          upstreamModelId: "blackboxai/openai/gpt-5.3-codex",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.4-nano",
+          kind: "llm",
+          name: "GPT-5.4 Nano",
+          upstreamModelId: "blackboxai/openai/gpt-5.4-nano",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v4-flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash",
+          upstreamModelId: "blackboxai/deepseek/deepseek-v4-flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.3",
+          kind: "llm",
+          name: "Grok 4.3",
+          upstreamModelId: "blackboxai/x-ai/grok-4.3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "claude-fable-5",
-          "kind": "llm",
-          "name": "Claude Fable 5",
-          "upstreamModelId": "blackboxai/anthropic/claude-fable-5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-opus-4.8",
-          "kind": "llm",
-          "name": "Claude Opus 4.8",
-          "upstreamModelId": "blackboxai/anthropic/claude-opus-4.8",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-sonnet-4.6",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.6",
-          "upstreamModelId": "blackboxai/anthropic/claude-sonnet-4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gpt-5.5",
-          "kind": "llm",
-          "name": "GPT-5.5",
-          "upstreamModelId": "blackboxai/openai/gpt-5.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gpt-5.4-pro",
-          "kind": "llm",
-          "name": "GPT-5.4 Pro",
-          "upstreamModelId": "blackboxai/openai/gpt-5.4-pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gpt-5.4",
-          "kind": "llm",
-          "name": "GPT-5.4",
-          "upstreamModelId": "blackboxai/openai/gpt-5.4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gpt-5.3-codex",
-          "kind": "llm",
-          "name": "GPT-5.3 Codex",
-          "upstreamModelId": "blackboxai/openai/gpt-5.3-codex",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gpt-5.4-nano",
-          "kind": "llm",
-          "name": "GPT-5.4 Nano",
-          "upstreamModelId": "blackboxai/openai/gpt-5.4-nano",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v4-flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash",
-          "upstreamModelId": "blackboxai/deepseek/deepseek-v4-flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.3",
-          "kind": "llm",
-          "name": "Grok 4.3",
-          "upstreamModelId": "blackboxai/x-ai/grok-4.3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
     "brave-search": {
-      "id": "brave-search",
-      "catalogKey": "brave",
-      "aliases": [],
-      "models": []
+      id: "brave-search",
+      catalogKey: "brave",
+      aliases: [],
+      models: [],
     },
-    "byteplus": {
-      "id": "byteplus",
-      "catalogKey": "byteplus",
-      "aliases": [
-        "bpm"
+    byteplus: {
+      id: "byteplus",
+      catalogKey: "byteplus",
+      aliases: ["bpm"],
+      models: [
+        {
+          id: "seed-2-0-pro-260328",
+          kind: "llm",
+          name: "Seed 2.0 Pro",
+        },
+        {
+          id: "seed-2-0-code-preview-260328",
+          kind: "llm",
+          name: "Seed 2.0 Code Preview",
+        },
+        {
+          id: "seed-2-0-mini-260215",
+          kind: "llm",
+          name: "Seed 2.0 Mini",
+        },
+        {
+          id: "seed-2-0-lite-260228",
+          kind: "llm",
+          name: "Seed 2.0 Lite",
+        },
+        {
+          id: "kimi-k2-thinking-251104",
+          kind: "llm",
+          name: "Kimi K2 Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "glm-4-7-251222",
+          kind: "llm",
+          name: "GLM 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-oss-120b-250805",
+          kind: "llm",
+          name: "GPT-OSS-120B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "seed-2-0-pro-260328",
-          "kind": "llm",
-          "name": "Seed 2.0 Pro"
-        },
-        {
-          "id": "seed-2-0-code-preview-260328",
-          "kind": "llm",
-          "name": "Seed 2.0 Code Preview"
-        },
-        {
-          "id": "seed-2-0-mini-260215",
-          "kind": "llm",
-          "name": "Seed 2.0 Mini"
-        },
-        {
-          "id": "seed-2-0-lite-260228",
-          "kind": "llm",
-          "name": "Seed 2.0 Lite"
-        },
-        {
-          "id": "kimi-k2-thinking-251104",
-          "kind": "llm",
-          "name": "Kimi K2 Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-4-7-251222",
-          "kind": "llm",
-          "name": "GLM 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gpt-oss-120b-250805",
-          "kind": "llm",
-          "name": "GPT-OSS-120B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
-    "cartesia": {
-      "id": "cartesia",
-      "catalogKey": "cartesia",
-      "aliases": [],
-      "models": []
+    cartesia: {
+      id: "cartesia",
+      catalogKey: "cartesia",
+      aliases: [],
+      models: [],
     },
-    "cerebras": {
-      "id": "cerebras",
-      "catalogKey": "cerebras",
-      "aliases": [],
-      "models": [
+    cerebras: {
+      id: "cerebras",
+      catalogKey: "cerebras",
+      aliases: [],
+      models: [
         {
-          "id": "gpt-oss-120b",
-          "kind": "llm",
-          "name": "GPT OSS 120B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-oss-120b",
+          kind: "llm",
+          name: "GPT OSS 120B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "zai-glm-4.7",
-          "kind": "llm",
-          "name": "ZAI GLM 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "zai-glm-4.7",
+          kind: "llm",
+          name: "ZAI GLM 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "llama-3.3-70b",
-          "kind": "llm",
-          "name": "Llama 3.3 70B"
+          id: "llama-3.3-70b",
+          kind: "llm",
+          name: "Llama 3.3 70B",
         },
         {
-          "id": "llama-4-scout-17b-16e-instruct",
-          "kind": "llm",
-          "name": "Llama 4 Scout"
+          id: "llama-4-scout-17b-16e-instruct",
+          kind: "llm",
+          name: "Llama 4 Scout",
         },
         {
-          "id": "qwen-3-235b-a22b-instruct-2507",
-          "kind": "llm",
-          "name": "Qwen3 235B A22B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen-3-235b-a22b-instruct-2507",
+          kind: "llm",
+          name: "Qwen3 235B A22B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen-3-32b",
-          "kind": "llm",
-          "name": "Qwen3 32B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "chutes": {
-      "id": "chutes",
-      "catalogKey": "chutes",
-      "aliases": [
-        "ch"
+          id: "qwen-3-32b",
+          kind: "llm",
+          name: "Qwen3 32B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": []
     },
-    "claude": {
-      "id": "claude",
-      "catalogKey": "cc",
-      "aliases": [],
-      "models": [
-        {
-          "id": "claude-fable-5",
-          "kind": "llm",
-          "name": "Claude Fable 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-sonnet-5",
-          "kind": "llm",
-          "name": "Claude Sonnet 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-opus-4-8",
-          "kind": "llm",
-          "name": "Claude Opus 4.8",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-opus-4-7",
-          "kind": "llm",
-          "name": "Claude Opus 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "claude-haiku-4-5-20251001",
-          "kind": "llm",
-          "name": "Claude 4.5 Haiku",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+    chutes: {
+      id: "chutes",
+      catalogKey: "chutes",
+      aliases: ["ch"],
+      models: [],
     },
-    "cline": {
-      "id": "cline",
-      "catalogKey": "cl",
-      "aliases": [],
-      "models": [
+    claude: {
+      id: "claude",
+      catalogKey: "cc",
+      aliases: [],
+      models: [
         {
-          "id": "anthropic/claude-opus-4.7",
-          "kind": "llm",
-          "name": "Claude Opus 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-fable-5",
+          kind: "llm",
+          name: "Claude Fable 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "anthropic/claude-sonnet-4.6",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-5",
+          kind: "llm",
+          name: "Claude Sonnet 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "anthropic/claude-opus-4.6",
-          "kind": "llm",
-          "name": "Claude Opus 4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4-8",
+          kind: "llm",
+          name: "Claude Opus 4.8",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "openai/gpt-5.3-codex",
-          "kind": "llm",
-          "name": "GPT-5.3 Codex",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4-7",
+          kind: "llm",
+          name: "Claude Opus 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "openai/gpt-5.4",
-          "kind": "llm",
-          "name": "GPT-5.4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-haiku-4-5-20251001",
+          kind: "llm",
+          name: "Claude 4.5 Haiku",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
-        {
-          "id": "google/gemini-3.1-pro-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "google/gemini-3.1-flash-lite-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Flash Lite Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kwaipilot/kat-coder-pro",
-          "kind": "llm",
-          "name": "KAT Coder Pro"
-        }
-      ]
+      ],
     },
-    "clinepass": {
-      "id": "clinepass",
-      "catalogKey": "clinepass",
-      "aliases": [],
-      "models": [
+    cline: {
+      id: "cline",
+      catalogKey: "cl",
+      aliases: [],
+      models: [
         {
-          "id": "cline-pass/glm-5.2",
-          "kind": "llm",
-          "name": "GLM-5.2 (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "anthropic/claude-opus-4.7",
+          kind: "llm",
+          name: "Claude Opus 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/kimi-k2.7-code",
-          "kind": "llm",
-          "name": "Kimi K2.7 Code (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "anthropic/claude-sonnet-4.6",
+          kind: "llm",
+          name: "Claude Sonnet 4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/kimi-k2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6 (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "anthropic/claude-opus-4.6",
+          kind: "llm",
+          name: "Claude Opus 4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/deepseek-v4-pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "openai/gpt-5.3-codex",
+          kind: "llm",
+          name: "GPT-5.3 Codex",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/deepseek-v4-flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "openai/gpt-5.4",
+          kind: "llm",
+          name: "GPT-5.4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/mimo-v2.5",
-          "kind": "llm",
-          "name": "MiMo-V2.5 (ClinePass)"
+          id: "google/gemini-3.1-pro-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Pro Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/mimo-v2.5-pro",
-          "kind": "llm",
-          "name": "MiMo-V2.5-Pro (ClinePass)"
+          id: "google/gemini-3.1-flash-lite-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Flash Lite Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/minimax-m3",
-          "kind": "llm",
-          "name": "MiniMax M3 (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "kwaipilot/kat-coder-pro",
+          kind: "llm",
+          name: "KAT Coder Pro",
+        },
+      ],
+    },
+    clinepass: {
+      id: "clinepass",
+      catalogKey: "clinepass",
+      aliases: [],
+      models: [
+        {
+          id: "cline-pass/glm-5.2",
+          kind: "llm",
+          name: "GLM-5.2 (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/qwen3.7-max",
-          "kind": "llm",
-          "name": "Qwen3.7 Max (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "cline-pass/kimi-k2.7-code",
+          kind: "llm",
+          name: "Kimi K2.7 Code (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "cline-pass/qwen3.7-plus",
-          "kind": "llm",
-          "name": "Qwen3.7 Plus (ClinePass)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "cline-pass/kimi-k2.6",
+          kind: "llm",
+          name: "Kimi K2.6 (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "cline-pass/deepseek-v4-pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "cline-pass/deepseek-v4-flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "cline-pass/mimo-v2.5",
+          kind: "llm",
+          name: "MiMo-V2.5 (ClinePass)",
+        },
+        {
+          id: "cline-pass/mimo-v2.5-pro",
+          kind: "llm",
+          name: "MiMo-V2.5-Pro (ClinePass)",
+        },
+        {
+          id: "cline-pass/minimax-m3",
+          kind: "llm",
+          name: "MiniMax M3 (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "cline-pass/qwen3.7-max",
+          kind: "llm",
+          name: "Qwen3.7 Max (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "cline-pass/qwen3.7-plus",
+          kind: "llm",
+          name: "Qwen3.7 Plus (ClinePass)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "cloudflare-ai": {
-      "id": "cloudflare-ai",
-      "catalogKey": "cloudflare-ai",
-      "aliases": [
-        "cf"
+      id: "cloudflare-ai",
+      catalogKey: "cloudflare-ai",
+      aliases: ["cf"],
+      models: [
+        {
+          id: "@cf/meta/llama-3.2-1b-instruct",
+          kind: "llm",
+          name: "Llama 3.2 1B Instruct",
+        },
+        {
+          id: "@cf/meta/llama-3.2-3b-instruct",
+          kind: "llm",
+          name: "Llama 3.2 3B Instruct",
+        },
+        {
+          id: "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+          kind: "llm",
+          name: "Llama 3.1 8B Instruct FP8 Fast",
+        },
+        {
+          id: "@cf/meta/llama-3.1-8b-instruct-awq",
+          kind: "llm",
+          name: "Llama 3.1 8B Instruct AWQ",
+        },
+        {
+          id: "@cf/mistralai/mistral-small-3.1-24b-instruct",
+          kind: "llm",
+          name: "Mistral Small 3.1 24B Instruct",
+        },
+        {
+          id: "@cf/meta/llama-3.1-70b-instruct-fp8-fast",
+          kind: "llm",
+          name: "Llama 3.1 70B Instruct FP8 Fast",
+        },
+        {
+          id: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          kind: "llm",
+          name: "Llama 3.3 70B Instruct FP8 Fast",
+        },
+        {
+          id: "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+          kind: "llm",
+          name: "DeepSeek R1 Distill Qwen 32B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "@cf/moonshotai/kimi-k2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "@cf/moonshotai/kimi-k2.6",
+          kind: "llm",
+          name: "Kimi K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "@cf/zai-org/glm-4.7-flash",
+          kind: "llm",
+          name: "GLM 4.7 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "@cf/qwen/qwq-32b",
+          kind: "llm",
+          name: "QwQ 32B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "@cf/qwen/qwen2.5-coder-32b-instruct",
+          kind: "llm",
+          name: "Qwen 2.5 Coder 32B Instruct",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "@cf/meta/llama-3.2-1b-instruct",
-          "kind": "llm",
-          "name": "Llama 3.2 1B Instruct"
-        },
-        {
-          "id": "@cf/meta/llama-3.2-3b-instruct",
-          "kind": "llm",
-          "name": "Llama 3.2 3B Instruct"
-        },
-        {
-          "id": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
-          "kind": "llm",
-          "name": "Llama 3.1 8B Instruct FP8 Fast"
-        },
-        {
-          "id": "@cf/meta/llama-3.1-8b-instruct-awq",
-          "kind": "llm",
-          "name": "Llama 3.1 8B Instruct AWQ"
-        },
-        {
-          "id": "@cf/mistralai/mistral-small-3.1-24b-instruct",
-          "kind": "llm",
-          "name": "Mistral Small 3.1 24B Instruct"
-        },
-        {
-          "id": "@cf/meta/llama-3.1-70b-instruct-fp8-fast",
-          "kind": "llm",
-          "name": "Llama 3.1 70B Instruct FP8 Fast"
-        },
-        {
-          "id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-          "kind": "llm",
-          "name": "Llama 3.3 70B Instruct FP8 Fast"
-        },
-        {
-          "id": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-          "kind": "llm",
-          "name": "DeepSeek R1 Distill Qwen 32B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "@cf/moonshotai/kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "@cf/moonshotai/kimi-k2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "@cf/zai-org/glm-4.7-flash",
-          "kind": "llm",
-          "name": "GLM 4.7 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "@cf/qwen/qwq-32b",
-          "kind": "llm",
-          "name": "QwQ 32B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "@cf/qwen/qwen2.5-coder-32b-instruct",
-          "kind": "llm",
-          "name": "Qwen 2.5 Coder 32B Instruct",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
     "codebuddy-cn": {
-      "id": "codebuddy-cn",
-      "catalogKey": "cbcn",
-      "aliases": [],
-      "models": [
+      id: "codebuddy-cn",
+      catalogKey: "cbcn",
+      aliases: [],
+      models: [
         {
-          "id": "glm-5.2",
-          "kind": "llm",
-          "name": "GLM-5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-5.1",
-          "kind": "llm",
-          "name": "GLM-5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-5.0",
-          "kind": "llm",
-          "name": "GLM-5.0",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-5.0-turbo",
-          "kind": "llm",
-          "name": "GLM-5.0-Turbo",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-5v-turbo",
-          "kind": "llm",
-          "name": "GLM-5v-Turbo",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-4.7",
-          "kind": "llm",
-          "name": "GLM-4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "minimax-m3",
-          "kind": "llm",
-          "name": "MiniMax-M3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "minimax-m2.7",
-          "kind": "llm",
-          "name": "MiniMax-M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.7",
-          "kind": "llm",
-          "name": "Kimi-K2.7-Code",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.6",
-          "kind": "llm",
-          "name": "Kimi-K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi-K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "hy3-preview",
-          "kind": "llm",
-          "name": "Hy3 Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v4-pro",
-          "kind": "llm",
-          "name": "DeepSeek-V4-Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v4-flash",
-          "kind": "llm",
-          "name": "DeepSeek-V4-Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v3-2-volc",
-          "kind": "llm",
-          "name": "DeepSeek-V3.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "codex": {
-      "id": "codex",
-      "catalogKey": "cx",
-      "aliases": [],
-      "models": [
-        {
-          "id": "gpt-5.6-sol",
-          "kind": "llm",
-          "name": "GPT 5.6 Sol",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "glm-5.2",
+          kind: "llm",
+          name: "GLM-5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.6-sol"
         },
         {
-          "id": "gpt-5.6-sol-review",
-          "kind": "llm",
-          "name": "GPT 5.6 Sol Review",
-          "upstreamModelId": "gpt-5.6-sol",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "glm-5.1",
+          kind: "llm",
+          name: "GLM-5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.6-sol"
         },
         {
-          "id": "gpt-5.6-terra",
-          "kind": "llm",
-          "name": "GPT 5.6 Terra",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "glm-5.0",
+          kind: "llm",
+          name: "GLM-5.0",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.6-terra"
         },
         {
-          "id": "gpt-5.6-terra-review",
-          "kind": "llm",
-          "name": "GPT 5.6 Terra Review",
-          "upstreamModelId": "gpt-5.6-terra",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "glm-5.0-turbo",
+          kind: "llm",
+          name: "GLM-5.0-Turbo",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.6-terra"
         },
         {
-          "id": "gpt-5.6-luna",
-          "kind": "llm",
-          "name": "GPT 5.6 Luna",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "glm-5v-turbo",
+          kind: "llm",
+          name: "GLM-5v-Turbo",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.6-luna"
         },
         {
-          "id": "gpt-5.6-luna-review",
-          "kind": "llm",
-          "name": "GPT 5.6 Luna Review",
-          "upstreamModelId": "gpt-5.6-luna",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "glm-4.7",
+          kind: "llm",
+          name: "GLM-4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.6-luna"
         },
         {
-          "id": "gpt-5.5",
-          "kind": "llm",
-          "name": "GPT 5.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "minimax-m3",
+          kind: "llm",
+          name: "MiniMax-M3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.5"
         },
         {
-          "id": "gpt-5.5-review",
-          "kind": "llm",
-          "name": "GPT 5.5 Review",
-          "upstreamModelId": "gpt-5.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "minimax-m2.7",
+          kind: "llm",
+          name: "MiniMax-M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.5"
         },
         {
-          "id": "gpt-5.4",
-          "kind": "llm",
-          "name": "GPT 5.4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "kimi-k2.7",
+          kind: "llm",
+          name: "Kimi-K2.7-Code",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.4"
         },
         {
-          "id": "gpt-5.4-review",
-          "kind": "llm",
-          "name": "GPT 5.4 Review",
-          "upstreamModelId": "gpt-5.4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "kimi-k2.6",
+          kind: "llm",
+          name: "Kimi-K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.4"
         },
         {
-          "id": "gpt-5.4-mini",
-          "kind": "llm",
-          "name": "GPT 5.4 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi-K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.4-mini"
         },
         {
-          "id": "gpt-5.4-mini-review",
-          "kind": "llm",
-          "name": "GPT 5.4 Mini Review",
-          "upstreamModelId": "gpt-5.4-mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "hy3-preview",
+          kind: "llm",
+          name: "Hy3 Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.4-mini"
         },
         {
-          "id": "gpt-5.3-codex-spark",
-          "kind": "llm",
-          "name": "GPT 5.3 Codex Spark",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "deepseek-v4-pro",
+          kind: "llm",
+          name: "DeepSeek-V4-Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.3-codex-spark"
         },
         {
-          "id": "gpt-5.3-codex-spark-review",
-          "kind": "llm",
-          "name": "GPT 5.3 Codex Spark Review",
-          "upstreamModelId": "gpt-5.3-codex-spark",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
+          id: "deepseek-v4-flash",
+          kind: "llm",
+          name: "DeepSeek-V4-Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
           },
-          "canonicalProvider": "openai",
-          "canonicalModelId": "gpt-5.3-codex-spark"
-        }
-      ]
-    },
-    "cohere": {
-      "id": "cohere",
-      "catalogKey": "cohere",
-      "aliases": [],
-      "models": [
-        {
-          "id": "command-r-plus-08-2024",
-          "kind": "llm",
-          "name": "Command R+ (Aug 2024)"
         },
         {
-          "id": "command-r-08-2024",
-          "kind": "llm",
-          "name": "Command R (Aug 2024)"
+          id: "deepseek-v3-2-volc",
+          kind: "llm",
+          name: "DeepSeek-V3.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
-        {
-          "id": "command-a-03-2025",
-          "kind": "llm",
-          "name": "Command A (Mar 2025)"
-        }
-      ]
-    },
-    "comfyui": {
-      "id": "comfyui",
-      "catalogKey": "comfyui",
-      "aliases": [],
-      "models": []
-    },
-    "commandcode": {
-      "id": "commandcode",
-      "catalogKey": "commandcode",
-      "aliases": [
-        "cmc"
       ],
-      "models": [
-        {
-          "id": "deepseek/deepseek-v4-pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek/deepseek-v4-flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "moonshotai/Kimi-K2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "moonshotai/Kimi-K2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "zai-org/GLM-5.1",
-          "kind": "llm",
-          "name": "GLM 5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "zai-org/GLM-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "MiniMaxAI/MiniMax-M2.7",
-          "kind": "llm",
-          "name": "MiniMax M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "MiniMaxAI/MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "Qwen/Qwen3.6-Max-Preview",
-          "kind": "llm",
-          "name": "Qwen 3.6 Max Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "Qwen/Qwen3.6-Plus",
-          "kind": "llm",
-          "name": "Qwen 3.6 Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "stepfun/Step-3.5-Flash",
-          "kind": "llm",
-          "name": "Step 3.5 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "step",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
-    "coqui": {
-      "id": "coqui",
-      "catalogKey": "coqui",
-      "aliases": [],
-      "models": []
-    },
-    "cursor": {
-      "id": "cursor",
-      "catalogKey": "cu",
-      "aliases": [],
-      "models": [
+    codex: {
+      id: "codex",
+      catalogKey: "cx",
+      aliases: [],
+      models: [
         {
-          "id": "default",
-          "kind": "llm",
-          "name": "Auto (Server Picks)"
+          id: "gpt-5.6-sol",
+          kind: "llm",
+          name: "GPT 5.6 Sol",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.6-sol",
         },
         {
-          "id": "claude-4.5-opus-high-thinking",
-          "kind": "llm",
-          "name": "Claude 4.5 Opus High Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-sol-review",
+          kind: "llm",
+          name: "GPT 5.6 Sol Review",
+          upstreamModelId: "gpt-5.6-sol",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.6-sol",
         },
         {
-          "id": "claude-4.5-opus-high",
-          "kind": "llm",
-          "name": "Claude 4.5 Opus High",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-terra",
+          kind: "llm",
+          name: "GPT 5.6 Terra",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.6-terra",
         },
         {
-          "id": "claude-4.5-sonnet-thinking",
-          "kind": "llm",
-          "name": "Claude 4.5 Sonnet Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-terra-review",
+          kind: "llm",
+          name: "GPT 5.6 Terra Review",
+          upstreamModelId: "gpt-5.6-terra",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.6-terra",
         },
         {
-          "id": "claude-4.5-sonnet",
-          "kind": "llm",
-          "name": "Claude 4.5 Sonnet",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-luna",
+          kind: "llm",
+          name: "GPT 5.6 Luna",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.6-luna",
         },
         {
-          "id": "claude-4.5-haiku",
-          "kind": "llm",
-          "name": "Claude 4.5 Haiku",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-luna-review",
+          kind: "llm",
+          name: "GPT 5.6 Luna Review",
+          upstreamModelId: "gpt-5.6-luna",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.6-luna",
         },
         {
-          "id": "claude-4.5-opus",
-          "kind": "llm",
-          "name": "Claude 4.5 Opus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.5",
+          kind: "llm",
+          name: "GPT 5.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.5",
         },
         {
-          "id": "gpt-5.2-codex",
-          "kind": "llm",
-          "name": "GPT 5.2 Codex",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.5-review",
+          kind: "llm",
+          name: "GPT 5.5 Review",
+          upstreamModelId: "gpt-5.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.5",
         },
         {
-          "id": "claude-4.6-opus-max",
-          "kind": "llm",
-          "name": "Claude 4.6 Opus Max",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4",
+          kind: "llm",
+          name: "GPT 5.4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.4",
         },
         {
-          "id": "claude-4.6-sonnet-medium-thinking",
-          "kind": "llm",
-          "name": "Claude 4.6 Sonnet Medium Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4-review",
+          kind: "llm",
+          name: "GPT 5.4 Review",
+          upstreamModelId: "gpt-5.4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.4",
         },
         {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4-mini",
+          kind: "llm",
+          name: "GPT 5.4 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.4-mini",
         },
         {
-          "id": "gemini-3-flash-preview",
-          "kind": "llm",
-          "name": "Gemini 3 Flash Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4-mini-review",
+          kind: "llm",
+          name: "GPT 5.4 Mini Review",
+          upstreamModelId: "gpt-5.4-mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.4-mini",
         },
         {
-          "id": "gpt-5.2",
-          "kind": "llm",
-          "name": "GPT 5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.3-codex-spark",
+          kind: "llm",
+          name: "GPT 5.3 Codex Spark",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.3-codex-spark",
         },
         {
-          "id": "gpt-5.3-codex",
-          "kind": "llm",
-          "name": "GPT 5.3 Codex",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "deepgram": {
-      "id": "deepgram",
-      "catalogKey": "deepgram",
-      "aliases": [
-        "dg"
+          id: "gpt-5.3-codex-spark-review",
+          kind: "llm",
+          name: "GPT 5.3 Codex Spark Review",
+          upstreamModelId: "gpt-5.3-codex-spark",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+          canonicalProvider: "openai",
+          canonicalModelId: "gpt-5.3-codex-spark",
+        },
       ],
-      "models": []
     },
-    "deepseek": {
-      "id": "deepseek",
-      "catalogKey": "deepseek",
-      "aliases": [
-        "ds"
+    cohere: {
+      id: "cohere",
+      catalogKey: "cohere",
+      aliases: [],
+      models: [
+        {
+          id: "command-r-plus-08-2024",
+          kind: "llm",
+          name: "Command R+ (Aug 2024)",
+        },
+        {
+          id: "command-r-08-2024",
+          kind: "llm",
+          name: "Command R (Aug 2024)",
+        },
+        {
+          id: "command-a-03-2025",
+          kind: "llm",
+          name: "Command A (Mar 2025)",
+        },
       ],
-      "models": [
+    },
+    comfyui: {
+      id: "comfyui",
+      catalogKey: "comfyui",
+      aliases: [],
+      models: [],
+    },
+    commandcode: {
+      id: "commandcode",
+      catalogKey: "commandcode",
+      aliases: ["cmc"],
+      models: [
         {
-          "id": "deepseek-v4-pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek/deepseek-v4-pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-v4-pro-max",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro Max",
-          "upstreamModelId": "deepseek-v4-pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek/deepseek-v4-flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-v4-pro-none",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro No Thinking",
-          "upstreamModelId": "deepseek-v4-pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "moonshotai/Kimi-K2.6",
+          kind: "llm",
+          name: "Kimi K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-v4-flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "moonshotai/Kimi-K2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-chat",
-          "kind": "llm",
-          "name": "DeepSeek V3.2 Chat"
+          id: "zai-org/GLM-5.1",
+          kind: "llm",
+          name: "GLM 5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-reasoner",
-          "kind": "llm",
-          "name": "DeepSeek V3.2 Reasoner",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "zai-org/GLM-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "MiniMaxAI/MiniMax-M2.7",
+          kind: "llm",
+          name: "MiniMax M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "MiniMaxAI/MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "Qwen/Qwen3.6-Max-Preview",
+          kind: "llm",
+          name: "Qwen 3.6 Max Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "Qwen/Qwen3.6-Plus",
+          kind: "llm",
+          name: "Qwen 3.6 Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "stepfun/Step-3.5-Flash",
+          kind: "llm",
+          name: "Step 3.5 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "step",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
+    },
+    coqui: {
+      id: "coqui",
+      catalogKey: "coqui",
+      aliases: [],
+      models: [],
+    },
+    cursor: {
+      id: "cursor",
+      catalogKey: "cu",
+      aliases: [],
+      models: [
+        {
+          id: "default",
+          kind: "llm",
+          name: "Auto (Server Picks)",
+        },
+        {
+          id: "claude-4.5-opus-high-thinking",
+          kind: "llm",
+          name: "Claude 4.5 Opus High Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-4.5-opus-high",
+          kind: "llm",
+          name: "Claude 4.5 Opus High",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-4.5-sonnet-thinking",
+          kind: "llm",
+          name: "Claude 4.5 Sonnet Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-4.5-sonnet",
+          kind: "llm",
+          name: "Claude 4.5 Sonnet",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-4.5-haiku",
+          kind: "llm",
+          name: "Claude 4.5 Haiku",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-4.5-opus",
+          kind: "llm",
+          name: "Claude 4.5 Opus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.2-codex",
+          kind: "llm",
+          name: "GPT 5.2 Codex",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-4.6-opus-max",
+          kind: "llm",
+          name: "Claude 4.6 Opus Max",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "claude-4.6-sonnet-medium-thinking",
+          kind: "llm",
+          name: "Claude 4.6 Sonnet Medium Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-3-flash-preview",
+          kind: "llm",
+          name: "Gemini 3 Flash Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.2",
+          kind: "llm",
+          name: "GPT 5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gpt-5.3-codex",
+          kind: "llm",
+          name: "GPT 5.3 Codex",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
+    },
+    deepgram: {
+      id: "deepgram",
+      catalogKey: "deepgram",
+      aliases: ["dg"],
+      models: [],
+    },
+    deepseek: {
+      id: "deepseek",
+      catalogKey: "deepseek",
+      aliases: ["ds"],
+      models: [
+        {
+          id: "deepseek-v4-pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v4-pro-max",
+          kind: "llm",
+          name: "DeepSeek V4 Pro Max",
+          upstreamModelId: "deepseek-v4-pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v4-pro-none",
+          kind: "llm",
+          name: "DeepSeek V4 Pro No Thinking",
+          upstreamModelId: "deepseek-v4-pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v4-flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-chat",
+          kind: "llm",
+          name: "DeepSeek V3.2 Chat",
+        },
+        {
+          id: "deepseek-reasoner",
+          kind: "llm",
+          name: "DeepSeek V3.2 Reasoner",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "edge-tts": {
-      "id": "edge-tts",
-      "catalogKey": "edge-tts",
-      "aliases": [],
-      "models": []
+      id: "edge-tts",
+      catalogKey: "edge-tts",
+      aliases: [],
+      models: [],
     },
-    "elevenlabs": {
-      "id": "elevenlabs",
-      "catalogKey": "el",
-      "aliases": [],
-      "models": []
+    elevenlabs: {
+      id: "elevenlabs",
+      catalogKey: "el",
+      aliases: [],
+      models: [],
     },
-    "exa": {
-      "id": "exa",
-      "catalogKey": "exa",
-      "aliases": [],
-      "models": []
+    exa: {
+      id: "exa",
+      catalogKey: "exa",
+      aliases: [],
+      models: [],
     },
     "fal-ai": {
-      "id": "fal-ai",
-      "catalogKey": "fal-ai",
-      "aliases": [
-        "fal"
+      id: "fal-ai",
+      catalogKey: "fal-ai",
+      aliases: ["fal"],
+      models: [],
+    },
+    featherless: {
+      id: "featherless",
+      catalogKey: "featherless",
+      aliases: ["fl"],
+      models: [
+        {
+          id: "deepseek-ai/DeepSeek-V4-Pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-ai/DeepSeek-V4-Flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "zai-org/GLM-5.2",
+          kind: "llm",
+          name: "GLM 5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "zai-org/GLM-5.1",
+          kind: "llm",
+          name: "GLM 5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "moonshotai/Kimi-K2.7-Code",
+          kind: "llm",
+          name: "Kimi K2.7 Code",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "moonshotai/Kimi-K2.6",
+          kind: "llm",
+          name: "Kimi K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "moonshotai/Kimi-K2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": []
     },
-    "featherless": {
-      "id": "featherless",
-      "catalogKey": "featherless",
-      "aliases": [
-        "fl"
+    firecrawl: {
+      id: "firecrawl",
+      catalogKey: "firecrawl",
+      aliases: [],
+      models: [],
+    },
+    fireworks: {
+      id: "fireworks",
+      catalogKey: "fireworks",
+      aliases: [],
+      models: [
+        {
+          id: "accounts/fireworks/models/deepseek-v3p1",
+          kind: "llm",
+          name: "DeepSeek V3.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "accounts/fireworks/models/llama-v3p3-70b-instruct",
+          kind: "llm",
+          name: "Llama 3.3 70B",
+        },
+        {
+          id: "accounts/fireworks/models/qwen3-235b-a22b",
+          kind: "llm",
+          name: "Qwen3 235B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "deepseek-ai/DeepSeek-V4-Pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-ai/DeepSeek-V4-Flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "zai-org/GLM-5.2",
-          "kind": "llm",
-          "name": "GLM 5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "zai-org/GLM-5.1",
-          "kind": "llm",
-          "name": "GLM 5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "moonshotai/Kimi-K2.7-Code",
-          "kind": "llm",
-          "name": "Kimi K2.7 Code",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "moonshotai/Kimi-K2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "moonshotai/Kimi-K2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
-    "firecrawl": {
-      "id": "firecrawl",
-      "catalogKey": "firecrawl",
-      "aliases": [],
-      "models": []
-    },
-    "fireworks": {
-      "id": "fireworks",
-      "catalogKey": "fireworks",
-      "aliases": [],
-      "models": [
+    gemini: {
+      id: "gemini",
+      catalogKey: "gemini",
+      aliases: [],
+      models: [
         {
-          "id": "accounts/fireworks/models/deepseek-v3p1",
-          "kind": "llm",
-          "name": "DeepSeek V3.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gemini-3.1-pro-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Pro Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "accounts/fireworks/models/llama-v3p3-70b-instruct",
-          "kind": "llm",
-          "name": "Llama 3.3 70B"
+          id: "gemini-3.1-flash-lite-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Flash Lite Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "accounts/fireworks/models/qwen3-235b-a22b",
-          "kind": "llm",
-          "name": "Qwen3 235B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "gemini": {
-      "id": "gemini",
-      "catalogKey": "gemini",
-      "aliases": [],
-      "models": [
-        {
-          "id": "gemini-3.1-pro-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-3-flash-preview",
+          kind: "llm",
+          name: "Gemini 3 Flash Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gemini-3.1-flash-lite-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Flash Lite Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-2.5-pro",
+          kind: "llm",
+          name: "Gemini 2.5 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "gemini-3-flash-preview",
-          "kind": "llm",
-          "name": "Gemini 3 Flash Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-2.5-flash",
+          kind: "llm",
+          name: "Gemini 2.5 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "gemini-2.5-pro",
-          "kind": "llm",
-          "name": "Gemini 2.5 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
+          id: "gemini-2.5-flash-lite",
+          kind: "llm",
+          name: "Gemini 2.5 Flash Lite",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "gemini-2.5-flash",
-          "kind": "llm",
-          "name": "Gemini 2.5 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
+          id: "gemma-4-31b-it",
+          kind: "llm",
+          name: "Gemma 4 31B IT",
         },
-        {
-          "id": "gemini-2.5-flash-lite",
-          "kind": "llm",
-          "name": "Gemini 2.5 Flash Lite",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
-        },
-        {
-          "id": "gemma-4-31b-it",
-          "kind": "llm",
-          "name": "Gemma 4 31B IT"
-        }
-      ]
+      ],
     },
     "gemini-cli": {
-      "id": "gemini-cli",
-      "catalogKey": "gc",
-      "aliases": [],
-      "models": [
+      id: "gemini-cli",
+      catalogKey: "gc",
+      aliases: [],
+      models: [
         {
-          "id": "gemini-3.1-pro-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-3.1-pro-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Pro Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gemini-3-pro-preview",
-          "kind": "llm",
-          "name": "Gemini 3 Pro Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-3-pro-preview",
+          kind: "llm",
+          name: "Gemini 3 Pro Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gemini-3-flash-preview",
-          "kind": "llm",
-          "name": "Gemini 3 Flash Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-3-flash-preview",
+          kind: "llm",
+          name: "Gemini 3 Flash Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gemini-3.1-flash-lite-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Flash Lite Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-3.1-flash-lite-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Flash Lite Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gemini-2.5-pro",
-          "kind": "llm",
-          "name": "Gemini 2.5 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
+          id: "gemini-2.5-pro",
+          kind: "llm",
+          name: "Gemini 2.5 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "gemini-2.5-flash",
-          "kind": "llm",
-          "name": "Gemini 2.5 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
+          id: "gemini-2.5-flash",
+          kind: "llm",
+          name: "Gemini 2.5 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "gemini-2.5-flash-lite",
-          "kind": "llm",
-          "name": "Gemini 2.5 Flash Lite",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
-        }
-      ]
+          id: "gemini-2.5-flash-lite",
+          kind: "llm",
+          name: "Gemini 2.5 Flash Lite",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
+        },
+      ],
     },
-    "github": {
-      "id": "github",
-      "catalogKey": "gh",
-      "aliases": [],
-      "models": [
+    github: {
+      id: "github",
+      catalogKey: "gh",
+      aliases: [],
+      models: [
         {
-          "id": "gpt-5.2",
-          "kind": "llm",
-          "name": "GPT-5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.2",
+          kind: "llm",
+          name: "GPT-5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.2-codex",
-          "kind": "llm",
-          "name": "GPT-5.2 Codex",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.2-codex",
+          kind: "llm",
+          name: "GPT-5.2 Codex",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.3-codex",
-          "kind": "llm",
-          "name": "GPT-5.3 Codex",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.3-codex",
+          kind: "llm",
+          name: "GPT-5.3 Codex",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.4",
-          "kind": "llm",
-          "name": "GPT-5.4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4",
+          kind: "llm",
+          name: "GPT-5.4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.4-mini",
-          "kind": "llm",
-          "name": "GPT-5.4 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4-mini",
+          kind: "llm",
+          name: "GPT-5.4 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-haiku-4.5",
-          "kind": "llm",
-          "name": "Claude Haiku 4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-haiku-4.5",
+          kind: "llm",
+          name: "Claude Haiku 4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.5",
-          "kind": "llm",
-          "name": "Claude Opus 4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.5",
+          kind: "llm",
+          name: "Claude Opus 4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-4.5",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-4.5",
+          kind: "llm",
+          name: "Claude Sonnet 4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-4.6",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-4.6",
+          kind: "llm",
+          name: "Claude Sonnet 4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.6",
-          "kind": "llm",
-          "name": "Claude Opus 4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.6",
+          kind: "llm",
+          name: "Claude Opus 4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.7",
-          "kind": "llm",
-          "name": "Claude Opus 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.7",
+          kind: "llm",
+          name: "Claude Opus 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gemini-2.5-pro",
-          "kind": "llm",
-          "name": "Gemini 2.5 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
+          id: "gemini-2.5-pro",
+          kind: "llm",
+          name: "Gemini 2.5 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "gemini-3-flash-preview",
-          "kind": "llm",
-          "name": "Gemini 3 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-3-flash-preview",
+          kind: "llm",
+          name: "Gemini 3 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gemini-3.1-pro-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "gemini-3.1-pro-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "grok-code-fast-1",
-          "kind": "llm",
-          "name": "Grok Code Fast 1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "grok-code-fast-1",
+          kind: "llm",
+          name: "Grok Code Fast 1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "oswe-vscode-prime",
-          "kind": "llm",
-          "name": "Raptor Mini"
+          id: "oswe-vscode-prime",
+          kind: "llm",
+          name: "Raptor Mini",
         },
         {
-          "id": "goldeneye-free-auto",
-          "kind": "llm",
-          "name": "GoldenEye"
-        }
-      ]
+          id: "goldeneye-free-auto",
+          kind: "llm",
+          name: "GoldenEye",
+        },
+      ],
     },
-    "gitlab": {
-      "id": "gitlab",
-      "catalogKey": "gitlab",
-      "aliases": [],
-      "models": []
+    gitlab: {
+      id: "gitlab",
+      catalogKey: "gitlab",
+      aliases: [],
+      models: [],
     },
-    "glm": {
-      "id": "glm",
-      "catalogKey": "glm",
-      "aliases": [],
-      "models": [
+    glm: {
+      id: "glm",
+      catalogKey: "glm",
+      aliases: [],
+      models: [
         {
-          "id": "glm-5.2",
-          "kind": "llm",
-          "name": "GLM 5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5.2",
+          kind: "llm",
+          name: "GLM 5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5.1",
-          "kind": "llm",
-          "name": "GLM 5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5.1",
+          kind: "llm",
+          name: "GLM 5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.7",
-          "kind": "llm",
-          "name": "GLM 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-4.7",
+          kind: "llm",
+          name: "GLM 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.6v",
-          "kind": "llm",
-          "name": "GLM 4.6V (Vision)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "glm-4.6v",
+          kind: "llm",
+          name: "GLM 4.6V (Vision)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "glm-cn": {
-      "id": "glm-cn",
-      "catalogKey": "glm-cn",
-      "aliases": [],
-      "models": [
+      id: "glm-cn",
+      catalogKey: "glm-cn",
+      aliases: [],
+      models: [
         {
-          "id": "glm-5.2",
-          "kind": "llm",
-          "name": "GLM 5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5.2",
+          kind: "llm",
+          name: "GLM 5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5.1",
-          "kind": "llm",
-          "name": "GLM 5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5.1",
+          kind: "llm",
+          name: "GLM 5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.7",
-          "kind": "llm",
-          "name": "GLM-4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-4.7",
+          kind: "llm",
+          name: "GLM-4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.6",
-          "kind": "llm",
-          "name": "GLM-4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-4.6",
+          kind: "llm",
+          name: "GLM-4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.5-air",
-          "kind": "llm",
-          "name": "GLM-4.5-Air",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "glm-4.5-air",
+          kind: "llm",
+          name: "GLM-4.5-Air",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "google-pse": {
-      "id": "google-pse",
-      "catalogKey": "gpse",
-      "aliases": [],
-      "models": []
+      id: "google-pse",
+      catalogKey: "gpse",
+      aliases: [],
+      models: [],
     },
     "google-tts": {
-      "id": "google-tts",
-      "catalogKey": "google-tts",
-      "aliases": [],
-      "models": []
+      id: "google-tts",
+      catalogKey: "google-tts",
+      aliases: [],
+      models: [],
     },
     "grok-cli": {
-      "id": "grok-cli",
-      "catalogKey": "gcli",
-      "aliases": [
-        "grok-build",
-        "gb"
+      id: "grok-cli",
+      catalogKey: "gcli",
+      aliases: ["grok-build", "gb"],
+      models: [
+        {
+          id: "grok-build",
+          kind: "llm",
+          name: "Grok Build",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.5",
+          kind: "llm",
+          name: "Grok 4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.5-high",
+          kind: "llm",
+          name: "Grok 4.5 (High)",
+          upstreamModelId: "grok-4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.5-medium",
+          kind: "llm",
+          name: "Grok 4.5 (Medium)",
+          upstreamModelId: "grok-4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.5-low",
+          kind: "llm",
+          name: "Grok 4.5 (Low)",
+          upstreamModelId: "grok-4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "grok-build",
-          "kind": "llm",
-          "name": "Grok Build",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.5",
-          "kind": "llm",
-          "name": "Grok 4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.5-high",
-          "kind": "llm",
-          "name": "Grok 4.5 (High)",
-          "upstreamModelId": "grok-4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.5-medium",
-          "kind": "llm",
-          "name": "Grok 4.5 (Medium)",
-          "upstreamModelId": "grok-4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.5-low",
-          "kind": "llm",
-          "name": "Grok 4.5 (Low)",
-          "upstreamModelId": "grok-4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
     "grok-web": {
-      "id": "grok-web",
-      "catalogKey": "grok-web",
-      "aliases": [
-        "gw"
+      id: "grok-web",
+      catalogKey: "grok-web",
+      aliases: ["gw"],
+      models: [
+        {
+          id: "grok-3",
+          kind: "llm",
+          name: "Grok 3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-3-mini",
+          kind: "llm",
+          name: "Grok 3 Mini (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-3-thinking",
+          kind: "llm",
+          name: "Grok 3 Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4",
+          kind: "llm",
+          name: "Grok 4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4-mini",
+          kind: "llm",
+          name: "Grok 4 Mini (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4-thinking",
+          kind: "llm",
+          name: "Grok 4 Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4-heavy",
+          kind: "llm",
+          name: "Grok 4 Heavy (SuperGrok)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.1-mini",
+          kind: "llm",
+          name: "Grok 4.1 Mini (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.1-fast",
+          kind: "llm",
+          name: "Grok 4.1 Fast",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.1-expert",
+          kind: "llm",
+          name: "Grok 4.1 Expert",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.1-thinking",
+          kind: "llm",
+          name: "Grok 4.1 Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "grok-4.2",
+          kind: "llm",
+          name: "Grok 4.2 (4.20 Beta)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
+      passthroughModels: true,
+    },
+    groq: {
+      id: "groq",
+      catalogKey: "groq",
+      aliases: [],
+      models: [
         {
-          "id": "grok-3",
-          "kind": "llm",
-          "name": "Grok 3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "llama-3.3-70b-versatile",
+          kind: "llm",
+          name: "Llama 3.3 70B",
         },
         {
-          "id": "grok-3-mini",
-          "kind": "llm",
-          "name": "Grok 3 Mini (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "meta-llama/llama-4-maverick-17b-128e-instruct",
+          kind: "llm",
+          name: "Llama 4 Maverick",
         },
         {
-          "id": "grok-3-thinking",
-          "kind": "llm",
-          "name": "Grok 3 Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen/qwen3-32b",
+          kind: "llm",
+          name: "Qwen3 32B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "grok-4",
-          "kind": "llm",
-          "name": "Grok 4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "openai/gpt-oss-120b",
+          kind: "llm",
+          name: "GPT-OSS 120B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
-        {
-          "id": "grok-4-mini",
-          "kind": "llm",
-          "name": "Grok 4 Mini (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4-thinking",
-          "kind": "llm",
-          "name": "Grok 4 Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4-heavy",
-          "kind": "llm",
-          "name": "Grok 4 Heavy (SuperGrok)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.1-mini",
-          "kind": "llm",
-          "name": "Grok 4.1 Mini (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.1-fast",
-          "kind": "llm",
-          "name": "Grok 4.1 Fast",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.1-expert",
-          "kind": "llm",
-          "name": "Grok 4.1 Expert",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.1-thinking",
-          "kind": "llm",
-          "name": "Grok 4.1 Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "grok-4.2",
-          "kind": "llm",
-          "name": "Grok 4.2 (4.20 Beta)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
       ],
-      "passthroughModels": true
     },
-    "groq": {
-      "id": "groq",
-      "catalogKey": "groq",
-      "aliases": [],
-      "models": [
-        {
-          "id": "llama-3.3-70b-versatile",
-          "kind": "llm",
-          "name": "Llama 3.3 70B"
-        },
-        {
-          "id": "meta-llama/llama-4-maverick-17b-128e-instruct",
-          "kind": "llm",
-          "name": "Llama 4 Maverick"
-        },
-        {
-          "id": "qwen/qwen3-32b",
-          "kind": "llm",
-          "name": "Qwen3 32B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "openai/gpt-oss-120b",
-          "kind": "llm",
-          "name": "GPT-OSS 120B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+    huggingface: {
+      id: "huggingface",
+      catalogKey: "huggingface",
+      aliases: ["hf"],
+      models: [],
     },
-    "huggingface": {
-      "id": "huggingface",
-      "catalogKey": "huggingface",
-      "aliases": [
-        "hf"
+    hyperbolic: {
+      id: "hyperbolic",
+      catalogKey: "hyperbolic",
+      aliases: ["hyp"],
+      models: [
+        {
+          id: "Qwen/QwQ-32B",
+          kind: "llm",
+          name: "QwQ 32B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-ai/DeepSeek-R1",
+          kind: "llm",
+          name: "DeepSeek R1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-ai/DeepSeek-V3",
+          kind: "llm",
+          name: "DeepSeek V3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "meta-llama/Llama-3.3-70B-Instruct",
+          kind: "llm",
+          name: "Llama 3.3 70B",
+        },
+        {
+          id: "meta-llama/Llama-3.2-3B-Instruct",
+          kind: "llm",
+          name: "Llama 3.2 3B",
+        },
+        {
+          id: "Qwen/Qwen2.5-72B-Instruct",
+          kind: "llm",
+          name: "Qwen 2.5 72B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "Qwen/Qwen2.5-Coder-32B-Instruct",
+          kind: "llm",
+          name: "Qwen 2.5 Coder 32B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "NousResearch/Hermes-3-Llama-3.1-70B",
+          kind: "llm",
+          name: "Hermes 3 70B",
+        },
       ],
-      "models": []
     },
-    "hyperbolic": {
-      "id": "hyperbolic",
-      "catalogKey": "hyperbolic",
-      "aliases": [
-        "hyp"
+    iflow: {
+      id: "iflow",
+      catalogKey: "if",
+      aliases: [],
+      models: [
+        {
+          id: "qwen3-coder-plus",
+          kind: "llm",
+          name: "Qwen3 Coder Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-max",
+          kind: "llm",
+          name: "Qwen3 Max",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-vl-plus",
+          kind: "llm",
+          name: "Qwen3 VL Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-max-preview",
+          kind: "llm",
+          name: "Qwen3 Max Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-235b",
+          kind: "llm",
+          name: "Qwen3 235B A22B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-235b-a22b-instruct",
+          kind: "llm",
+          name: "Qwen3 235B A22B Instruct",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-235b-a22b-thinking-2507",
+          kind: "llm",
+          name: "Qwen3 235B A22B Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-32b",
+          kind: "llm",
+          name: "Qwen3 32B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2",
+          kind: "llm",
+          name: "Kimi K2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v3.2",
+          kind: "llm",
+          name: "DeepSeek V3.2 Exp",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v3.1",
+          kind: "llm",
+          name: "DeepSeek V3.1 Terminus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v3",
+          kind: "llm",
+          name: "DeepSeek V3 671B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-r1",
+          kind: "llm",
+          name: "DeepSeek R1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "glm-4.7",
+          kind: "llm",
+          name: "GLM 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "iflow-rome-30ba3b",
+          kind: "llm",
+          name: "iFlow ROME",
+        },
       ],
-      "models": [
-        {
-          "id": "Qwen/QwQ-32B",
-          "kind": "llm",
-          "name": "QwQ 32B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-ai/DeepSeek-R1",
-          "kind": "llm",
-          "name": "DeepSeek R1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-ai/DeepSeek-V3",
-          "kind": "llm",
-          "name": "DeepSeek V3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "meta-llama/Llama-3.3-70B-Instruct",
-          "kind": "llm",
-          "name": "Llama 3.3 70B"
-        },
-        {
-          "id": "meta-llama/Llama-3.2-3B-Instruct",
-          "kind": "llm",
-          "name": "Llama 3.2 3B"
-        },
-        {
-          "id": "Qwen/Qwen2.5-72B-Instruct",
-          "kind": "llm",
-          "name": "Qwen 2.5 72B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "Qwen/Qwen2.5-Coder-32B-Instruct",
-          "kind": "llm",
-          "name": "Qwen 2.5 Coder 32B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "NousResearch/Hermes-3-Llama-3.1-70B",
-          "kind": "llm",
-          "name": "Hermes 3 70B"
-        }
-      ]
     },
-    "iflow": {
-      "id": "iflow",
-      "catalogKey": "if",
-      "aliases": [],
-      "models": [
-        {
-          "id": "qwen3-coder-plus",
-          "kind": "llm",
-          "name": "Qwen3 Coder Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-max",
-          "kind": "llm",
-          "name": "Qwen3 Max",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-vl-plus",
-          "kind": "llm",
-          "name": "Qwen3 VL Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-max-preview",
-          "kind": "llm",
-          "name": "Qwen3 Max Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-235b",
-          "kind": "llm",
-          "name": "Qwen3 235B A22B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-235b-a22b-instruct",
-          "kind": "llm",
-          "name": "Qwen3 235B A22B Instruct",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-235b-a22b-thinking-2507",
-          "kind": "llm",
-          "name": "Qwen3 235B A22B Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-32b",
-          "kind": "llm",
-          "name": "Qwen3 32B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2",
-          "kind": "llm",
-          "name": "Kimi K2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v3.2",
-          "kind": "llm",
-          "name": "DeepSeek V3.2 Exp",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v3.1",
-          "kind": "llm",
-          "name": "DeepSeek V3.1 Terminus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v3",
-          "kind": "llm",
-          "name": "DeepSeek V3 671B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-r1",
-          "kind": "llm",
-          "name": "DeepSeek R1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-4.7",
-          "kind": "llm",
-          "name": "GLM 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "iflow-rome-30ba3b",
-          "kind": "llm",
-          "name": "iFlow ROME"
-        }
-      ]
-    },
-    "inworld": {
-      "id": "inworld",
-      "catalogKey": "inworld",
-      "aliases": [],
-      "models": []
+    inworld: {
+      id: "inworld",
+      catalogKey: "inworld",
+      aliases: [],
+      models: [],
     },
     "jina-ai": {
-      "id": "jina-ai",
-      "catalogKey": "jina",
-      "aliases": [],
-      "models": []
+      id: "jina-ai",
+      catalogKey: "jina",
+      aliases: [],
+      models: [],
     },
     "jina-reader": {
-      "id": "jina-reader",
-      "catalogKey": "jina-reader",
-      "aliases": [],
-      "models": []
+      id: "jina-reader",
+      catalogKey: "jina-reader",
+      aliases: [],
+      models: [],
     },
-    "kilocode": {
-      "id": "kilocode",
-      "catalogKey": "kc",
-      "aliases": [],
-      "models": [
+    kilocode: {
+      id: "kilocode",
+      catalogKey: "kc",
+      aliases: [],
+      models: [
         {
-          "id": "anthropic/claude-sonnet-4-20250514",
-          "kind": "llm",
-          "name": "Claude Sonnet 4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "anthropic/claude-sonnet-4-20250514",
+          kind: "llm",
+          name: "Claude Sonnet 4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "anthropic/claude-opus-4-20250514",
-          "kind": "llm",
-          "name": "Claude Opus 4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "anthropic/claude-opus-4-20250514",
+          kind: "llm",
+          name: "Claude Opus 4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "google/gemini-2.5-pro",
-          "kind": "llm",
-          "name": "Gemini 2.5 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
+          id: "google/gemini-2.5-pro",
+          kind: "llm",
+          name: "Gemini 2.5 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "google/gemini-2.5-flash",
-          "kind": "llm",
-          "name": "Gemini 2.5 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
+          id: "google/gemini-2.5-flash",
+          kind: "llm",
+          name: "Gemini 2.5 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
         },
         {
-          "id": "openai/gpt-4.1",
-          "kind": "llm",
-          "name": "GPT-4.1"
+          id: "openai/gpt-4.1",
+          kind: "llm",
+          name: "GPT-4.1",
         },
         {
-          "id": "openai/o3",
-          "kind": "llm",
-          "name": "o3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "openai/o3",
+          kind: "llm",
+          name: "o3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek/deepseek-chat",
-          "kind": "llm",
-          "name": "DeepSeek Chat"
+          id: "deepseek/deepseek-chat",
+          kind: "llm",
+          name: "DeepSeek Chat",
         },
         {
-          "id": "deepseek/deepseek-reasoner",
-          "kind": "llm",
-          "name": "DeepSeek Reasoner",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        }
+          id: "deepseek/deepseek-reasoner",
+          kind: "llm",
+          name: "DeepSeek Reasoner",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
       ],
-      "modelsFetcher": true,
-      "passthroughModels": true
+      modelsFetcher: true,
+      passthroughModels: true,
     },
-    "kimchi": {
-      "id": "kimchi",
-      "catalogKey": "kimchi",
-      "aliases": [],
-      "models": [
+    kimchi: {
+      id: "kimchi",
+      catalogKey: "kimchi",
+      aliases: [],
+      models: [
         {
-          "id": "minimax-m3",
-          "kind": "llm",
-          "name": "MiniMax-M3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "minimax-m3",
+          kind: "llm",
+          name: "MiniMax-M3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "kimi-k2.7",
-          "kind": "llm",
-          "name": "Kimi-K2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "kimi-k2.7",
+          kind: "llm",
+          name: "Kimi-K2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "kimi-k2.6",
-          "kind": "llm",
-          "name": "Kimi-K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "kimi-k2.6",
+          kind: "llm",
+          name: "Kimi-K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi-K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi-K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "nemotron-3-ultra-fp4",
-          "kind": "llm",
-          "name": "Nemotron 3 Ultra FP4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": null,
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "nemotron-3-ultra-fp4",
+          kind: "llm",
+          name: "Nemotron 3 Ultra FP4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: null,
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "minimax-m2.7",
-          "kind": "llm",
-          "name": "MiniMax-M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "minimax-m2.7",
+          kind: "llm",
+          name: "MiniMax-M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4-6",
-          "kind": "llm",
-          "name": "Claude Opus 4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4-6",
+          kind: "llm",
+          name: "Claude Opus 4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-4-6",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
+          id: "claude-sonnet-4-6",
+          kind: "llm",
+          name: "Claude Sonnet 4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "passthroughModels": true
+      passthroughModels: true,
     },
-    "kimi": {
-      "id": "kimi",
-      "catalogKey": "kimi",
-      "aliases": [
-        "kimi-coding",
-        "kmc"
+    kimi: {
+      id: "kimi",
+      catalogKey: "kimi",
+      aliases: ["kimi-coding", "kmc"],
+      models: [
+        {
+          id: "kimi-k3",
+          kind: "llm",
+          name: "Kimi K3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "k3",
+          kind: "llm",
+          name: "Kimi K3 (Code)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-for-coding",
+          kind: "llm",
+          name: "Kimi for Coding",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-for-coding-highspeed",
+          kind: "llm",
+          name: "Kimi for Coding Highspeed",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.7-code",
+          kind: "llm",
+          name: "Kimi K2.7 Code",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.7-code-highspeed",
+          kind: "llm",
+          name: "Kimi K2.7 Code Highspeed",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.6",
+          kind: "llm",
+          name: "Kimi K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.5-thinking",
+          kind: "llm",
+          name: "Kimi K2.5 Thinking",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-latest",
+          kind: "llm",
+          name: "Kimi Latest",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "kimi-k3",
-          "kind": "llm",
-          "name": "Kimi K3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "k3",
-          "kind": "llm",
-          "name": "Kimi K3 (Code)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-for-coding",
-          "kind": "llm",
-          "name": "Kimi for Coding",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-for-coding-highspeed",
-          "kind": "llm",
-          "name": "Kimi for Coding Highspeed",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.7-code",
-          "kind": "llm",
-          "name": "Kimi K2.7 Code",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.7-code-highspeed",
-          "kind": "llm",
-          "name": "Kimi K2.7 Code Highspeed",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.5-thinking",
-          "kind": "llm",
-          "name": "Kimi K2.5 Thinking",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-latest",
-          "kind": "llm",
-          "name": "Kimi Latest",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
-    "kiro": {
-      "id": "kiro",
-      "catalogKey": "kr",
-      "aliases": [],
-      "models": [
+    kiro: {
+      id: "kiro",
+      catalogKey: "kr",
+      aliases: [],
+      models: [
         {
-          "id": "claude-opus-4.8",
-          "kind": "llm",
-          "name": "Claude Opus 4.8",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.8",
+          kind: "llm",
+          name: "Claude Opus 4.8",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.8-thinking",
-          "kind": "llm",
-          "name": "Claude Opus 4.8 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.8-thinking",
+          kind: "llm",
+          name: "Claude Opus 4.8 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.8-agentic",
-          "kind": "llm",
-          "name": "Claude Opus 4.8 (Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.8-agentic",
+          kind: "llm",
+          name: "Claude Opus 4.8 (Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.8-thinking-agentic",
-          "kind": "llm",
-          "name": "Claude Opus 4.8 (Thinking + Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.8-thinking-agentic",
+          kind: "llm",
+          name: "Claude Opus 4.8 (Thinking + Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.7",
-          "kind": "llm",
-          "name": "Claude Opus 4.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.7",
+          kind: "llm",
+          name: "Claude Opus 4.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.7-thinking",
-          "kind": "llm",
-          "name": "Claude Opus 4.7 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.7-thinking",
+          kind: "llm",
+          name: "Claude Opus 4.7 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.7-agentic",
-          "kind": "llm",
-          "name": "Claude Opus 4.7 (Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.7-agentic",
+          kind: "llm",
+          name: "Claude Opus 4.7 (Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.7-thinking-agentic",
-          "kind": "llm",
-          "name": "Claude Opus 4.7 (Thinking + Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.7-thinking-agentic",
+          kind: "llm",
+          name: "Claude Opus 4.7 (Thinking + Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.5",
-          "kind": "llm",
-          "name": "Claude Opus 4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.5",
+          kind: "llm",
+          name: "Claude Opus 4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.5-thinking",
-          "kind": "llm",
-          "name": "Claude Opus 4.5 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.5-thinking",
+          kind: "llm",
+          name: "Claude Opus 4.5 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.5-agentic",
-          "kind": "llm",
-          "name": "Claude Opus 4.5 (Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.5-agentic",
+          kind: "llm",
+          name: "Claude Opus 4.5 (Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-opus-4.5-thinking-agentic",
-          "kind": "llm",
-          "name": "Claude Opus 4.5 (Thinking + Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-opus-4.5-thinking-agentic",
+          kind: "llm",
+          name: "Claude Opus 4.5 (Thinking + Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-5",
-          "kind": "llm",
-          "name": "Claude Sonnet 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-5",
+          kind: "llm",
+          name: "Claude Sonnet 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-4.5",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-4.5",
+          kind: "llm",
+          name: "Claude Sonnet 4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-haiku-4.5",
-          "kind": "llm",
-          "name": "Claude Haiku 4.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-haiku-4.5",
+          kind: "llm",
+          name: "Claude Haiku 4.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-3.2",
-          "kind": "llm",
-          "name": "DeepSeek 3.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-3.2",
+          kind: "llm",
+          name: "DeepSeek 3.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3-coder-next",
-          "kind": "llm",
-          "name": "Qwen3 Coder Next",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-coder-next",
+          kind: "llm",
+          name: "Qwen3 Coder Next",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "glm-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-sol",
-          "kind": "llm",
-          "name": "GPT 5.6 Sol",
-          "upstreamModelId": "gpt-5.6-sol",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-sol",
+          kind: "llm",
+          name: "GPT 5.6 Sol",
+          upstreamModelId: "gpt-5.6-sol",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-terra",
-          "kind": "llm",
-          "name": "GPT 5.6 Terra",
-          "upstreamModelId": "gpt-5.6-terra",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-terra",
+          kind: "llm",
+          name: "GPT 5.6 Terra",
+          upstreamModelId: "gpt-5.6-terra",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-luna",
-          "kind": "llm",
-          "name": "GPT 5.6 Luna",
-          "upstreamModelId": "gpt-5.6-luna",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-luna",
+          kind: "llm",
+          name: "GPT 5.6 Luna",
+          upstreamModelId: "gpt-5.6-luna",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-5-thinking",
-          "kind": "llm",
-          "name": "Claude Sonnet 5 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-5-thinking",
+          kind: "llm",
+          name: "Claude Sonnet 5 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-4.5-thinking",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.5 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-4.5-thinking",
+          kind: "llm",
+          name: "Claude Sonnet 4.5 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-haiku-4.5-thinking",
-          "kind": "llm",
-          "name": "Claude Haiku 4.5 (Thinking)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-haiku-4.5-thinking",
+          kind: "llm",
+          name: "Claude Haiku 4.5 (Thinking)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-sol-thinking",
-          "kind": "llm",
-          "name": "GPT 5.6 Sol (Thinking)",
-          "upstreamModelId": "gpt-5.6-sol",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-sol-thinking",
+          kind: "llm",
+          name: "GPT 5.6 Sol (Thinking)",
+          upstreamModelId: "gpt-5.6-sol",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-terra-thinking",
-          "kind": "llm",
-          "name": "GPT 5.6 Terra (Thinking)",
-          "upstreamModelId": "gpt-5.6-terra",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-terra-thinking",
+          kind: "llm",
+          name: "GPT 5.6 Terra (Thinking)",
+          upstreamModelId: "gpt-5.6-terra",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-luna-thinking",
-          "kind": "llm",
-          "name": "GPT 5.6 Luna (Thinking)",
-          "upstreamModelId": "gpt-5.6-luna",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-luna-thinking",
+          kind: "llm",
+          name: "GPT 5.6 Luna (Thinking)",
+          upstreamModelId: "gpt-5.6-luna",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-5-agentic",
-          "kind": "llm",
-          "name": "Claude Sonnet 5 (Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-5-agentic",
+          kind: "llm",
+          name: "Claude Sonnet 5 (Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-4.5-agentic",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.5 (Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-4.5-agentic",
+          kind: "llm",
+          name: "Claude Sonnet 4.5 (Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-haiku-4.5-agentic",
-          "kind": "llm",
-          "name": "Claude Haiku 4.5 (Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-haiku-4.5-agentic",
+          kind: "llm",
+          name: "Claude Haiku 4.5 (Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-sol-agentic",
-          "kind": "llm",
-          "name": "GPT 5.6 Sol (Agentic)",
-          "upstreamModelId": "gpt-5.6-sol",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-sol-agentic",
+          kind: "llm",
+          name: "GPT 5.6 Sol (Agentic)",
+          upstreamModelId: "gpt-5.6-sol",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-terra-agentic",
-          "kind": "llm",
-          "name": "GPT 5.6 Terra (Agentic)",
-          "upstreamModelId": "gpt-5.6-terra",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-terra-agentic",
+          kind: "llm",
+          name: "GPT 5.6 Terra (Agentic)",
+          upstreamModelId: "gpt-5.6-terra",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-luna-agentic",
-          "kind": "llm",
-          "name": "GPT 5.6 Luna (Agentic)",
-          "upstreamModelId": "gpt-5.6-luna",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-luna-agentic",
+          kind: "llm",
+          name: "GPT 5.6 Luna (Agentic)",
+          upstreamModelId: "gpt-5.6-luna",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-5-thinking-agentic",
-          "kind": "llm",
-          "name": "Claude Sonnet 5 (Thinking + Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-5-thinking-agentic",
+          kind: "llm",
+          name: "Claude Sonnet 5 (Thinking + Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-sonnet-4.5-thinking-agentic",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.5 (Thinking + Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-sonnet-4.5-thinking-agentic",
+          kind: "llm",
+          name: "Claude Sonnet 4.5 (Thinking + Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "claude-haiku-4.5-thinking-agentic",
-          "kind": "llm",
-          "name": "Claude Haiku 4.5 (Thinking + Agentic)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "claude-haiku-4.5-thinking-agentic",
+          kind: "llm",
+          name: "Claude Haiku 4.5 (Thinking + Agentic)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-sol-thinking-agentic",
-          "kind": "llm",
-          "name": "GPT 5.6 Sol (Thinking + Agentic)",
-          "upstreamModelId": "gpt-5.6-sol",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-sol-thinking-agentic",
+          kind: "llm",
+          name: "GPT 5.6 Sol (Thinking + Agentic)",
+          upstreamModelId: "gpt-5.6-sol",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-terra-thinking-agentic",
-          "kind": "llm",
-          "name": "GPT 5.6 Terra (Thinking + Agentic)",
-          "upstreamModelId": "gpt-5.6-terra",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.6-terra-thinking-agentic",
+          kind: "llm",
+          name: "GPT 5.6 Terra (Thinking + Agentic)",
+          upstreamModelId: "gpt-5.6-terra",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.6-luna-thinking-agentic",
-          "kind": "llm",
-          "name": "GPT 5.6 Luna (Thinking + Agentic)",
-          "upstreamModelId": "gpt-5.6-luna",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "gpt-5.6-luna-thinking-agentic",
+          kind: "llm",
+          name: "GPT 5.6 Luna (Thinking + Agentic)",
+          upstreamModelId: "gpt-5.6-luna",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
-    "linkup": {
-      "id": "linkup",
-      "catalogKey": "linkup",
-      "aliases": [],
-      "models": []
+    linkup: {
+      id: "linkup",
+      catalogKey: "linkup",
+      aliases: [],
+      models: [],
     },
     "local-device": {
-      "id": "local-device",
-      "catalogKey": "local-device",
-      "aliases": [],
-      "models": []
+      id: "local-device",
+      catalogKey: "local-device",
+      aliases: [],
+      models: [],
     },
     "mimo-free": {
-      "id": "mimo-free",
-      "catalogKey": "mmf",
-      "aliases": [],
-      "models": [
+      id: "mimo-free",
+      catalogKey: "mmf",
+      aliases: [],
+      models: [
         {
-          "id": "mimo-auto",
-          "kind": "llm",
-          "name": "MiMo Auto"
-        }
+          id: "mimo-auto",
+          kind: "llm",
+          name: "MiMo Auto",
+        },
       ],
-      "modelsFetcher": true,
-      "passthroughModels": true
+      modelsFetcher: true,
+      passthroughModels: true,
     },
-    "minimax": {
-      "id": "minimax",
-      "catalogKey": "minimax",
-      "aliases": [],
-      "models": [
+    minimax: {
+      id: "minimax",
+      catalogKey: "minimax",
+      aliases: [],
+      models: [
         {
-          "id": "MiniMax-M3",
-          "kind": "llm",
-          "name": "MiniMax M3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M3",
+          kind: "llm",
+          name: "MiniMax M3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.7",
-          "kind": "llm",
-          "name": "MiniMax M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.7",
+          kind: "llm",
+          name: "MiniMax M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.1",
-          "kind": "llm",
-          "name": "MiniMax M2.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "MiniMax-M2.1",
+          kind: "llm",
+          name: "MiniMax M2.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "minimax-cn": {
-      "id": "minimax-cn",
-      "catalogKey": "minimax-cn",
-      "aliases": [],
-      "models": [
+      id: "minimax-cn",
+      catalogKey: "minimax-cn",
+      aliases: [],
+      models: [
         {
-          "id": "MiniMax-M3",
-          "kind": "llm",
-          "name": "MiniMax M3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M3",
+          kind: "llm",
+          name: "MiniMax M3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.7",
-          "kind": "llm",
-          "name": "MiniMax M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.7",
+          kind: "llm",
+          name: "MiniMax M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMax-M2.1",
-          "kind": "llm",
-          "name": "MiniMax M2.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "mistral": {
-      "id": "mistral",
-      "catalogKey": "mistral",
-      "aliases": [],
-      "models": [
-        {
-          "id": "mistral-large-latest",
-          "kind": "llm",
-          "name": "Mistral Large 3"
+          id: "MiniMax-M2.1",
+          kind: "llm",
+          name: "MiniMax M2.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
-        {
-          "id": "codestral-latest",
-          "kind": "llm",
-          "name": "Codestral"
-        },
-        {
-          "id": "mistral-medium-latest",
-          "kind": "llm",
-          "name": "Mistral Medium 3"
-        }
-      ]
-    },
-    "mmf": {
-      "id": "mmf",
-      "catalogKey": "mmf",
-      "aliases": [],
-      "models": [
-        {
-          "id": "mimo-auto",
-          "kind": "llm",
-          "name": "MiMo Auto"
-        }
-      ]
-    },
-    "nanobanana": {
-      "id": "nanobanana",
-      "catalogKey": "nanobanana",
-      "aliases": [
-        "nb"
       ],
-      "models": []
     },
-    "nebius": {
-      "id": "nebius",
-      "catalogKey": "nebius",
-      "aliases": [],
-      "models": [
+    mistral: {
+      id: "mistral",
+      catalogKey: "mistral",
+      aliases: [],
+      models: [
         {
-          "id": "meta-llama/Llama-3.3-70B-Instruct",
-          "kind": "llm",
-          "name": "Llama 3.3 70B Instruct"
-        }
-      ]
+          id: "mistral-large-latest",
+          kind: "llm",
+          name: "Mistral Large 3",
+        },
+        {
+          id: "codestral-latest",
+          kind: "llm",
+          name: "Codestral",
+        },
+        {
+          id: "mistral-medium-latest",
+          kind: "llm",
+          name: "Mistral Medium 3",
+        },
+      ],
     },
-    "nvidia": {
-      "id": "nvidia",
-      "catalogKey": "nvidia",
-      "aliases": [],
-      "models": [
+    mmf: {
+      id: "mmf",
+      catalogKey: "mmf",
+      aliases: [],
+      models: [
         {
-          "id": "minimaxai/minimax-m2.7",
-          "kind": "llm",
-          "name": "MiniMax M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "mimo-auto",
+          kind: "llm",
+          name: "MiMo Auto",
         },
-        {
-          "id": "minimaxai/minimax-m3",
-          "kind": "llm",
-          "name": "MiniMax M3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "z-ai/glm-5.2",
-          "kind": "llm",
-          "name": "GLM 5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-ai/deepseek-v4-pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-ai/deepseek-v4-flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "moonshotai/kimi-k2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "nvidia/nemotron-3-ultra-550b-a55b",
-          "kind": "llm",
-          "name": "Nemotron 3 Ultra",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": null,
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+      ],
     },
-    "ollama": {
-      "id": "ollama",
-      "catalogKey": "ollama",
-      "aliases": [],
-      "models": [
+    nanobanana: {
+      id: "nanobanana",
+      catalogKey: "nanobanana",
+      aliases: ["nb"],
+      models: [],
+    },
+    nebius: {
+      id: "nebius",
+      catalogKey: "nebius",
+      aliases: [],
+      models: [
         {
-          "id": "gpt-oss:120b",
-          "kind": "llm",
-          "name": "GPT OSS 120B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "meta-llama/Llama-3.3-70B-Instruct",
+          kind: "llm",
+          name: "Llama 3.3 70B Instruct",
+        },
+      ],
+    },
+    nvidia: {
+      id: "nvidia",
+      catalogKey: "nvidia",
+      aliases: [],
+      models: [
+        {
+          id: "minimaxai/minimax-m2.7",
+          kind: "llm",
+          name: "MiniMax M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "kimi-k2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "minimaxai/minimax-m3",
+          kind: "llm",
+          name: "MiniMax M3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "z-ai/glm-5.2",
+          kind: "llm",
+          name: "GLM 5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "minimax-m2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/deepseek-v4-pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "glm-4.7-flash",
-          "kind": "llm",
-          "name": "GLM 4.7 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/deepseek-v4-flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "qwen3.5",
-          "kind": "llm",
-          "name": "Qwen3.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "moonshotai/kimi-k2.6",
+          kind: "llm",
+          name: "Kimi K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "minimax-m3",
-          "kind": "llm",
-          "name": "MiniMax M3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "nvidia/nemotron-3-ultra-550b-a55b",
+          kind: "llm",
+          name: "Nemotron 3 Ultra",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: null,
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
+    },
+    ollama: {
+      id: "ollama",
+      catalogKey: "ollama",
+      aliases: [],
+      models: [
+        {
+          id: "gpt-oss:120b",
+          kind: "llm",
+          name: "GPT OSS 120B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "glm-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "minimax-m2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "glm-4.7-flash",
+          kind: "llm",
+          name: "GLM 4.7 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3.5",
+          kind: "llm",
+          name: "Qwen3.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "minimax-m3",
+          kind: "llm",
+          name: "MiniMax M3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "ollama-local": {
-      "id": "ollama-local",
-      "catalogKey": "ollama-local",
-      "aliases": [],
-      "models": []
+      id: "ollama-local",
+      catalogKey: "ollama-local",
+      aliases: [],
+      models: [],
     },
-    "openai": {
-      "id": "openai",
-      "catalogKey": "openai",
-      "aliases": [],
-      "models": [
+    openai: {
+      id: "openai",
+      catalogKey: "openai",
+      aliases: [],
+      models: [
         {
-          "id": "gpt-5.4",
-          "kind": "llm",
-          "name": "GPT-5.4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4",
+          kind: "llm",
+          name: "GPT-5.4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.4-mini",
-          "kind": "llm",
-          "name": "GPT-5.4 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4-mini",
+          kind: "llm",
+          name: "GPT-5.4 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.4-nano",
-          "kind": "llm",
-          "name": "GPT-5.4 Nano",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.4-nano",
+          kind: "llm",
+          name: "GPT-5.4 Nano",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.2",
-          "kind": "llm",
-          "name": "GPT-5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.2",
+          kind: "llm",
+          name: "GPT-5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5.1",
-          "kind": "llm",
-          "name": "GPT-5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5.1",
+          kind: "llm",
+          name: "GPT-5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5",
-          "kind": "llm",
-          "name": "GPT-5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5",
+          kind: "llm",
+          name: "GPT-5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5-mini",
-          "kind": "llm",
-          "name": "GPT-5 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5-mini",
+          kind: "llm",
+          name: "GPT-5 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-5-nano",
-          "kind": "llm",
-          "name": "GPT-5 Nano",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "gpt-5-nano",
+          kind: "llm",
+          name: "GPT-5 Nano",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "gpt-4o",
-          "kind": "llm",
-          "name": "GPT-4o"
+          id: "gpt-4o",
+          kind: "llm",
+          name: "GPT-4o",
         },
         {
-          "id": "gpt-4o-mini",
-          "kind": "llm",
-          "name": "GPT-4o Mini"
+          id: "gpt-4o-mini",
+          kind: "llm",
+          name: "GPT-4o Mini",
         },
         {
-          "id": "gpt-4-turbo",
-          "kind": "llm",
-          "name": "GPT-4 Turbo"
+          id: "gpt-4-turbo",
+          kind: "llm",
+          name: "GPT-4 Turbo",
         },
         {
-          "id": "gpt-4.1",
-          "kind": "llm",
-          "name": "GPT-4.1"
+          id: "gpt-4.1",
+          kind: "llm",
+          name: "GPT-4.1",
         },
         {
-          "id": "gpt-4.1-mini",
-          "kind": "llm",
-          "name": "GPT-4.1 Mini"
+          id: "gpt-4.1-mini",
+          kind: "llm",
+          name: "GPT-4.1 Mini",
         },
         {
-          "id": "gpt-4.1-nano",
-          "kind": "llm",
-          "name": "GPT-4.1 Nano"
+          id: "gpt-4.1-nano",
+          kind: "llm",
+          name: "GPT-4.1 Nano",
         },
         {
-          "id": "o3",
-          "kind": "llm",
-          "name": "O3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "o3",
+          kind: "llm",
+          name: "O3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "o3-mini",
-          "kind": "llm",
-          "name": "O3 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "o3-mini",
+          kind: "llm",
+          name: "O3 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "o3-pro",
-          "kind": "llm",
-          "name": "O3 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "o3-pro",
+          kind: "llm",
+          name: "O3 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "o4-mini",
-          "kind": "llm",
-          "name": "O4 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "o4-mini",
+          kind: "llm",
+          name: "O4 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "o1",
-          "kind": "llm",
-          "name": "O1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "o1",
+          kind: "llm",
+          name: "O1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "o1-mini",
-          "kind": "llm",
-          "name": "O1 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "o1-mini",
+          kind: "llm",
+          name: "O1 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
-    "opencode": {
-      "id": "opencode",
-      "catalogKey": "oc",
-      "aliases": [],
-      "models": [],
-      "modelsFetcher": true,
-      "passthroughModels": true
+    opencode: {
+      id: "opencode",
+      catalogKey: "oc",
+      aliases: [],
+      models: [],
+      modelsFetcher: true,
+      passthroughModels: true,
     },
     "opencode-go": {
-      "id": "opencode-go",
-      "catalogKey": "opencode-go",
-      "aliases": [
-        "ocg"
+      id: "opencode-go",
+      catalogKey: "opencode-go",
+      aliases: ["ocg"],
+      models: [
+        {
+          id: "glm-5.2",
+          kind: "llm",
+          name: "GLM 5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "glm-5.1",
+          kind: "llm",
+          name: "GLM 5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.7-code",
+          kind: "llm",
+          name: "Kimi K2.7 Code",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "kimi-k2.6",
+          kind: "llm",
+          name: "Kimi K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v4-pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v4-flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "mimo-v2.5",
+          kind: "llm",
+          name: "MiMo V2.5",
+        },
+        {
+          id: "mimo-v2.5-pro",
+          kind: "llm",
+          name: "MiMo V2.5 Pro",
+        },
+        {
+          id: "minimax-m3",
+          kind: "llm",
+          name: "MiniMax M3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "minimax-m2.7",
+          kind: "llm",
+          name: "MiniMax M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "minimax-m2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3.7-max",
+          kind: "llm",
+          name: "Qwen 3.7 Max",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3.7-plus",
+          kind: "llm",
+          name: "Qwen 3.7 Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3.6-plus",
+          kind: "llm",
+          name: "Qwen 3.6 Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "glm-5.2",
-          "kind": "llm",
-          "name": "GLM 5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "glm-5.1",
-          "kind": "llm",
-          "name": "GLM 5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.7-code",
-          "kind": "llm",
-          "name": "Kimi K2.7 Code",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "kimi-k2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v4-pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v4-flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "mimo-v2.5",
-          "kind": "llm",
-          "name": "MiMo V2.5"
-        },
-        {
-          "id": "mimo-v2.5-pro",
-          "kind": "llm",
-          "name": "MiMo V2.5 Pro"
-        },
-        {
-          "id": "minimax-m3",
-          "kind": "llm",
-          "name": "MiniMax M3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "minimax-m2.7",
-          "kind": "llm",
-          "name": "MiniMax M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "minimax-m2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3.7-max",
-          "kind": "llm",
-          "name": "Qwen 3.7 Max",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3.7-plus",
-          "kind": "llm",
-          "name": "Qwen 3.7 Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3.6-plus",
-          "kind": "llm",
-          "name": "Qwen 3.6 Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
-    "openrouter": {
-      "id": "openrouter",
-      "catalogKey": "openrouter",
-      "aliases": [],
-      "models": [],
-      "modelsFetcher": true,
-      "passthroughModels": true
+    openrouter: {
+      id: "openrouter",
+      catalogKey: "openrouter",
+      aliases: [],
+      models: [],
+      modelsFetcher: true,
+      passthroughModels: true,
     },
-    "perplexity": {
-      "id": "perplexity",
-      "catalogKey": "perplexity",
-      "aliases": [
-        "pplx"
+    perplexity: {
+      id: "perplexity",
+      catalogKey: "perplexity",
+      aliases: ["pplx"],
+      models: [
+        {
+          id: "sonar-pro",
+          kind: "llm",
+          name: "Sonar Pro",
+        },
+        {
+          id: "sonar",
+          kind: "llm",
+          name: "Sonar",
+        },
       ],
-      "models": [
-        {
-          "id": "sonar-pro",
-          "kind": "llm",
-          "name": "Sonar Pro"
-        },
-        {
-          "id": "sonar",
-          "kind": "llm",
-          "name": "Sonar"
-        }
-      ]
     },
     "perplexity-agent": {
-      "id": "perplexity-agent",
-      "catalogKey": "perplexity-agent",
-      "aliases": [
-        "pplx-agent",
-        "pplx-responses"
+      id: "perplexity-agent",
+      catalogKey: "perplexity-agent",
+      aliases: ["pplx-agent", "pplx-responses"],
+      models: [
+        {
+          id: "perplexity/sonar",
+          kind: "llm",
+          name: "Perplexity Sonar",
+        },
+        {
+          id: "openai/gpt-5.5",
+          kind: "llm",
+          name: "GPT-5.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "openai/gpt-5.4",
+          kind: "llm",
+          name: "GPT-5.4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "openai/gpt-5.4-mini",
+          kind: "llm",
+          name: "GPT-5.4 Mini",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "anthropic/claude-sonnet-4-6",
+          kind: "llm",
+          name: "Claude Sonnet 4.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "anthropic/claude-opus-4-8",
+          kind: "llm",
+          name: "Claude Opus 4.8",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-adaptive",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "google/gemini-3.1-pro-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "xai/grok-4.20-reasoning",
+          kind: "llm",
+          name: "Grok 4.20 Reasoning",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "perplexity/glm-5.2",
+          kind: "llm",
+          name: "GLM 5.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "perplexity/kimi-k2.7-code",
+          kind: "llm",
+          name: "Kimi K2.7 Code",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "nvidia/nemotron-3-super-120b-a12b",
+          kind: "llm",
+          name: "Nemotron 3 Super 120B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: null,
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "perplexity/sonar",
-          "kind": "llm",
-          "name": "Perplexity Sonar"
-        },
-        {
-          "id": "openai/gpt-5.5",
-          "kind": "llm",
-          "name": "GPT-5.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "openai/gpt-5.4",
-          "kind": "llm",
-          "name": "GPT-5.4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "openai/gpt-5.4-mini",
-          "kind": "llm",
-          "name": "GPT-5.4 Mini",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "anthropic/claude-sonnet-4-6",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "anthropic/claude-opus-4-8",
-          "kind": "llm",
-          "name": "Claude Opus 4.8",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-adaptive",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "google/gemini-3.1-pro-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "xai/grok-4.20-reasoning",
-          "kind": "llm",
-          "name": "Grok 4.20 Reasoning",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "perplexity/glm-5.2",
-          "kind": "llm",
-          "name": "GLM 5.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "perplexity/kimi-k2.7-code",
-          "kind": "llm",
-          "name": "Kimi K2.7 Code",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "nvidia/nemotron-3-super-120b-a12b",
-          "kind": "llm",
-          "name": "Nemotron 3 Super 120B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": null,
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ],
-      "modelsFetcher": true,
-      "passthroughModels": true
+      modelsFetcher: true,
+      passthroughModels: true,
     },
     "perplexity-web": {
-      "id": "perplexity-web",
-      "catalogKey": "perplexity-web",
-      "aliases": [
-        "pw"
+      id: "perplexity-web",
+      catalogKey: "perplexity-web",
+      aliases: ["pw"],
+      models: [
+        {
+          id: "pplx-auto",
+          kind: "llm",
+          name: "Perplexity Auto (Free)",
+        },
+        {
+          id: "pplx-sonar",
+          kind: "llm",
+          name: "Perplexity Sonar",
+        },
+        {
+          id: "pplx-gpt",
+          kind: "llm",
+          name: "GPT-5.4 (via Perplexity)",
+        },
+        {
+          id: "pplx-gemini",
+          kind: "llm",
+          name: "Gemini 3.1 Pro (via Perplexity)",
+        },
+        {
+          id: "pplx-sonnet",
+          kind: "llm",
+          name: "Claude Sonnet 4.6 (via Perplexity)",
+        },
+        {
+          id: "pplx-opus",
+          kind: "llm",
+          name: "Claude Opus 4.6 (via Perplexity)",
+        },
+        {
+          id: "pplx-nemotron",
+          kind: "llm",
+          name: "Nemotron 3 Super (via Perplexity)",
+        },
       ],
-      "models": [
-        {
-          "id": "pplx-auto",
-          "kind": "llm",
-          "name": "Perplexity Auto (Free)"
-        },
-        {
-          "id": "pplx-sonar",
-          "kind": "llm",
-          "name": "Perplexity Sonar"
-        },
-        {
-          "id": "pplx-gpt",
-          "kind": "llm",
-          "name": "GPT-5.4 (via Perplexity)"
-        },
-        {
-          "id": "pplx-gemini",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro (via Perplexity)"
-        },
-        {
-          "id": "pplx-sonnet",
-          "kind": "llm",
-          "name": "Claude Sonnet 4.6 (via Perplexity)"
-        },
-        {
-          "id": "pplx-opus",
-          "kind": "llm",
-          "name": "Claude Opus 4.6 (via Perplexity)"
-        },
-        {
-          "id": "pplx-nemotron",
-          "kind": "llm",
-          "name": "Nemotron 3 Super (via Perplexity)"
-        }
-      ]
     },
-    "playht": {
-      "id": "playht",
-      "catalogKey": "playht",
-      "aliases": [],
-      "models": []
+    playht: {
+      id: "playht",
+      catalogKey: "playht",
+      aliases: [],
+      models: [],
     },
-    "qoder": {
-      "id": "qoder",
-      "catalogKey": "qd",
-      "aliases": [],
-      "models": [
+    qoder: {
+      id: "qoder",
+      catalogKey: "qd",
+      aliases: [],
+      models: [
         {
-          "id": "qmodel_latest",
-          "kind": "llm",
-          "name": "Qoder Qwen 3.7 Max"
-        }
-      ]
-    },
-    "qwen": {
-      "id": "qwen",
-      "catalogKey": "qw",
-      "aliases": [],
-      "models": [
-        {
-          "id": "qwen3-coder-plus",
-          "kind": "llm",
-          "name": "Qwen3 Coder Plus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qmodel_latest",
+          kind: "llm",
+          name: "Qoder Qwen 3.7 Max",
         },
-        {
-          "id": "qwen3-coder-flash",
-          "kind": "llm",
-          "name": "Qwen3 Coder Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "vision-model",
-          "kind": "llm",
-          "name": "Qwen3 Vision Model",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "coder-model",
-          "kind": "llm",
-          "name": "Qwen3.6 Coder Model",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
-    },
-    "recraft": {
-      "id": "recraft",
-      "catalogKey": "recraft",
-      "aliases": [],
-      "models": []
-    },
-    "runwayml": {
-      "id": "runwayml",
-      "catalogKey": "runwayml",
-      "aliases": [
-        "runway"
       ],
-      "models": []
     },
-    "sdwebui": {
-      "id": "sdwebui",
-      "catalogKey": "sdwebui",
-      "aliases": [],
-      "models": []
+    qwen: {
+      id: "qwen",
+      catalogKey: "qw",
+      aliases: [],
+      models: [
+        {
+          id: "qwen3-coder-plus",
+          kind: "llm",
+          name: "Qwen3 Coder Plus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-coder-flash",
+          kind: "llm",
+          name: "Qwen3 Coder Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "vision-model",
+          kind: "llm",
+          name: "Qwen3 Vision Model",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "coder-model",
+          kind: "llm",
+          name: "Qwen3.6 Coder Model",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
-    "searchapi": {
-      "id": "searchapi",
-      "catalogKey": "searchapi",
-      "aliases": [],
-      "models": []
+    recraft: {
+      id: "recraft",
+      catalogKey: "recraft",
+      aliases: [],
+      models: [],
     },
-    "searxng": {
-      "id": "searxng",
-      "catalogKey": "searxng",
-      "aliases": [],
-      "models": []
+    runwayml: {
+      id: "runwayml",
+      catalogKey: "runwayml",
+      aliases: ["runway"],
+      models: [],
     },
-    "serper": {
-      "id": "serper",
-      "catalogKey": "serper",
-      "aliases": [],
-      "models": []
+    sdwebui: {
+      id: "sdwebui",
+      catalogKey: "sdwebui",
+      aliases: [],
+      models: [],
     },
-    "siliconflow": {
-      "id": "siliconflow",
-      "catalogKey": "siliconflow",
-      "aliases": [],
-      "models": [
+    searchapi: {
+      id: "searchapi",
+      catalogKey: "searchapi",
+      aliases: [],
+      models: [],
+    },
+    searxng: {
+      id: "searxng",
+      catalogKey: "searxng",
+      aliases: [],
+      models: [],
+    },
+    serper: {
+      id: "serper",
+      catalogKey: "serper",
+      aliases: [],
+      models: [],
+    },
+    siliconflow: {
+      id: "siliconflow",
+      catalogKey: "siliconflow",
+      aliases: [],
+      models: [
         {
-          "id": "deepseek-ai/DeepSeek-V4-Pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/DeepSeek-V4-Pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-ai/DeepSeek-V4-Flash",
-          "kind": "llm",
-          "name": "DeepSeek V4 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/DeepSeek-V4-Flash",
+          kind: "llm",
+          name: "DeepSeek V4 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-ai/DeepSeek-V3.2",
-          "kind": "llm",
-          "name": "DeepSeek V3.2",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/DeepSeek-V3.2",
+          kind: "llm",
+          name: "DeepSeek V3.2",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-ai/DeepSeek-V3.2-Exp",
-          "kind": "llm",
-          "name": "DeepSeek V3.2 Exp",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/DeepSeek-V3.2-Exp",
+          kind: "llm",
+          name: "DeepSeek V3.2 Exp",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-ai/DeepSeek-V3.1",
-          "kind": "llm",
-          "name": "DeepSeek V3.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/DeepSeek-V3.1",
+          kind: "llm",
+          name: "DeepSeek V3.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-ai/DeepSeek-V3.1-Terminus",
-          "kind": "llm",
-          "name": "DeepSeek V3.1 Terminus",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/DeepSeek-V3.1-Terminus",
+          kind: "llm",
+          name: "DeepSeek V3.1 Terminus",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "deepseek-ai/DeepSeek-R1",
-          "kind": "llm",
-          "name": "DeepSeek R1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "deepseek-ai/DeepSeek-R1",
+          kind: "llm",
+          name: "DeepSeek R1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "Qwen/Qwen3.5-397B-A17B",
-          "kind": "llm",
-          "name": "Qwen 3.5 397B A17B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "Qwen/Qwen3.5-397B-A17B",
+          kind: "llm",
+          name: "Qwen 3.5 397B A17B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "Qwen/Qwen3.5-122B-A10B",
-          "kind": "llm",
-          "name": "Qwen 3.5 122B A10B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "Qwen/Qwen3.5-122B-A10B",
+          kind: "llm",
+          name: "Qwen 3.5 122B A10B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "zai-org/GLM-5.1",
-          "kind": "llm",
-          "name": "GLM 5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "zai-org/GLM-5.1",
+          kind: "llm",
+          name: "GLM 5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "zai-org/GLM-5",
-          "kind": "llm",
-          "name": "GLM 5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "zai-org/GLM-5",
+          kind: "llm",
+          name: "GLM 5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "moonshotai/Kimi-K2.6",
-          "kind": "llm",
-          "name": "Kimi K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "moonshotai/Kimi-K2.6",
+          kind: "llm",
+          name: "Kimi K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "moonshotai/Kimi-K2.5",
-          "kind": "llm",
-          "name": "Kimi K2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "moonshotai/Kimi-K2.5",
+          kind: "llm",
+          name: "Kimi K2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "openai/gpt-oss-120b",
-          "kind": "llm",
-          "name": "GPT OSS 120B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "openai/gpt-oss-120b",
+          kind: "llm",
+          name: "GPT OSS 120B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "MiniMaxAI/MiniMax-M2.5",
-          "kind": "llm",
-          "name": "MiniMax M2.5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "MiniMaxAI/MiniMax-M2.5",
+          kind: "llm",
+          name: "MiniMax M2.5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "inclusionAI/Ling-flash-2.0",
-          "kind": "llm",
-          "name": "Ling Flash 2.0",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": null,
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "inclusionAI/Ling-flash-2.0",
+          kind: "llm",
+          name: "Ling Flash 2.0",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: null,
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "stability-ai": {
-      "id": "stability-ai",
-      "catalogKey": "stability-ai",
-      "aliases": [
-        "stability"
+      id: "stability-ai",
+      catalogKey: "stability-ai",
+      aliases: ["stability"],
+      models: [],
+    },
+    tavily: {
+      id: "tavily",
+      catalogKey: "tavily",
+      aliases: [],
+      models: [],
+    },
+    together: {
+      id: "together",
+      catalogKey: "together",
+      aliases: [],
+      models: [
+        {
+          id: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+          kind: "llm",
+          name: "Llama 3.3 70B Turbo",
+        },
+        {
+          id: "deepseek-ai/DeepSeek-R1",
+          kind: "llm",
+          name: "DeepSeek R1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "Qwen/Qwen3-235B-A22B",
+          kind: "llm",
+          name: "Qwen3 235B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+          kind: "llm",
+          name: "Llama 4 Maverick",
+        },
       ],
-      "models": []
     },
-    "tavily": {
-      "id": "tavily",
-      "catalogKey": "tavily",
-      "aliases": [],
-      "models": []
+    topaz: {
+      id: "topaz",
+      catalogKey: "topaz",
+      aliases: [],
+      models: [],
     },
-    "together": {
-      "id": "together",
-      "catalogKey": "together",
-      "aliases": [],
-      "models": [
+    tortoise: {
+      id: "tortoise",
+      catalogKey: "tortoise",
+      aliases: [],
+      models: [],
+    },
+    venice: {
+      id: "venice",
+      catalogKey: "venice",
+      aliases: ["vn"],
+      models: [
         {
-          "id": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-          "kind": "llm",
-          "name": "Llama 3.3 70B Turbo"
+          id: "venice-uncensored-1-2",
+          kind: "llm",
+          name: "Venice Uncensored 1.2",
         },
         {
-          "id": "deepseek-ai/DeepSeek-R1",
-          "kind": "llm",
-          "name": "DeepSeek R1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
+          id: "zai-org-glm-5",
+          kind: "llm",
+          name: "GLM-5",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "Qwen/Qwen3-235B-A22B",
-          "kind": "llm",
-          "name": "Qwen3 235B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "qwen3-235b-a22b-instruct-2507",
+          kind: "llm",
+          name: "Qwen3 235B A22B Instruct",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-          "kind": "llm",
-          "name": "Llama 4 Maverick"
-        }
-      ]
-    },
-    "topaz": {
-      "id": "topaz",
-      "catalogKey": "topaz",
-      "aliases": [],
-      "models": []
-    },
-    "tortoise": {
-      "id": "tortoise",
-      "catalogKey": "tortoise",
-      "aliases": [],
-      "models": []
-    },
-    "venice": {
-      "id": "venice",
-      "catalogKey": "venice",
-      "aliases": [
-        "vn"
+          id: "qwen3-coder-480b-a35b-instruct-turbo",
+          kind: "llm",
+          name: "Qwen3 Coder 480B A35B Turbo",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen3-vl-235b-a22b",
+          kind: "llm",
+          name: "Qwen3 VL 235B A22B",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "deepseek-v4-pro",
+          kind: "llm",
+          name: "DeepSeek V4 Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "llama-3.3-70b",
+          kind: "llm",
+          name: "Llama 3.3 70B",
+        },
+        {
+          id: "hermes-3-llama-3.1-405b",
+          kind: "llm",
+          name: "Hermes 3 Llama 3.1 405B",
+        },
+        {
+          id: "mistral-small-3-2-24b-instruct",
+          kind: "llm",
+          name: "Mistral Small 3.2 24B",
+        },
       ],
-      "models": [
-        {
-          "id": "venice-uncensored-1-2",
-          "kind": "llm",
-          "name": "Venice Uncensored 1.2"
-        },
-        {
-          "id": "zai-org-glm-5",
-          "kind": "llm",
-          "name": "GLM-5",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-235b-a22b-instruct-2507",
-          "kind": "llm",
-          "name": "Qwen3 235B A22B Instruct",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-coder-480b-a35b-instruct-turbo",
-          "kind": "llm",
-          "name": "Qwen3 Coder 480B A35B Turbo",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen3-vl-235b-a22b",
-          "kind": "llm",
-          "name": "Qwen3 VL 235B A22B",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "deepseek-v4-pro",
-          "kind": "llm",
-          "name": "DeepSeek V4 Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "llama-3.3-70b",
-          "kind": "llm",
-          "name": "Llama 3.3 70B"
-        },
-        {
-          "id": "hermes-3-llama-3.1-405b",
-          "kind": "llm",
-          "name": "Hermes 3 Llama 3.1 405B"
-        },
-        {
-          "id": "mistral-small-3-2-24b-instruct",
-          "kind": "llm",
-          "name": "Mistral Small 3.2 24B"
-        }
-      ],
-      "modelsFetcher": true,
-      "passthroughModels": true
+      modelsFetcher: true,
+      passthroughModels: true,
     },
     "vercel-ai-gateway": {
-      "id": "vercel-ai-gateway",
-      "catalogKey": "vercel-ai-gateway",
-      "aliases": [
-        "vercel"
-      ],
-      "models": [],
-      "modelsFetcher": true,
-      "passthroughModels": true
+      id: "vercel-ai-gateway",
+      catalogKey: "vercel-ai-gateway",
+      aliases: ["vercel"],
+      models: [],
+      modelsFetcher: true,
+      passthroughModels: true,
     },
-    "vertex": {
-      "id": "vertex",
-      "catalogKey": "vertex",
-      "aliases": [
-        "vx"
+    vertex: {
+      id: "vertex",
+      catalogKey: "vertex",
+      aliases: ["vx"],
+      models: [
+        {
+          id: "gemini-3.1-pro-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Pro Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-3.1-flash-lite-preview",
+          kind: "llm",
+          name: "Gemini 3.1 Flash Lite Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-3-flash-preview",
+          kind: "llm",
+          name: "Gemini 3 Flash Preview",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-level",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "gemini-2.5-flash",
+          kind: "llm",
+          name: "Gemini 2.5 Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "gemini-budget",
+            thinkingCanDisable: true,
+            thinkingRange: {
+              min: 0,
+              max: 24576,
+            },
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "gemini-3.1-pro-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Pro Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gemini-3.1-flash-lite-preview",
-          "kind": "llm",
-          "name": "Gemini 3.1 Flash Lite Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gemini-3-flash-preview",
-          "kind": "llm",
-          "name": "Gemini 3 Flash Preview",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-level",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "gemini-2.5-flash",
-          "kind": "llm",
-          "name": "Gemini 2.5 Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "gemini-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": {
-              "min": 0,
-              "max": 24576
-            }
-          }
-        }
-      ]
     },
     "vertex-partner": {
-      "id": "vertex-partner",
-      "catalogKey": "vertex-partner",
-      "aliases": [
-        "vxp"
+      id: "vertex-partner",
+      catalogKey: "vertex-partner",
+      aliases: ["vxp"],
+      models: [
+        {
+          id: "deepseek-ai/deepseek-v3.2-maas",
+          kind: "llm",
+          name: "DeepSeek V3.2 (Vertex)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen/qwen3-next-80b-a3b-thinking-maas",
+          kind: "llm",
+          name: "Qwen3 Next 80B Thinking (Vertex)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "qwen/qwen3-next-80b-a3b-instruct-maas",
+          kind: "llm",
+          name: "Qwen3 Next 80B Instruct (Vertex)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "qwen",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "zai-org/glm-5-maas",
+          kind: "llm",
+          name: "GLM-5 (Vertex)",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "deepseek-ai/deepseek-v3.2-maas",
-          "kind": "llm",
-          "name": "DeepSeek V3.2 (Vertex)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen/qwen3-next-80b-a3b-thinking-maas",
-          "kind": "llm",
-          "name": "Qwen3 Next 80B Thinking (Vertex)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "qwen/qwen3-next-80b-a3b-instruct-maas",
-          "kind": "llm",
-          "name": "Qwen3 Next 80B Instruct (Vertex)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "qwen",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "zai-org/glm-5-maas",
-          "kind": "llm",
-          "name": "GLM-5 (Vertex)",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
     "volcengine-ark": {
-      "id": "volcengine-ark",
-      "catalogKey": "volcengine-ark",
-      "aliases": [
-        "ark"
+      id: "volcengine-ark",
+      catalogKey: "volcengine-ark",
+      aliases: ["ark"],
+      models: [
+        {
+          id: "Doubao-Seed-2.0-Code",
+          kind: "llm",
+          name: "Doubao-Seed-2.0-Code",
+        },
+        {
+          id: "Doubao-Seed-2.0-pro",
+          kind: "llm",
+          name: "Doubao-Seed-2.0-pro",
+        },
+        {
+          id: "Doubao-Seed-2.0-lite",
+          kind: "llm",
+          name: "Doubao-Seed-2.0-lite",
+        },
+        {
+          id: "Doubao-Seed-Code",
+          kind: "llm",
+          name: "Doubao-Seed-Code",
+        },
+        {
+          id: "DeepSeek-V4-Flash",
+          kind: "llm",
+          name: "DeepSeek-V4-Flash",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "DeepSeek-V4-Pro",
+          kind: "llm",
+          name: "DeepSeek-V4-Pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "deepseek",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "GLM-5.1",
+          kind: "llm",
+          name: "GLM-5.1",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "zai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "MiniMax-M2.7",
+          kind: "llm",
+          name: "MiniMax-M2.7",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "minimax",
+            thinkingCanDisable: false,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "Kimi-K2.6",
+          kind: "llm",
+          name: "Kimi-K2.6",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "kimi",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
       ],
-      "models": [
-        {
-          "id": "Doubao-Seed-2.0-Code",
-          "kind": "llm",
-          "name": "Doubao-Seed-2.0-Code"
-        },
-        {
-          "id": "Doubao-Seed-2.0-pro",
-          "kind": "llm",
-          "name": "Doubao-Seed-2.0-pro"
-        },
-        {
-          "id": "Doubao-Seed-2.0-lite",
-          "kind": "llm",
-          "name": "Doubao-Seed-2.0-lite"
-        },
-        {
-          "id": "Doubao-Seed-Code",
-          "kind": "llm",
-          "name": "Doubao-Seed-Code"
-        },
-        {
-          "id": "DeepSeek-V4-Flash",
-          "kind": "llm",
-          "name": "DeepSeek-V4-Flash",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "DeepSeek-V4-Pro",
-          "kind": "llm",
-          "name": "DeepSeek-V4-Pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "deepseek",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "GLM-5.1",
-          "kind": "llm",
-          "name": "GLM-5.1",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "zai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "MiniMax-M2.7",
-          "kind": "llm",
-          "name": "MiniMax-M2.7",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "minimax",
-            "thinkingCanDisable": false,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "Kimi-K2.6",
-          "kind": "llm",
-          "name": "Kimi-K2.6",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "kimi",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
     },
     "voyage-ai": {
-      "id": "voyage-ai",
-      "catalogKey": "voyage-ai",
-      "aliases": [],
-      "models": []
+      id: "voyage-ai",
+      catalogKey: "voyage-ai",
+      aliases: [],
+      models: [],
     },
-    "xai": {
-      "id": "xai",
-      "catalogKey": "xai",
-      "aliases": [],
-      "models": [
+    xai: {
+      id: "xai",
+      catalogKey: "xai",
+      aliases: [],
+      models: [
         {
-          "id": "grok-4",
-          "kind": "llm",
-          "name": "Grok 4",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "grok-4",
+          kind: "llm",
+          name: "Grok 4",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "grok-4-fast-reasoning",
-          "kind": "llm",
-          "name": "Grok 4 Fast Reasoning",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "grok-4-fast-reasoning",
+          kind: "llm",
+          name: "Grok 4 Fast Reasoning",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "grok-code-fast-1",
-          "kind": "llm",
-          "name": "Grok Code Fast",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
+          id: "grok-code-fast-1",
+          kind: "llm",
+          name: "Grok Code Fast",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
         },
         {
-          "id": "grok-3",
-          "kind": "llm",
-          "name": "Grok 3",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "openai",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        }
-      ]
+          id: "grok-3",
+          kind: "llm",
+          name: "Grok 3",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "openai",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+      ],
     },
     "xiaomi-mimo": {
-      "id": "xiaomi-mimo",
-      "catalogKey": "xiaomi-mimo",
-      "aliases": [
-        "mimo"
+      id: "xiaomi-mimo",
+      catalogKey: "xiaomi-mimo",
+      aliases: ["mimo"],
+      models: [
+        {
+          id: "mimo-v2.5-pro",
+          kind: "llm",
+          name: "MiMo V2.5 Pro",
+        },
+        {
+          id: "mimo-v2.5",
+          kind: "llm",
+          name: "MiMo V2.5",
+        },
+        {
+          id: "mimo-v2-omni",
+          kind: "llm",
+          name: "MiMo V2 Omni",
+        },
+        {
+          id: "mimo-v2-flash",
+          kind: "llm",
+          name: "MiMo V2 Flash",
+        },
       ],
-      "models": [
-        {
-          "id": "mimo-v2.5-pro",
-          "kind": "llm",
-          "name": "MiMo V2.5 Pro"
-        },
-        {
-          "id": "mimo-v2.5",
-          "kind": "llm",
-          "name": "MiMo V2.5"
-        },
-        {
-          "id": "mimo-v2-omni",
-          "kind": "llm",
-          "name": "MiMo V2 Omni"
-        },
-        {
-          "id": "mimo-v2-flash",
-          "kind": "llm",
-          "name": "MiMo V2 Flash"
-        }
-      ]
     },
     "xiaomi-tokenplan": {
-      "id": "xiaomi-tokenplan",
-      "catalogKey": "xiaomi-tokenplan",
-      "aliases": [
-        "xmtp"
+      id: "xiaomi-tokenplan",
+      catalogKey: "xiaomi-tokenplan",
+      aliases: ["xmtp"],
+      models: [
+        {
+          id: "mimo-v2.5-pro",
+          kind: "llm",
+          name: "MiMo V2.5 Pro",
+        },
+        {
+          id: "mimo-v2.5-pro-claude",
+          kind: "llm",
+          name: "MiMo V2.5 Pro (Claude Native)",
+          upstreamModelId: "mimo-v2.5-pro",
+          reasoning: {
+            reasoning: true,
+            thinkingFormat: "claude-budget",
+            thinkingCanDisable: true,
+            thinkingRange: null,
+          },
+        },
+        {
+          id: "mimo-v2.5",
+          kind: "llm",
+          name: "MiMo V2.5",
+        },
+        {
+          id: "mimo-v2-pro",
+          kind: "llm",
+          name: "MiMo V2 Pro",
+        },
+        {
+          id: "mimo-v2-omni",
+          kind: "llm",
+          name: "MiMo V2 Omni",
+        },
+        {
+          id: "mimo-v2-tts",
+          kind: "llm",
+          name: "MiMo V2 TTS",
+        },
+        {
+          id: "mimo-v2.5-tts",
+          kind: "llm",
+          name: "MiMo V2.5 TTS",
+        },
+        {
+          id: "mimo-v2.5-tts-voiceclone",
+          kind: "llm",
+          name: "MiMo V2.5 TTS Voice Clone",
+        },
+        {
+          id: "mimo-v2.5-tts-voicedesign",
+          kind: "llm",
+          name: "MiMo V2.5 TTS Voice Design",
+        },
       ],
-      "models": [
-        {
-          "id": "mimo-v2.5-pro",
-          "kind": "llm",
-          "name": "MiMo V2.5 Pro"
-        },
-        {
-          "id": "mimo-v2.5-pro-claude",
-          "kind": "llm",
-          "name": "MiMo V2.5 Pro (Claude Native)",
-          "upstreamModelId": "mimo-v2.5-pro",
-          "reasoning": {
-            "reasoning": true,
-            "thinkingFormat": "claude-budget",
-            "thinkingCanDisable": true,
-            "thinkingRange": null
-          }
-        },
-        {
-          "id": "mimo-v2.5",
-          "kind": "llm",
-          "name": "MiMo V2.5"
-        },
-        {
-          "id": "mimo-v2-pro",
-          "kind": "llm",
-          "name": "MiMo V2 Pro"
-        },
-        {
-          "id": "mimo-v2-omni",
-          "kind": "llm",
-          "name": "MiMo V2 Omni"
-        },
-        {
-          "id": "mimo-v2-tts",
-          "kind": "llm",
-          "name": "MiMo V2 TTS"
-        },
-        {
-          "id": "mimo-v2.5-tts",
-          "kind": "llm",
-          "name": "MiMo V2.5 TTS"
-        },
-        {
-          "id": "mimo-v2.5-tts-voiceclone",
-          "kind": "llm",
-          "name": "MiMo V2.5 TTS Voice Clone"
-        },
-        {
-          "id": "mimo-v2.5-tts-voicedesign",
-          "kind": "llm",
-          "name": "MiMo V2.5 TTS Voice Design"
-        }
-      ]
     },
-    "youcom": {
-      "id": "youcom",
-      "catalogKey": "youcom",
-      "aliases": [],
-      "models": []
-    }
+    youcom: {
+      id: "youcom",
+      catalogKey: "youcom",
+      aliases: [],
+      models: [],
+    },
   },
-  "routeOwners": {
-    "aai": "assemblyai",
-    "ag": "antigravity",
-    "alicode": "alicode",
+  routeOwners: {
+    aai: "assemblyai",
+    ag: "antigravity",
+    alicode: "alicode",
     "alicode-intl": "alicode-intl",
     "alims-intl": "alims-intl",
-    "anthropic": "anthropic",
-    "ark": "volcengine-ark",
-    "assemblyai": "assemblyai",
-    "azure": "azure",
-    "bb": "blackbox",
-    "bfl": "black-forest-labs",
+    anthropic: "anthropic",
+    ark: "volcengine-ark",
+    assemblyai: "assemblyai",
+    azure: "azure",
+    bb: "blackbox",
+    bfl: "black-forest-labs",
     "black-forest-labs": "black-forest-labs",
-    "blackbox": "blackbox",
-    "bpm": "byteplus",
-    "brave": "brave-search",
-    "byteplus": "byteplus",
-    "cartesia": "cartesia",
-    "cbcn": "codebuddy-cn",
-    "cc": "claude",
-    "cerebras": "cerebras",
-    "cf": "cloudflare-ai",
-    "ch": "chutes",
-    "chutes": "chutes",
-    "cl": "cline",
-    "clinepass": "clinepass",
+    blackbox: "blackbox",
+    bpm: "byteplus",
+    brave: "brave-search",
+    byteplus: "byteplus",
+    cartesia: "cartesia",
+    cbcn: "codebuddy-cn",
+    cc: "claude",
+    cerebras: "cerebras",
+    cf: "cloudflare-ai",
+    ch: "chutes",
+    chutes: "chutes",
+    cl: "cline",
+    clinepass: "clinepass",
     "cloudflare-ai": "cloudflare-ai",
-    "cmc": "commandcode",
-    "cohere": "cohere",
-    "comfyui": "comfyui",
-    "commandcode": "commandcode",
-    "coqui": "coqui",
-    "cu": "cursor",
-    "cx": "codex",
-    "deepgram": "deepgram",
-    "deepseek": "deepseek",
-    "dg": "deepgram",
-    "ds": "deepseek",
+    cmc: "commandcode",
+    cohere: "cohere",
+    comfyui: "comfyui",
+    commandcode: "commandcode",
+    coqui: "coqui",
+    cu: "cursor",
+    cx: "codex",
+    deepgram: "deepgram",
+    deepseek: "deepseek",
+    dg: "deepgram",
+    ds: "deepseek",
     "edge-tts": "edge-tts",
-    "el": "elevenlabs",
-    "exa": "exa",
-    "fal": "fal-ai",
+    el: "elevenlabs",
+    exa: "exa",
+    fal: "fal-ai",
     "fal-ai": "fal-ai",
-    "featherless": "featherless",
-    "firecrawl": "firecrawl",
-    "fireworks": "fireworks",
-    "fl": "featherless",
-    "gb": "grok-cli",
-    "gc": "gemini-cli",
-    "gcli": "grok-cli",
-    "gemini": "gemini",
-    "gh": "github",
-    "gitlab": "gitlab",
-    "glm": "glm",
+    featherless: "featherless",
+    firecrawl: "firecrawl",
+    fireworks: "fireworks",
+    fl: "featherless",
+    gb: "grok-cli",
+    gc: "gemini-cli",
+    gcli: "grok-cli",
+    gemini: "gemini",
+    gh: "github",
+    gitlab: "gitlab",
+    glm: "glm",
     "glm-cn": "glm-cn",
     "google-tts": "google-tts",
-    "gpse": "google-pse",
+    gpse: "google-pse",
     "grok-build": "grok-cli",
     "grok-web": "grok-web",
-    "groq": "groq",
-    "gw": "grok-web",
-    "hf": "huggingface",
-    "huggingface": "huggingface",
-    "hyp": "hyperbolic",
-    "hyperbolic": "hyperbolic",
-    "if": "iflow",
-    "inworld": "inworld",
-    "jina": "jina-ai",
+    groq: "groq",
+    gw: "grok-web",
+    hf: "huggingface",
+    huggingface: "huggingface",
+    hyp: "hyperbolic",
+    hyperbolic: "hyperbolic",
+    if: "iflow",
+    inworld: "inworld",
+    jina: "jina-ai",
     "jina-reader": "jina-reader",
-    "kc": "kilocode",
-    "kimchi": "kimchi",
-    "kimi": "kimi",
+    kc: "kilocode",
+    kimchi: "kimchi",
+    kimi: "kimi",
     "kimi-coding": "kimi",
-    "kmc": "kimi",
-    "kr": "kiro",
-    "linkup": "linkup",
+    kmc: "kimi",
+    kr: "kiro",
+    linkup: "linkup",
     "local-device": "local-device",
-    "mimo": "xiaomi-mimo",
-    "minimax": "minimax",
+    mimo: "xiaomi-mimo",
+    minimax: "minimax",
     "minimax-cn": "minimax-cn",
-    "mistral": "mistral",
-    "mmf": "mmf",
-    "nanobanana": "nanobanana",
-    "nb": "nanobanana",
-    "nebius": "nebius",
-    "nvidia": "nvidia",
-    "oc": "opencode",
-    "ocg": "opencode-go",
-    "ollama": "ollama",
+    mistral: "mistral",
+    mmf: "mmf",
+    nanobanana: "nanobanana",
+    nb: "nanobanana",
+    nebius: "nebius",
+    nvidia: "nvidia",
+    oc: "opencode",
+    ocg: "opencode-go",
+    ollama: "ollama",
     "ollama-local": "ollama-local",
-    "openai": "openai",
+    openai: "openai",
     "opencode-go": "opencode-go",
-    "openrouter": "openrouter",
-    "perplexity": "perplexity",
+    openrouter: "openrouter",
+    perplexity: "perplexity",
     "perplexity-agent": "perplexity-agent",
     "perplexity-web": "perplexity-web",
-    "playht": "playht",
-    "polly": "aws-polly",
-    "pplx": "perplexity",
+    playht: "playht",
+    polly: "aws-polly",
+    pplx: "perplexity",
     "pplx-agent": "perplexity-agent",
     "pplx-responses": "perplexity-agent",
-    "pw": "perplexity-web",
-    "qd": "qoder",
-    "qw": "qwen",
-    "recraft": "recraft",
-    "runway": "runwayml",
-    "runwayml": "runwayml",
-    "sdwebui": "sdwebui",
-    "searchapi": "searchapi",
-    "searxng": "searxng",
-    "serper": "serper",
-    "siliconflow": "siliconflow",
-    "stability": "stability-ai",
+    pw: "perplexity-web",
+    qd: "qoder",
+    qw: "qwen",
+    recraft: "recraft",
+    runway: "runwayml",
+    runwayml: "runwayml",
+    sdwebui: "sdwebui",
+    searchapi: "searchapi",
+    searxng: "searxng",
+    serper: "serper",
+    siliconflow: "siliconflow",
+    stability: "stability-ai",
     "stability-ai": "stability-ai",
-    "tavily": "tavily",
-    "together": "together",
-    "topaz": "topaz",
-    "tortoise": "tortoise",
-    "venice": "venice",
-    "vercel": "vercel-ai-gateway",
+    tavily: "tavily",
+    together: "together",
+    topaz: "topaz",
+    tortoise: "tortoise",
+    venice: "venice",
+    vercel: "vercel-ai-gateway",
     "vercel-ai-gateway": "vercel-ai-gateway",
-    "vertex": "vertex",
+    vertex: "vertex",
     "vertex-partner": "vertex-partner",
-    "vn": "venice",
+    vn: "venice",
     "volcengine-ark": "volcengine-ark",
     "voyage-ai": "voyage-ai",
-    "vx": "vertex",
-    "vxp": "vertex-partner",
-    "xai": "xai",
+    vx: "vertex",
+    vxp: "vertex-partner",
+    xai: "xai",
     "xiaomi-mimo": "xiaomi-mimo",
     "xiaomi-tokenplan": "xiaomi-tokenplan",
-    "xmtp": "xiaomi-tokenplan",
-    "youcom": "youcom"
+    xmtp: "xiaomi-tokenplan",
+    youcom: "youcom",
   },
-  "reasoningPicker": {
-    "formatLevels": {
-      "openai": [
-        "none",
-        "minimal",
-        "low",
-        "medium",
-        "high",
-        "xhigh"
-      ],
-      "claude-adaptive": [
-        "none",
-        "low",
-        "medium",
-        "high",
-        "max"
-      ],
-      "claude-budget": [
-        "none",
-        "low",
-        "medium",
-        "high",
-        "xhigh",
-        "max"
-      ],
-      "gemini-level": [
-        "minimal",
-        "low",
-        "medium",
-        "high"
-      ],
-      "gemini-budget": [
-        "none",
-        "low",
-        "medium",
-        "high"
-      ],
-      "zai": [
-        "none",
-        "thinking"
-      ],
-      "qwen": [
-        "none",
-        "low",
-        "medium",
-        "high"
-      ],
-      "kimi": [
-        "none",
-        "low",
-        "medium",
-        "high",
-        "max"
-      ],
-      "deepseek": [
-        "none",
-        "high",
-        "max"
-      ],
-      "minimax": [
-        "none",
-        "thinking"
-      ],
-      "hunyuan": [
-        "none",
-        "low",
-        "medium",
-        "high"
-      ],
-      "step": [
-        "none",
-        "low",
-        "medium",
-        "high"
-      ]
+  reasoningPicker: {
+    formatLevels: {
+      openai: ["none", "minimal", "low", "medium", "high", "xhigh"],
+      "claude-adaptive": ["none", "low", "medium", "high", "max"],
+      "claude-budget": ["none", "low", "medium", "high", "xhigh", "max"],
+      "gemini-level": ["minimal", "low", "medium", "high"],
+      "gemini-budget": ["none", "low", "medium", "high"],
+      zai: ["none", "thinking"],
+      qwen: ["none", "low", "medium", "high"],
+      kimi: ["none", "low", "medium", "high", "max"],
+      deepseek: ["none", "high", "max"],
+      minimax: ["none", "thinking"],
+      hunyuan: ["none", "low", "medium", "high"],
+      step: ["none", "low", "medium", "high"],
     },
-    "patternLevels": [
+    patternLevels: [
       {
-        "pattern": "*gpt-5.6-sol*",
-        "levels": [
-          "none",
-          "minimal",
-          "low",
-          "medium",
-          "high",
-          "xhigh",
-          "max"
-        ]
+        pattern: "*gpt-5.6-sol*",
+        levels: ["none", "minimal", "low", "medium", "high", "xhigh", "max"],
       },
       {
-        "pattern": "*codex*",
-        "levels": [
-          "low",
-          "medium",
-          "high",
-          "xhigh"
-        ]
-      }
-    ]
-  }
+        pattern: "*codex*",
+        levels: ["low", "medium", "high", "xhigh"],
+      },
+    ],
+  },
 };

@@ -126,7 +126,7 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
     });
     const hooks = await plugin({} as never);
     const config: any = {};
-    await hooks.config!(config);
+    await hooks.config?.(config);
 
     expect(requests.sort()).toEqual(
       [
@@ -249,7 +249,7 @@ test("existing config skips resolver", async () => {
     model: "other/keep",
     provider: { "9router": { models: { existing: { id: "USER_KEEP" } } } },
   };
-  await hooks.config!(config);
+  await hooks.config?.(config);
   expect(calls).toBe(0);
   expect(config).toEqual({
     model: "other/keep",
