@@ -1,61 +1,177 @@
-import { afterEach, describe, expect, test } from "bun:test";
-import plugin, { extractDiscoveryEntries, listModels, pickDefaultModel } from "../src/index.js";
-
-const originalFetch = globalThis.fetch;
-afterEach(() => { globalThis.fetch = originalFetch; });
+import { describe, expect, test } from "bun:test";
+import {
+  acceptDiscoveryEntries,
+  createPlugin,
+  pickDefaultModel,
+} from "../src/index.js";
 
 describe("discovery", () => {
-  test("preserves entry fields and name fallback", () => {
-    expect(extractDiscoveryEntries({ models: [{ id: " raw/id ", name: "Display", capabilities: { reasoning: true }, extra: 1 }, { name: "fallback" }] })).toEqual([
-      { id: " raw/id ", name: "Display", capabilities: { reasoning: true } }, { id: "fallback", name: "fallback" },
+  test("accepts root arrays, valid IDs regardless of kind, and first exact ID", () => {
+    expect(
+      acceptDiscoveryEntries({
+        models: [
+          { id: "private/model", kind: "llm", name: "lie" },
+          { id: "private/model", kind: "llm" },
+          { id: "ok", kind: "image" },
+          { id: "constructor", kind: "llm" },
+        ],
+      }),
+    ).toEqual([
+      { id: "private/model", kind: "llm" },
+      { id: "ok", kind: "llm" },
     ]);
+    expect(acceptDiscoveryEntries([{ id: "data/id", kind: "llm" }])).toEqual([
+      { id: "data/id", kind: "llm" },
+    ]);
+    expect(
+      acceptDiscoveryEntries({ data: [{ id: "x", kind: "llm" }] }),
+    ).toEqual([{ id: "x", kind: "llm" }]);
   });
-
-  test("handles scalars and ignores invalid values", () => {
-    expect(extractDiscoveryEntries(["x", 12, false, null, [], {}, { id: "" }, { id: {} }])).toEqual([{ id: "x" }, { id: "12" }, { id: "false" }]);
-  });
-
-  test("falls back across endpoints", async () => {
-    const urls: string[] = [];
-    globalThis.fetch = (async (url: string) => { urls.push(url); return new Response(JSON.stringify(url.endsWith("/model") ? { data: [{ id: "x" }] } : [])); }) as typeof fetch;
-    expect(await listModels("https://router/v1", 50, "key")).toEqual([{ id: "x" }]);
-    expect(urls).toEqual(["https://router/v1/models", "https://router/v1/model"]);
+  test("rejects singleton, malformed, and danger IDs", () => {
+    expect(acceptDiscoveryEntries({ id: "x", kind: "llm" })).toEqual([]);
+    expect(
+      acceptDiscoveryEntries({
+        models: [
+          { id: " x", kind: "llm" },
+          { id: "x\n", kind: "llm" },
+          { id: "__proto__", kind: "llm" },
+          { id: "x" },
+          null,
+        ],
+      }),
+    ).toEqual([{ id: "x", kind: "llm" }]);
   });
 });
 
-test("config preserves existing model/default and configures raw IDs with variants", async () => {
-  globalThis.fetch = (async () => new Response(JSON.stringify({ models: [{ id: "cx/gpt-5.6-sol", capabilities: { reasoning: true } }, { id: "cx/gpt-5.6-terra", kind: "image" }, { id: "image/model", kind: "image" }, { id: "opaque", kind: "unknown" }] }))) as typeof fetch;
+test("factory preserves own user entries and never resolves them", async () => {
+  let calls = 0;
+  const plugin = createPlugin({
+    env: {},
+    listModels: async () => [{ id: "fresh", kind: "llm" }],
+    modelsDevClient: {
+      lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
+      lookupExact: async () => null,
+    },
+    resolveModel: async (id) => {
+      calls++;
+      return { id };
+    },
+  });
+  const hooks = await plugin({} as never);
+  const cfg: any = {
+    model: "keep",
+    provider: { "9router": { models: { fresh: { id: "user" } } } },
+  };
+  await hooks.config!(cfg);
+  expect(calls).toBe(0);
+  expect(cfg.provider["9router"].models.fresh).toEqual({ id: "user" });
+  expect(cfg.model).toBe("keep");
+  expect(pickDefaultModel([{ id: "cx/gpt", kind: "llm" }])).toBe("cx/gpt");
+});
+
+test("factory preserves user model reference without reading getters", async () => {
+  const user = { id: "user" };
+  const models: any = {};
+  Object.defineProperty(models, "fresh", {
+    enumerable: true,
+    get() {
+      throw new Error("getter");
+    },
+  });
+  const plugin = createPlugin({
+    env: {},
+    listModels: async () => [{ id: "fresh", kind: "llm" }],
+    modelsDevClient: {
+      lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
+      lookupExact: async () => null,
+    },
+    resolveModel: async () => {
+      throw new Error("resolver");
+    },
+  });
+  const hooks = await plugin({} as never);
+  await hooks.config!({ provider: { "9router": { models } } } as any);
+  expect(Object.getOwnPropertyDescriptor(models, "fresh")?.get).toBeDefined();
+  expect(user).toEqual({ id: "user" });
+});
+
+test("reject matrix and valid-ID default", async () => {
+  const inherited = Object.create({ id: "inherited", kind: "llm" });
+  expect(
+    acceptDiscoveryEntries({
+      models: [
+        { id: "x".repeat(513), kind: "llm" },
+        { id: "x\x7f", kind: "llm" },
+        { id: "__proto__", kind: "llm" },
+        { id: "prototype", kind: "llm" },
+        { id: "constructor", kind: "llm" },
+        { id: "x", kind: "image" },
+        { id: "x", kind: "tts" },
+        { id: "x", kind: "stt" },
+        { id: "x", kind: "embedding" },
+        { id: "x", kind: "web" },
+        { id: "x" },
+        inherited,
+      ],
+    }),
+  ).toEqual([{ id: "x", kind: "llm" }]);
+  expect(acceptDiscoveryEntries("scalar")).toEqual([]);
+  expect(acceptDiscoveryEntries({ id: "one", kind: "llm" })).toEqual([]);
+  const plugin = createPlugin({
+    env: {},
+    listModels: async () => [
+      { id: "image", kind: "image" } as any,
+      { id: "later/gpt", kind: "llm" },
+    ],
+    modelsDevClient: {
+      lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
+      lookupExact: async () => null,
+    },
+    resolveModel: async (id) => ({ id }),
+  });
   const hooks = await plugin({} as never);
   const cfg: any = {};
   await hooks.config!(cfg);
-  expect(cfg.provider["9router"].models["cx/gpt-5.6-sol"].variants).toEqual({ none: { reasoningEffort: "none" }, minimal: { reasoningEffort: "minimal" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" }, xhigh: { reasoningEffort: "xhigh" }, max: { reasoningEffort: "max" } });
-  expect(cfg.provider["9router"].models["cx/gpt-5.6-terra"]).toBeDefined();
-  expect(cfg.provider["9router"].models["image/model"]).toBeUndefined();
-  expect(cfg.provider["9router"].models.opaque).toBeDefined();
-  expect(cfg.model).toBe("9router/cx/gpt-5.6-sol");
-  const existing: any = { model: "other/model", provider: { "9router": { models: { "cx/gpt-5.6-sol": { id: "keep" } } } } };
-  await hooks.config!(existing);
-  expect(existing.model).toBe("other/model");
-  expect(existing.provider["9router"].models["cx/gpt-5.6-sol"]).toEqual({ id: "keep" });
-  expect(pickDefaultModel([{ id: "raw/suffix " }])).toBe("raw/suffix ");
+  expect(Object.getPrototypeOf(cfg.provider["9router"].models)).toBeNull();
+  expect(cfg.model).toBe("9router/later/gpt");
 });
 
-test("default model returns raw ID, prioritizes gpt, and handles empty discovery", () => {
-  expect(pickDefaultModel([])).toBeNull();
-  expect(pickDefaultModel([{ id: "anthropic/claude-4" }, { id: "cx/gpt-5.6-sol" }])).toBe("cx/gpt-5.6-sol");
-});
-
-test("config excludes unmatched known non-LLM kinds and defaults to eligible runtime ID", async () => {
-  const nonLlmKinds = ["image", "tts", "stt", "embedding", "image-to-text", "web"];
-  const models = [
-    ...nonLlmKinds.map((kind) => ({ id: `unmatched/${kind}`, kind })),
-    { id: "later/eligible" },
-  ];
-  globalThis.fetch = (async () => new Response(JSON.stringify({ models }))) as typeof fetch;
+test("truthy non-object models fails safely", async () => {
+  const plugin = createPlugin({
+    env: {},
+    listModels: async () => [{ id: "x", kind: "llm" }],
+    modelsDevClient: {
+      lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
+      lookupExact: async () => null,
+    },
+    resolveModel: async () => ({}),
+  });
   const hooks = await plugin({} as never);
-  const cfg: any = {};
-  await hooks.config!(cfg);
-  for (const kind of nonLlmKinds) expect(cfg.provider["9router"].models[`unmatched/${kind}`]).toBeUndefined();
-  expect(cfg.provider["9router"].models["later/eligible"]).toBeDefined();
-  expect(cfg.model).toBe("9router/later/eligible");
+  await expect(
+    hooks.config!({ provider: { "9router": { models: [] } } } as any),
+  ).rejects.toThrow();
+});
+
+test("intake accepts exact 512 and ignores remaining kind cases", () => {
+  const id = "x".repeat(512);
+  const inheritedKind = Object.create({ kind: "llm" });
+  inheritedKind.id = "inherited-kind";
+  expect(
+    acceptDiscoveryEntries({
+      data: [
+        { id, kind: "llm" },
+        { id: "unknown", kind: "unknown" },
+        { id: "image-to-text", kind: "image-to-text" },
+        { id: "video", kind: "video" },
+        [],
+        inheritedKind,
+      ],
+    }),
+  ).toEqual([
+    { id, kind: "llm" },
+    { id: "unknown", kind: "llm" },
+    { id: "image-to-text", kind: "llm" },
+    { id: "video", kind: "llm" },
+    { id: "inherited-kind", kind: "llm" },
+  ]);
 });

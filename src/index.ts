@@ -1,92 +1,147 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import { NINE_ROUTER_LLM_CATALOG } from "./generated/9router-llm-catalog.js";
-import { matchLlmCatalogRoute } from "./llm-catalog.js";
-import { resolveModel } from "./model-mapper.js";
-import type { NineRouterDiscoveryEntry } from "./route-types.js";
-
+import {
+  resolveModel as defaultResolveModel,
+  type OpenCodeModelEntry,
+} from "./model-mapper.js";
+import { createModelsDevClient, type ModelsDevClient } from "./models-dev.js";
+import { readCacheBounded, writeCache } from "./cache.js";
+export type AcceptedDiscoveryEntry = { id: string; kind: "llm" };
 type AnyCfg = Record<string, any>;
-const DEFAULT_BASE = "http://localhost:20128/v1";
-const DEFAULT_TIMEOUT_MS = 5000;
-
-function buildHeaders(apiKey: string): Record<string, string> {
-  const headers: Record<string, string> = { Accept: "application/json" };
-  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
-  return headers;
+export interface PluginDependencies {
+  env?: NodeJS.ProcessEnv;
+  listModels(
+    baseUrl: string,
+    timeoutMs: number,
+    apiKey: string,
+  ): Promise<unknown>;
+  resolveModel(
+    fullId: string,
+    client: ModelsDevClient,
+  ): Promise<OpenCodeModelEntry>;
+  modelsDevClient: ModelsDevClient;
 }
-
-async function fetchJson(url: string, timeoutMs: number, apiKey: string): Promise<unknown> {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, { signal: controller.signal, headers: buildHeaders(apiKey) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  } finally { clearTimeout(id); }
+const DEFAULT_BASE = "http://localhost:20128/v1",
+  DEFAULT_TIMEOUT_MS = 5000;
+const own = (v: object, k: string) => Object.hasOwn(v, k);
+const safe = (id: unknown): id is string =>
+  typeof id === "string" &&
+  id.length > 0 &&
+  id.length <= 512 &&
+  id === id.trim() &&
+  ![...id].some((c) => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127) &&
+  !["__proto__", "prototype", "constructor"].includes(id);
+export function acceptDiscoveryEntries(
+  json: unknown,
+): AcceptedDiscoveryEntry[] {
+  const values: unknown[] = Array.isArray(json)
+    ? json
+    : json && typeof json === "object" && Array.isArray((json as any).models)
+      ? (json as any).models
+      : json && typeof json === "object" && Array.isArray((json as any).data)
+        ? (json as any).data
+        : [];
+  const seen = new Set<string>();
+  return values.flatMap((v) =>
+    !v ||
+    typeof v !== "object" ||
+    Array.isArray(v) ||
+    !own(v, "id") ||
+    !safe((v as any).id) ||
+    seen.has((v as any).id)
+      ? []
+      : (seen.add((v as any).id), [{ id: (v as any).id, kind: "llm" }]),
+  );
 }
-
-function entry(value: unknown): NineRouterDiscoveryEntry | null {
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return { id: String(value) };
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const item = value as Record<string, unknown>;
-  const id = typeof item.id === "string" && item.id.length ? item.id : typeof item.name === "string" && item.name.length ? item.name : null;
-  if (!id) return null;
-  const result: NineRouterDiscoveryEntry = { id };
-  if (typeof item.name === "string" && item.name.length) result.name = item.name;
-  if (typeof item.kind === "string") result.kind = item.kind;
-  if (item.capabilities && typeof item.capabilities === "object" && !Array.isArray(item.capabilities)) result.capabilities = item.capabilities as NineRouterDiscoveryEntry["capabilities"];
-  return result;
+export const extractDiscoveryEntries = acceptDiscoveryEntries;
+async function fetchJson(
+  url: string,
+  ms: number,
+  key: string,
+): Promise<unknown> {
+  const r = await fetch(url, {
+    signal: AbortSignal.timeout(ms),
+    headers: key
+      ? { Accept: "application/json", Authorization: `Bearer ${key}` }
+      : { Accept: "application/json" },
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
 }
-
-export function extractDiscoveryEntries(json: unknown): NineRouterDiscoveryEntry[] {
-  const values = Array.isArray(json) ? json
-    : json && typeof json === "object" && Array.isArray((json as Record<string, unknown>).models) ? (json as Record<string, unknown>).models as unknown[]
-    : json && typeof json === "object" && Array.isArray((json as Record<string, unknown>).data) ? (json as Record<string, unknown>).data as unknown[]
-    : json && typeof json === "object" ? [(json as Record<string, unknown>).model ?? (json as Record<string, unknown>).default_model ?? (json as Record<string, unknown>).name]
-    : [];
-  return values.map(entry).filter((value): value is NineRouterDiscoveryEntry => value !== null);
-}
-
-export async function listModels(baseUrl: string, timeoutMs: number, apiKey: string): Promise<NineRouterDiscoveryEntry[]> {
-  for (const url of [`${baseUrl}/models`, `${baseUrl}/model`, baseUrl]) {
+export async function listModels(
+  baseUrl: string,
+  timeoutMs: number,
+  apiKey: string,
+): Promise<AcceptedDiscoveryEntry[]> {
+  for (const url of [`${baseUrl}/models`, `${baseUrl}/model`, baseUrl])
     try {
-      const entries = extractDiscoveryEntries(await fetchJson(url, timeoutMs, apiKey));
+      const entries = acceptDiscoveryEntries(
+        await fetchJson(url, timeoutMs, apiKey),
+      );
       if (entries.length) return entries;
-    } catch { /* try next endpoint */ }
-  }
+    } catch {}
   return [];
 }
-
-function eligibleRuntimeEntries(entries: NineRouterDiscoveryEntry[]): NineRouterDiscoveryEntry[] {
-  return entries.filter((model) => matchLlmCatalogRoute(model.id, NINE_ROUTER_LLM_CATALOG)
-    || !model.kind || model.kind === "llm" || model.kind === "unknown");
-}
-
-export function pickDefaultModel(entries: NineRouterDiscoveryEntry[]): string | null {
-  for (const priority of ["gpt", "claude", "gemini", "deepseek", "small"]) {
-    const found = entries.find((item) => item.id.toLowerCase().includes(priority));
-    if (found) return found.id;
+export function pickDefaultModel(
+  entries: AcceptedDiscoveryEntry[],
+): string | null {
+  for (const p of ["gpt", "claude", "gemini", "deepseek", "small"]) {
+    const hit = entries.find((x) => x.id.toLowerCase().includes(p));
+    if (hit) return hit.id;
   }
   return entries[0]?.id ?? null;
 }
-
-const plugin: Plugin = async () => {
-  const baseUrl = process.env.OPENCODE_9ROUTER_URL || DEFAULT_BASE;
-  const apiKey = process.env.OPENCODE_9ROUTER_API_KEY || "";
-  const timeoutMs = Number(process.env.OPENCODE_9ROUTER_TIMEOUT_MS || DEFAULT_TIMEOUT_MS);
-  let runtimeEntries: NineRouterDiscoveryEntry[] = [];
-  let defaultModel: string | null = null;
-  try { runtimeEntries = eligibleRuntimeEntries(await listModels(baseUrl, timeoutMs, apiKey)); defaultModel = pickDefaultModel(runtimeEntries); }
-  catch (err) { console.warn("opencode-9router plugin: failed to discover models:", (err as any)?.message || err); }
-  return { config: async (cfg: AnyCfg) => {
-    cfg.provider ||= {}; cfg.provider["9router"] ||= {}; cfg.provider["9router"].npm ||= "@ai-sdk/openai-compatible";
-    cfg.provider["9router"].options ||= {}; cfg.provider["9router"].options.name ||= "9Router"; cfg.provider["9router"].options.baseURL ||= baseUrl;
-    if (apiKey && !cfg.provider["9router"].options.apiKey) cfg.provider["9router"].options.apiKey = apiKey;
-    cfg.provider["9router"].models ||= {};
-    for (const model of runtimeEntries) {
-      if (!cfg.provider["9router"].models[model.id]) cfg.provider["9router"].models[model.id] = await resolveModel(model.id, model);
-    }
-    if (!cfg.model && defaultModel) cfg.model = `9router/${defaultModel}`;
-  }};
-};
-
-export default plugin;
+const client = createModelsDevClient({
+  fetch: globalThis.fetch,
+  apiUrl: "https://models.dev/api.json",
+  modelsUrl: "https://models.dev/models.json",
+  cache: { read: readCacheBounded, write: writeCache },
+});
+export function createPlugin(
+  dependencies?: Partial<PluginDependencies>,
+): Plugin {
+  const env = dependencies?.env ?? process.env,
+    discover = dependencies?.listModels ?? listModels,
+    mapper = dependencies?.resolveModel ?? defaultResolveModel,
+    md = dependencies?.modelsDevClient ?? client;
+  return async () => {
+    const baseUrl = env.OPENCODE_9ROUTER_URL || DEFAULT_BASE,
+      apiKey = env.OPENCODE_9ROUTER_API_KEY || "",
+      timeoutMs = Number(env.OPENCODE_9ROUTER_TIMEOUT_MS || DEFAULT_TIMEOUT_MS);
+    let entries: AcceptedDiscoveryEntry[] = [];
+    try {
+      entries = acceptDiscoveryEntries(
+        await discover(baseUrl, timeoutMs, apiKey),
+      );
+    } catch {}
+    const selected = pickDefaultModel(entries);
+    return {
+      config: async (cfg: AnyCfg) => {
+        cfg.provider ||= {};
+        cfg.provider["9router"] ||= {};
+        const provider = cfg.provider["9router"];
+        provider.npm ||= "@ai-sdk/openai-compatible";
+        provider.options ||= {};
+        provider.options.name ||= "9Router";
+        provider.options.baseURL ||= baseUrl;
+        if (apiKey && !provider.options.apiKey)
+          provider.options.apiKey = apiKey;
+        if (!provider.models) provider.models = Object.create(null);
+        if (
+          typeof provider.models !== "object" ||
+          Array.isArray(provider.models)
+        )
+          throw new TypeError("9router models must be an object");
+        for (const { id } of entries)
+          if (!own(provider.models, id))
+            Object.defineProperty(provider.models, id, {
+              value: await mapper(id, md),
+              enumerable: true,
+              configurable: true,
+              writable: true,
+            });
+        if (!cfg.model && selected) cfg.model = `9router/${selected}`;
+      },
+    };
+  };
+}
+export default createPlugin();

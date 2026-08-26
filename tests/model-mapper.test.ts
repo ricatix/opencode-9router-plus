@@ -1,164 +1,152 @@
-import { describe, expect, test } from "bun:test";
+import { expect, test } from "bun:test";
 import { resolveModel } from "../src/model-mapper.js";
 
-describe("resolveModel", () => {
-  test("uses catalog variants despite runtime range and raw ID/name", async () => {
-    const calls: unknown[][] = [];
-    const discovery = { id: "cx/gpt-5.6-sol", capabilities: { reasoning: true, thinkingRange: ["low"] } };
-    const entry = await resolveModel(discovery.id, discovery, {
-      lookupModelsDev: async (...args) => { calls.push(args); return { providerModel: { id: "gpt-5.6-sol", name: "Provider", family: "provider", reasoning_options: [{ type: "effort", values: ["low"] }] }, modelOnly: null }; },
-    });
-    expect(calls).toEqual([["codex", "codex/gpt-5.6-sol"]]);
-    expect(entry.id).toBe("cx/gpt-5.6-sol");
-    expect(entry.name).toBe("Provider");
-    expect(entry.variants).toEqual({ none: { reasoningEffort: "none" }, minimal: { reasoningEffort: "minimal" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" }, xhigh: { reasoningEffort: "xhigh" }, max: { reasoningEffort: "max" } });
-  });
+const client = (
+  canonical: any = { providerModel: null, modelOnly: null },
+  exact: any = null,
+) => ({
+  lookupCanonical: async (...args: string[]) => canonical,
+  lookupExact: async (id: string) => (id === "private/exact" ? exact : null),
+  lookupUniqueLeaf: async (id: string) =>
+    id === "private/exact" ? exact : null,
+});
 
-  test("prefers provider metadata over model-only metadata", async () => {
-    const entry = await resolveModel("cx/gpt-5.6-sol", { id: "cx/gpt-5.6-sol", capabilities: { reasoning: true } }, {
-      lookupModelsDev: async () => ({ providerModel: { id: "x", name: "x", family: "provider", reasoning_options: [{ type: "effort", values: ["high"] }] }, modelOnly: { id: "x", name: "x", family: "model", reasoning_options: [{ type: "effort", values: ["low"] }] } }),
-    });
-    expect(entry.family).toBe("provider");
-    expect(entry.variants).toEqual({ none: { reasoningEffort: "none" }, minimal: { reasoningEffort: "minimal" }, low: { reasoningEffort: "low" }, medium: { reasoningEffort: "medium" }, high: { reasoningEffort: "high" }, xhigh: { reasoningEffort: "xhigh" }, max: { reasoningEffort: "max" } });
+test("catalog controls reasoning and projects safe provider/global metadata", async () => {
+  const entry = await resolveModel(
+    "cx/gpt-5.6-sol",
+    client({
+      providerModel: {
+        id: "x",
+        name: "Provider",
+        cost: { input: 1, output: 2 },
+        attachment: true,
+        reasoning: false,
+      },
+      modelOnly: {
+        id: "x",
+        family: "global",
+        limit: { context: 10, output: 2 },
+        modalities: { input: ["text"], output: ["image"] },
+        temperature: false,
+      },
+    }),
+  );
+  expect(entry).toMatchObject({
+    id: "cx/gpt-5.6-sol",
+    name: "Provider",
+    family: "global",
+    cost: { input: 1, output: 2 },
+    limit: { context: 10, output: 2 },
+    modalities: { input: ["text"], output: ["image"] },
+    attachment: false,
+    temperature: false,
+    tool_call: false,
+    reasoning: true,
   });
-
-  test("merges provider and model-only metadata field by field", async () => {
-    const entry = await resolveModel("cx/gpt-5.6-sol", undefined, {
-      lookupModelsDev: async () => ({
-        providerModel: {
-          id: "x",
-          name: "Provider Name",
-          family: "provider-family",
-          limit: { context: 200000, output: 10000 },
-        },
-        modelOnly: {
-          id: "x",
-          name: "Global Name",
-          family: "global-family",
-          attachment: true,
-          reasoning: true,
-          temperature: false,
-          tool_call: false,
-          release_date: "2025-01-01",
-          cost: { input: 1, output: 2 },
-          modalities: { input: ["text", "image"], output: ["text"] },
-          limit: { context: 100000, output: 5000 },
-        },
-      }),
-    });
-    expect(entry).toMatchObject({
-      id: "cx/gpt-5.6-sol",
-      name: "Provider Name",
-      family: "provider-family",
-      attachment: true,
+  expect(entry.variants).toBeDefined();
+});
+test("unmatched uses unique leaf only, default false flags, rejects unsafe metadata", async () => {
+  const entry = await resolveModel(
+    "private/exact",
+    client(undefined, {
+      id: "private/exact",
+      name: " bad ",
+      cost: { input: Infinity, output: 1 },
+      limit: { context: 0, output: 1 },
+      modalities: { input: ["binary"], output: ["text"] },
       reasoning: true,
+    }),
+  );
+  expect(entry).toEqual({
+    id: "private/exact",
+    name: "private/exact",
+    attachment: false,
+    reasoning: false,
+    temperature: false,
+    tool_call: false,
+  });
+});
+
+test("uses valid global compound when provider compound is invalid", async () => {
+  const entry = await resolveModel(
+    "cx/gpt-5.6-sol",
+    client({
+      providerModel: {
+        id: "p",
+        name: "",
+        cost: { input: -1, output: 1 },
+        limit: { context: 0, output: 1 },
+        modalities: { input: ["binary"], output: ["text"] },
+      },
+      modelOnly: {
+        id: "g",
+        cost: { input: 2, output: 3 },
+        limit: { context: 4, output: 5 },
+        modalities: { input: ["text"], output: ["image"] },
+      },
+    }),
+  );
+  expect(entry).toMatchObject({
+    attachment: false,
+    reasoning: true,
+    temperature: false,
+    tool_call: false,
+    cost: { input: 2, output: 3 },
+    limit: { context: 4, output: 5 },
+    modalities: { input: ["text"], output: ["image"] },
+  });
+});
+
+test("rejects invalid metadata matrix and ignores models.dev booleans", async () => {
+  const bad = ["", "x".repeat(513), "x\n"];
+  for (const name of bad) {
+    const e = await resolveModel(
+      "private/exact",
+      client(undefined, {
+        id: "x",
+        name,
+        family: name,
+        release_date: name,
+        attachment: true,
+        reasoning: true,
+        temperature: true,
+        tool_call: true,
+        cost: { input: NaN, output: Infinity },
+        limit: { context: 1.5, output: 10_000_001 },
+        modalities: { input: Array(17).fill("text"), output: ["text"] },
+      }),
+    );
+    expect(e).toMatchObject({
+      name: "private/exact",
+      attachment: false,
+      reasoning: false,
       temperature: false,
       tool_call: false,
-      release_date: "2025-01-01",
-      cost: { input: 1, output: 2 },
-      modalities: { input: ["text", "image"], output: ["text"] },
-      limit: { context: 200000, output: 10000 },
     });
-  });
+  }
+  for (const mode of [
+    { input: ["text", "text"], output: ["text"] },
+    { input: ["x".repeat(65)], output: ["text"] },
+    { input: ["binary"], output: ["text"] },
+  ])
+    expect(
+      (
+        await resolveModel(
+          "private/exact",
+          client(undefined, {
+            id: "x",
+            name: "ok",
+            cost: { input: -1, output: 1 },
+            limit: { context: 0, output: 1 },
+            modalities: mode,
+          }),
+        )
+      ).modalities,
+    ).toBeUndefined();
+});
 
-  test("uses model-only fallback", async () => {
-    const entry = await resolveModel("cx/gpt-5.6-sol", undefined, { lookupModelsDev: async () => ({ providerModel: null, modelOnly: { id: "x", name: "x", family: "model" } }) });
-    expect(entry.family).toBe("model");
-  });
-
-  test("enriches uncatalogued provider/model IDs from unambiguous legacy metadata", async () => {
-    const entry = await resolveModel("private-provider/private-model", undefined, {
-      lookupModel: async (id) => id === "private-model"
-        ? {
-            id,
-            name: "Private Model",
-            family: "private",
-            release_date: "2025-01-01",
-            attachment: true,
-            reasoning: true,
-            temperature: false,
-            tool_call: false,
-            cost: { input: 1, output: 2 },
-            modalities: { input: ["image"], output: ["audio"] },
-            limit: { context: 131072, output: 8192 },
-          }
-        : null,
-    });
-    expect(entry).toMatchObject({
-      id: "private-provider/private-model",
-      name: "Private Model",
-      family: "private",
-      release_date: "2025-01-01",
-      attachment: true,
-      reasoning: true,
-      temperature: false,
-      tool_call: false,
-      cost: { input: 1, output: 2 },
-      modalities: { input: ["image"], output: ["audio"] },
-      limit: { context: 131072, output: 8192 },
-    });
-  });
-
-  test("enriches uncatalogued vision model from unambiguous legacy metadata", async () => {
-    const entry = await resolveModel("private/vision", undefined, {
-      lookupModel: async () => ({
-        id: "vision",
-        name: "Private Vision",
-        modalities: { input: ["text", "image"], output: ["text"] },
-      }),
-    });
-    expect(entry.id).toBe("private/vision");
-    expect(entry.name).toBe("Private Vision");
-    expect(entry.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
-  });
-
-  test("uses legacy lookup for uncatalogued slash IDs without mutating discovery", async () => {
-    const discovery = { id: "openai-compatible-team/private-model", capabilities: { reasoning: true, thinkingFormat: "openai" } };
-    let called = false;
-    const entry = await resolveModel(discovery.id, discovery, {
-      lookupModel: async (id) => { called = id === "private-model"; return null; },
-    });
-    expect(called).toBe(true);
-    expect(discovery).toEqual({ id: "openai-compatible-team/private-model", capabilities: { reasoning: true, thinkingFormat: "openai" } });
-    expect(entry.variants).toEqual({});
-    expect(entry).not.toHaveProperty("options.reasoningEffort");
-    expect(entry).toMatchObject({ id: discovery.id, name: discovery.id, attachment: false, reasoning: false, temperature: true, tool_call: true });
-  });
-
-  test("does not use legacy lookup for opaque IDs", async () => {
-    let called = false;
-    await resolveModel("opaque", undefined, {
-      lookupModel: async () => { called = true; return null; },
-    });
-    expect(called).toBe(false);
-  });
-
-  test("does not restore incomplete legacy limits", async () => {
-    const entry = await resolveModel("private-provider/private-model", undefined, {
-      lookupModel: async () => ({ id: "private-model", name: "Private Model", limit: { context: 131072 } }),
-    });
-    expect(entry.limit).toBeUndefined();
-  });
-
-  test("catalogued routes use canonical lookup only", async () => {
-    let legacyCalled = false;
-    const entry = await resolveModel("cx/gpt-5.6-sol", undefined, {
-      lookupModelsDev: async () => ({ providerModel: null, modelOnly: null }),
-      lookupModel: async () => { legacyCalled = true; return null; },
-    });
-    expect(legacyCalled).toBe(false);
-    expect(entry.limit).toBeUndefined();
-  });
-
-  test("omits variants for nonreasoning models", async () => {
-    const entry = await resolveModel("openai-compatible-team/private-model", { id: "openai-compatible-team/private-model", capabilities: { reasoning: false } });
-    expect(entry.variants).toBeUndefined();
-  });
-
-  test("matched nonreasoning source ignores runtime reasoning; unmatched falls back safely", async () => {
-    const matched = await resolveModel("ag/gemini-pro-agent", { id: "ag/gemini-pro-agent", capabilities: { reasoning: true } });
-    const unmatched = await resolveModel("opaque", { id: "opaque", capabilities: { reasoning: true } });
-    expect(matched.variants).toBeUndefined();
-    expect(unmatched).toMatchObject({ id: "opaque", name: "opaque", attachment: false, reasoning: false, temperature: true, tool_call: true, variants: {} });
-  });
+test("reviewed nonreasoning omits variants", async () => {
+  const e = await resolveModel("ag/gemini-pro-agent", client());
+  expect(e.reasoning).toBeFalse();
+  expect(e.variants).toBeUndefined();
 });
