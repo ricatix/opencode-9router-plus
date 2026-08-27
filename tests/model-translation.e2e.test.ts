@@ -3,12 +3,17 @@ import { createPlugin } from "../src/index.js";
 import { createModelsDevClient } from "../src/models-dev.js";
 
 const cache = { read: async () => null, write: async () => {} };
-const contract = (entry: Record<string, unknown>, keys: string[]) => {
+const contract = (
+  entry: Record<string, unknown>,
+  keys: string[],
+  toolCall = false,
+  attachment = false,
+) => {
   expect(Object.keys(entry).sort()).toEqual(keys.sort());
   expect(entry.id).toEqual(expect.any(String));
-  expect(entry.attachment).toBeFalse();
+  expect(entry.attachment).toBe(attachment);
   expect(entry.temperature).toBeFalse();
-  expect(entry.tool_call).toBeFalse();
+  expect(entry.tool_call).toBe(toolCall);
   if (entry.cost)
     expect(entry.cost).toEqual({
       input: expect.any(Number),
@@ -47,11 +52,16 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
               id: "cx/gpt-5.6-sol",
               kind: "llm",
               name: "LIVE_LIE",
-              reasoning: false,
-              attachment: true,
-              temperature: true,
-              tool_call: true,
-              capabilities: { reasoning: false, tool_call: true },
+              capabilities: {
+                reasoning: false,
+                tools: true,
+                vision: true,
+                pdf: true,
+                contextWindow: "101",
+                maxOutput: "21",
+              },
+              context_length: "100",
+              max_completion_tokens: "20",
             },
             { id: "private/nested/exact-meta" },
             { id: "private/default-only", kind: "image" },
@@ -146,12 +156,17 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
     ]);
     expect(models["cx/gpt-5.6-sol"]).toMatchObject({
       id: "cx/gpt-5.6-sol",
-      name: "PROVIDER_SENTINEL",
+      name: "LIVE_LIE",
       family: "provider-family",
       cost: { input: 1, output: 2 },
-      limit: { context: 100, output: 20 },
-      reasoning: true,
+      limit: { context: 101, output: 21 },
+      modalities: { input: ["text"], output: ["text"] },
+      attachment: true,
+      reasoning: false,
+      temperature: false,
+      tool_call: true,
     });
+    expect(models["cx/gpt-5.6-sol"].variants).toBeUndefined();
     expect(models["private/nested/exact-meta"]).toMatchObject({
       id: "private/nested/exact-meta",
       name: "EXACT_SENTINEL",
@@ -174,19 +189,23 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
       id: "accepted/missing-kind",
       reasoning: false,
     });
-    contract(models["cx/gpt-5.6-sol"], [
-      "id",
-      "name",
-      "family",
-      "cost",
-      "limit",
-      "modalities",
-      "attachment",
-      "reasoning",
-      "temperature",
-      "tool_call",
-      "variants",
-    ]);
+    contract(
+      models["cx/gpt-5.6-sol"],
+      [
+        "id",
+        "name",
+        "family",
+        "cost",
+        "limit",
+        "modalities",
+        "attachment",
+        "reasoning",
+        "temperature",
+        "tool_call",
+      ],
+      true,
+      true,
+    );
     contract(models["private/nested/exact-meta"], [
       "id",
       "name",
@@ -259,6 +278,95 @@ test("existing config skips resolver", async () => {
         options: { name: "9Router", baseURL: "http://localhost:20128/v1" },
         models: { existing: { id: "USER_KEEP" } },
       },
+    },
+  });
+});
+
+test("live discovery fields are authority and only safe mapper output reaches config", async () => {
+  const plugin = createPlugin({
+    env: {},
+    listModels: async () => [
+      {
+        id: "cx/gpt-5.6-sol",
+        kind: "llm",
+        live: {
+          name: "LIVE_SENTINEL",
+          capabilities: {
+            reasoning: false,
+            tools: true,
+            vision: true,
+            contextWindow: "321",
+            maxOutput: "123",
+          },
+        },
+      },
+    ],
+    modelsDevClient: {
+      lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
+      lookupExact: async () => null,
+      lookupUniqueLeaf: async () => null,
+    },
+  });
+  const hooks = await plugin({} as never);
+  const config: any = {};
+  await hooks.config?.(config);
+
+  expect(config.provider["9router"].models["cx/gpt-5.6-sol"]).toEqual({
+    id: "cx/gpt-5.6-sol",
+    name: "LIVE_SENTINEL",
+    attachment: true,
+    reasoning: false,
+    temperature: false,
+    tool_call: true,
+    limit: { context: 321, output: 123 },
+  });
+});
+
+test("mapper safe template keeps failed model and remaining discovered models", async () => {
+  const plugin = createPlugin({
+    env: {},
+    listModels: async () => [
+      { id: "broken", kind: "llm" },
+      { id: "kept", kind: "llm" },
+    ],
+    modelsDevClient: {
+      lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
+      lookupExact: async () => null,
+      lookupUniqueLeaf: async () => null,
+    },
+    resolveModel: async ({ id }) => {
+      if (id === "broken") throw new Error("broken");
+      return {
+        id,
+        name: id,
+        attachment: false,
+        reasoning: false,
+        temperature: false,
+        tool_call: false,
+      };
+    },
+  });
+  const hooks = await plugin({} as never);
+  const config: any = {};
+
+  await hooks.config?.(config);
+
+  expect(config.provider["9router"].models).toEqual({
+    broken: {
+      id: "broken",
+      name: "broken",
+      attachment: false,
+      reasoning: false,
+      temperature: false,
+      tool_call: false,
+    },
+    kept: {
+      id: "kept",
+      name: "kept",
+      attachment: false,
+      reasoning: false,
+      temperature: false,
+      tool_call: false,
     },
   });
 });

@@ -4,3 +4,4 @@ dist/
 .slim/deepwork/
 .slim/clonedeps/
 docs/superpowers/
+.vscode/

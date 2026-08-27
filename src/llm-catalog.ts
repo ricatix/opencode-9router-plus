@@ -11,6 +11,82 @@ function nonemptyString(value: unknown): value is string {
   return typeof value === "string" && value.length > 0;
 }
 
+const maxCatalogId = 512,
+  maxFormat = 64,
+  maxPickerEntries = 32,
+  maxLevels = 7,
+  maxBudget = 1_000_000;
+const catalogLevels = new Set([
+  "none",
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+  "thinking",
+]);
+const rangeLevels = new Set([
+  "none",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "on",
+  "off",
+]);
+const safeString = (value: unknown, max: number) =>
+  typeof value === "string" &&
+  value.length > 0 &&
+  value.length <= max &&
+  ![...value].some(
+    (char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127,
+  );
+const uniqueLevels = (value: unknown, allowed: Set<string>) =>
+  Array.isArray(value) &&
+  value.length > 0 &&
+  value.length <= maxLevels &&
+  value.every((level) => typeof level === "string" && allowed.has(level)) &&
+  new Set(value).size === value.length;
+function validRange(value: unknown): boolean {
+  if (value === null) return true;
+  if (uniqueLevels(value, rangeLevels)) return true;
+  if (!isRecord(value)) return false;
+  if (Object.keys(value).length === 1 && "values" in value)
+    return uniqueLevels(value.values, rangeLevels);
+  if (Object.keys(value).length !== 2 || !("min" in value) || !("max" in value))
+    return false;
+  return (
+    typeof value.min === "number" &&
+    typeof value.max === "number" &&
+    Number.isSafeInteger(value.min) &&
+    Number.isSafeInteger(value.max) &&
+    value.min >= 0 &&
+    value.min <= value.max &&
+    value.max <= maxBudget
+  );
+}
+function validReasoning(value: unknown): boolean {
+  if (
+    !isRecord(value) ||
+    Object.keys(value).length > 4 ||
+    (value.reasoning !== true && value.reasoning !== false)
+  )
+    return false;
+  if (
+    "thinkingFormat" in value &&
+    value.thinkingFormat !== null &&
+    !safeString(value.thinkingFormat, maxFormat)
+  )
+    return false;
+  if (
+    "thinkingCanDisable" in value &&
+    typeof value.thinkingCanDisable !== "boolean"
+  )
+    return false;
+  return !("thinkingRange" in value) || validRange(value.thinkingRange);
+}
+
 export function validateLlmCatalog(
   catalog: unknown,
 ): asserts catalog is NineRouterLlmCatalog {
@@ -59,7 +135,15 @@ export function validateLlmCatalog(
     }
     const modelIds = new Set<string>();
     for (const model of provider.models) {
-      if (!isRecord(model) || !nonemptyString(model.id) || model.kind !== "llm")
+      if (
+        !isRecord(model) ||
+        !nonemptyString(model.id) ||
+        model.kind !== "llm" ||
+        !["canonicalProvider", "canonicalModelId", "upstreamModelId"].every(
+          (key) => !(key in model) || safeString(model[key], maxCatalogId),
+        ) ||
+        (!("reasoning" in model) || validReasoning(model.reasoning)) === false
+      )
         throw new TypeError("Invalid LLM catalog model");
       if (modelIds.has(model.id))
         throw new TypeError("Duplicate LLM catalog model id");
@@ -78,17 +162,23 @@ export function validateLlmCatalog(
   if (
     !isRecord(catalog.reasoningPicker) ||
     !isRecord(catalog.reasoningPicker.formatLevels) ||
-    !Object.values(catalog.reasoningPicker.formatLevels).every(
-      (levels) => Array.isArray(levels) && levels.every(nonemptyString),
+    Object.keys(catalog.reasoningPicker.formatLevels).length >
+      maxPickerEntries ||
+    !Object.entries(catalog.reasoningPicker.formatLevels).every(
+      ([format, levels]) =>
+        safeString(format, maxFormat) && uniqueLevels(levels, catalogLevels),
     ) ||
     !Array.isArray(catalog.reasoningPicker.patternLevels) ||
+    catalog.reasoningPicker.patternLevels.length > maxPickerEntries ||
     !catalog.reasoningPicker.patternLevels.every(
       (entry) =>
         isRecord(entry) &&
-        nonemptyString(entry.pattern) &&
-        Array.isArray(entry.levels) &&
-        entry.levels.every(nonemptyString),
-    )
+        Object.keys(entry).length === 2 &&
+        safeString(entry.pattern, maxCatalogId) &&
+        uniqueLevels(entry.levels, catalogLevels),
+    ) ||
+    new Set(catalog.reasoningPicker.patternLevels.map((entry) => entry.pattern))
+      .size !== catalog.reasoningPicker.patternLevels.length
   )
     throw new TypeError("Invalid LLM catalog reasoningPicker");
 }

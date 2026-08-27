@@ -6,7 +6,7 @@
 
 ## OVERVIEW
 
-TypeScript ESM plugin for OpenCode. Runtime accepts explicit valid live 9router IDs, regardless of optional `kind`, and injects provider/model config without hardcoded lists in `opencode.json`. Non-LLM routes may appear. Reviewed static catalog supplies canonical identity, reasoning, and variants. `models.dev` enriches allowlisted metadata only. Unmatched models use conservative fallback.
+TypeScript ESM plugin for OpenCode. Runtime accepts explicit valid live 9router IDs, regardless of optional `kind`, preserves bounded normalized live metadata, and injects provider/model config without hardcoded lists in `opencode.json`. Non-LLM routes may appear. Reviewed static catalog supplies canonical lookup, fallback reasoning, and variants. `models.dev` enriches nonboolean metadata only. Unmatched models use conservative fallback.
 
 ## STRUCTURE
 
@@ -32,19 +32,19 @@ opencode-9router-plus/
 
 ## WHERE TO LOOK
 
-| Task                                   | Location                                 | Notes                                                                                        |
-| -------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Runtime provider injection and listing | `src/index.ts`                           | Uses live `${baseUrl}/models`; default base URL ends in `/v1`, with compatibility fallbacks. |
-| Model entry mapping                    | `src/model-mapper.ts`                    | Applies catalog capabilities, optional metadata enrichment, safe fallback.                   |
-| Catalog route matching                 | `src/llm-catalog.ts`                     | Validates catalog and matches runtime route IDs.                                             |
-| Reasoning variants                     | `src/capability-resolver.ts`             | Resolves allowed static catalog variants.                                                    |
-| Generated catalog                      | `src/generated/9router-llm-catalog.ts`   | Reviewed static catalog output.                                                              |
-| Catalog extraction                     | `scripts/extract-9router-llm-catalog.ts` | Extracts only audited upstream inputs.                                                       |
-| Upstream watch                         | renderer and workflow                    | Watch renders reports; audited refresh is separate.                                          |
-| Metadata enrichment                    | `src/models-dev.ts`, `src/cache.ts`      | `models.dev` metadata only; cache TTL 24h.                                                   |
-| Config CLI                             | `src/cli.ts`                             | Safe install, check, uninstall, JSONC refusal.                                               |
-| Tests                                  | `tests/`                                 | Run with `bun test`.                                                                         |
-| Public docs                            | `README.md`                              | Install, env, catalog, diagnostics, uninstall.                                               |
+| Task                                   | Location                                 | Notes                                                                                                                               |
+| -------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime provider injection and listing | `src/index.ts`                           | Uses live `${baseUrl}/models`, preserves bounded normalized metadata; default base URL ends in `/v1`, with compatibility fallbacks. |
+| Model entry mapping                    | `src/model-mapper.ts`                    | Applies canonical catalog lookup, fallback reasoning/variants, optional metadata enrichment, safe fallback.                         |
+| Catalog route matching                 | `src/llm-catalog.ts`                     | Broadly validates catalog structure and matches runtime route IDs.                                                                  |
+| Reasoning variants                     | `src/capability-resolver.ts`             | Resolves allowed static catalog variants.                                                                                           |
+| Generated catalog                      | `src/generated/9router-llm-catalog.ts`   | Reviewed static catalog output.                                                                                                     |
+| Catalog extraction                     | `scripts/extract-9router-llm-catalog.ts` | Extracts only audited upstream inputs.                                                                                              |
+| Upstream watch                         | renderer and workflow                    | Watch renders reports; audited refresh is separate.                                                                                 |
+| Metadata enrichment                    | `src/models-dev.ts`, `src/cache.ts`      | `models.dev` metadata only; cache TTL 24h.                                                                                          |
+| Config CLI                             | `src/cli.ts`                             | Safe install, check, uninstall, JSONC refusal.                                                                                      |
+| Tests                                  | `tests/`                                 | Run with `bun test`.                                                                                                                |
+| Public docs                            | `README.md`                              | Install, env, catalog, diagnostics, uninstall.                                                                                      |
 
 ## CODE MAP
 
@@ -62,8 +62,8 @@ opencode-9router-plus/
 - ESM package: local TypeScript imports use `.js` suffix.
 - TypeScript: ES2022, NodeNext, declarations, strict mode, unused local and parameter checks.
 - Runtime env: `OPENCODE_9ROUTER_URL`, `OPENCODE_9ROUTER_API_KEY`, `OPENCODE_9ROUTER_TIMEOUT_MS`.
-- Live discovery trusts only explicit valid `id`; `kind` is optional and ignored. Static reviewed catalog decides canonical identity, reasoning, and variants.
-- `models.dev` uses exact canonical/provider metadata lookup only. Reviewed Codex routes canonicalize to `openai` for metadata. Non-catalog routes may use global metadata only when exactly one key shares its exact case-sensitive final path segment. It does not decide listing, capabilities, route ownership, reasoning, or variants. Unmatched models use all-false conservative fallback.
+- Live discovery trusts only explicit valid `id`; `kind` is optional and ignored. It preserves bounded normalized name, capabilities, and limits. Live values take priority for those fields; reviewed static catalog supplies canonical lookup, fallback reasoning, and variants.
+- `models.dev` uses exact canonical/provider metadata lookup only. Reviewed Codex routes canonicalize to `openai` for metadata. Non-catalog routes may use global metadata only when exactly one key shares its exact case-sensitive final path segment. It supplies nonboolean metadata and atomic limits only after complete live limit pairs; it has no boolean capability authority. Unmatched models use all-false conservative fallback.
 - CLI config writes back up existing files and write atomically. Commented `.jsonc` fallback edits are refused.
 - Prefer `bun run check` for Prettier format check, Biome lint, unused-code, typecheck, and deterministic tests. `bun run format` writes source, config, and docs formatting without lockfiles or `dist/`. `bun run build` creates `dist/`. Use `bun run test:live` only with `OPENCODE_9ROUTER_API_KEY`. Release runs `bun run check` before `npm publish`; `prepublishOnly` retains `npm run clean && npm run build`.
 
@@ -79,7 +79,7 @@ opencode-9router-plus/
 
 ## NOTES
 
-- Catalog route matching runs before models.dev enrichment. Provider metadata is preferred field-by-field; global metadata fills missing fields. Exact lookup rejects ambiguity. Models without unambiguous metadata retain conservative fallback.
+- Catalog route matching runs before models.dev enrichment. Live name, capabilities, and limits take precedence; provider `models.dev` metadata is preferred field-by-field, with global metadata filling missing nonboolean fields. Exact lookup rejects ambiguity. Models without unambiguous metadata retain conservative fallback.
 - Catalog extractor, upstream watch renderer, runtime, and mapping are covered by Bun tests.
 - Upstream watch workflow reports changes only. It does not refresh catalog, publish, tag, or release.
 - `models.dev` cache: `~/.cache/opencode-9router-plus/models-dev-api.json` (5 MiB cap) and `~/.cache/opencode-9router-plus/models-dev-models.json` (1 MiB cap).

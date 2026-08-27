@@ -266,6 +266,118 @@ describe("LLM catalog", () => {
     ).toThrow();
   });
 
+  test("rejects malformed mapper and resolver catalog fields", () => {
+    const model = (patch: Record<string, unknown>) => ({
+      ...CATALOG_FIXTURE,
+      providers: {
+        ...CATALOG_FIXTURE.providers,
+        codex: {
+          ...CATALOG_FIXTURE.providers.codex,
+          models: [{ id: "gpt-5.6-sol", kind: "llm", ...patch }],
+        },
+      },
+    });
+    const rejects = [
+      model({ canonicalProvider: "" }),
+      model({ canonicalModelId: "x\n" }),
+      model({ upstreamModelId: 1 }),
+      model({ canonicalProvider: "x".repeat(513) }),
+      model({ reasoning: true }),
+      model({ reasoning: { reasoning: "true" } }),
+      model({ reasoning: { reasoning: true, thinkingFormat: 1 } }),
+      model({ reasoning: { reasoning: true, thinkingFormat: "" } }),
+      model({ reasoning: { reasoning: true, thinkingFormat: "x".repeat(65) } }),
+      model({ reasoning: { reasoning: true, thinkingCanDisable: "false" } }),
+      model({ reasoning: { reasoning: true, thinkingRange: "low" } }),
+      model({ reasoning: { reasoning: true, thinkingRange: [] } }),
+      model({ reasoning: { reasoning: true, thinkingRange: ["low", "low"] } }),
+      model({ reasoning: { reasoning: true, thinkingRange: ["unknown"] } }),
+      model({
+        reasoning: { reasoning: true, thinkingRange: Array(8).fill("low") },
+      }),
+      model({
+        reasoning: { reasoning: true, thinkingRange: { values: "low" } },
+      }),
+      model({
+        reasoning: {
+          reasoning: true,
+          thinkingRange: { values: ["low", "low"] },
+        },
+      }),
+      model({
+        reasoning: { reasoning: true, thinkingRange: { min: 1.5, max: 2 } },
+      }),
+      model({
+        reasoning: { reasoning: true, thinkingRange: { min: 2, max: 1 } },
+      }),
+      model({
+        reasoning: {
+          reasoning: true,
+          thinkingRange: { min: 0, max: 1_000_001 },
+        },
+      }),
+      model({
+        reasoning: {
+          reasoning: true,
+          thinkingRange: { min: 0, max: 1, extra: 2 },
+        },
+      }),
+      model({
+        reasoning: {
+          reasoning: true,
+          extra: true,
+          one: true,
+          two: true,
+          three: true,
+        },
+      }),
+    ];
+    for (const catalog of rejects)
+      expect(() => validateLlmCatalog(catalog)).toThrow();
+  });
+
+  test("rejects malformed and unbounded reasoning pickers", () => {
+    const picker = (patch: Record<string, unknown>) => ({
+      ...CATALOG_FIXTURE,
+      reasoningPicker: { ...CATALOG_FIXTURE.reasoningPicker, ...patch },
+    });
+    const rejects = [
+      picker({ formatLevels: { fmt: [] } }),
+      picker({ formatLevels: { fmt: ["low", "low"] } }),
+      picker({ formatLevels: { fmt: ["unknown"] } }),
+      picker({ formatLevels: { fmt: Array(8).fill("low") } }),
+      picker({ formatLevels: { ["x".repeat(65)]: ["low"] } }),
+      picker({
+        formatLevels: Object.fromEntries(
+          Array.from({ length: 33 }, (_, i) => [`f${i}`, ["low"]]),
+        ),
+      }),
+      picker({ patternLevels: [{ pattern: "", levels: ["low"] }] }),
+      picker({
+        patternLevels: [{ pattern: "x".repeat(513), levels: ["low"] }],
+      }),
+      picker({ patternLevels: [{ pattern: "*", levels: ["low", "low"] }] }),
+      picker({ patternLevels: [{ pattern: "*", levels: ["unknown"] }] }),
+      picker({
+        patternLevels: [{ pattern: "*", levels: Array(8).fill("low") }],
+      }),
+      picker({
+        patternLevels: [
+          { pattern: "*", levels: ["low"] },
+          { pattern: "*", levels: ["high"] },
+        ],
+      }),
+      picker({
+        patternLevels: Array.from({ length: 33 }, (_, i) => ({
+          pattern: `p${i}`,
+          levels: ["low"],
+        })),
+      }),
+    ];
+    for (const catalog of rejects)
+      expect(() => validateLlmCatalog(catalog)).toThrow();
+  });
+
   test("matches exact static route and preserves entry identity", () => {
     const match = matchLlmCatalogRoute("gb/grok-4.5-high", CATALOG_FIXTURE);
     expect(match).toMatchObject({
