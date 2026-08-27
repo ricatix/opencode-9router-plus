@@ -1,6 +1,6 @@
 {
   "name": "opencode-9router-plus",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Dynamic 9router provider plugin for opencode",
   "repository": {
     "type": "git",
