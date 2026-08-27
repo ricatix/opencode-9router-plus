@@ -5,7 +5,25 @@ import {
   type OpenCodeModelEntry,
 } from "./model-mapper.js";
 import { createModelsDevClient, type ModelsDevClient } from "./models-dev.js";
-export type AcceptedDiscoveryEntry = { id: string; kind: "llm" };
+
+type LiveModelMetadata = {
+  name?: string;
+  capabilities?: {
+    reasoning?: boolean;
+    tools?: boolean;
+    vision?: boolean;
+    pdf?: boolean;
+    contextWindow?: number;
+    maxOutput?: number;
+  };
+  context_length?: number;
+  max_completion_tokens?: number;
+};
+export type AcceptedDiscoveryEntry = {
+  id: string;
+  kind: "llm";
+  live?: LiveModelMetadata;
+};
 type AnyCfg = Record<string, any>;
 export interface PluginDependencies {
   env?: NodeJS.ProcessEnv;
@@ -15,7 +33,7 @@ export interface PluginDependencies {
     apiKey: string,
   ): Promise<unknown>;
   resolveModel(
-    fullId: string,
+    input: { id: string; live?: LiveModelMetadata },
     client: ModelsDevClient,
   ): Promise<OpenCodeModelEntry>;
   modelsDevClient: ModelsDevClient;
@@ -30,26 +48,81 @@ const safe = (id: unknown): id is string =>
   id === id.trim() &&
   ![...id].some((c) => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127) &&
   !["__proto__", "prototype", "constructor"].includes(id);
+const text = (value: unknown): value is string =>
+  typeof value === "string" &&
+  value.length > 0 &&
+  value.length <= 512 &&
+  value === value.trim() &&
+  ![...value].some((char) => {
+    const code = char.charCodeAt(0);
+    return code < 32 || code === 127;
+  });
+const boolean = (value: unknown) =>
+  value === true || value === "true"
+    ? true
+    : value === false || value === "false"
+      ? false
+      : undefined;
+const positiveSafeInt = (value: unknown) => {
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && /^[0-9]+$/.test(value)
+        ? Number(value)
+        : NaN;
+  return Number.isSafeInteger(n) && n > 0 ? n : undefined;
+};
+const value = (record: object, key: string) => {
+  const descriptor = Object.getOwnPropertyDescriptor(record, key);
+  return descriptor && "value" in descriptor ? descriptor.value : undefined;
+};
+const record = (value: unknown): value is object =>
+  !!value && typeof value === "object" && !Array.isArray(value);
+function liveMetadata(input: object): LiveModelMetadata {
+  if (Object.keys(input).length > 32) return {};
+  const capabilities = value(input, "capabilities");
+  if (record(capabilities) && Object.keys(capabilities).length > 32) return {};
+  const live: LiveModelMetadata = {};
+  const name = value(input, "name");
+  if (text(name)) live.name = name;
+  if (record(capabilities) && Object.keys(capabilities).length <= 32) {
+    const parsed: NonNullable<LiveModelMetadata["capabilities"]> = {};
+    for (const key of ["reasoning", "tools", "vision", "pdf"] as const) {
+      const normalized = boolean(value(capabilities, key));
+      if (normalized !== undefined) parsed[key] = normalized;
+    }
+    for (const key of ["contextWindow", "maxOutput"] as const) {
+      const normalized = positiveSafeInt(value(capabilities, key));
+      if (normalized !== undefined) parsed[key] = normalized;
+    }
+    if (Object.keys(parsed).length) live.capabilities = parsed;
+  }
+  for (const key of ["context_length", "max_completion_tokens"] as const) {
+    const normalized = positiveSafeInt(value(input, key));
+    if (normalized !== undefined) live[key] = normalized;
+  }
+  return live;
+}
 export function acceptDiscoveryEntries(
   json: unknown,
 ): AcceptedDiscoveryEntry[] {
   const values: unknown[] = Array.isArray(json)
     ? json
-    : json && typeof json === "object" && Array.isArray((json as any).models)
-      ? (json as any).models
-      : json && typeof json === "object" && Array.isArray((json as any).data)
-        ? (json as any).data
+    : record(json) && Array.isArray(value(json, "models"))
+      ? value(json, "models")
+      : record(json) && Array.isArray(value(json, "data"))
+        ? value(json, "data")
         : [];
+  if (values.length > 2000) return [];
   const seen = new Set<string>();
   return values.flatMap((v) =>
-    !v ||
-    typeof v !== "object" ||
-    Array.isArray(v) ||
+    !record(v) ||
     !own(v, "id") ||
-    !safe((v as any).id) ||
-    seen.has((v as any).id)
+    !safe(value(v, "id")) ||
+    seen.has(value(v, "id"))
       ? []
-      : (seen.add((v as any).id), [{ id: (v as any).id, kind: "llm" }]),
+      : (seen.add(value(v, "id")),
+        [{ id: value(v, "id"), kind: "llm", live: liveMetadata(v) }]),
   );
 }
 export const extractDiscoveryEntries = acceptDiscoveryEntries;
@@ -65,7 +138,31 @@ async function fetchJson(
       : { Accept: "application/json" },
   });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
+  const reader = r.body?.getReader();
+  if (!reader) return JSON.parse(await r.text());
+  const chunks: Uint8Array[] = [];
+  let bytes = 0;
+  try {
+    for (;;) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      bytes += chunk.value.byteLength;
+      if (bytes > 5 * 1024 * 1024) throw new Error("Response too large");
+      chunks.push(chunk.value);
+    }
+  } catch (error) {
+    await reader.cancel();
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+  const body = new Uint8Array(bytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return JSON.parse(new TextDecoder().decode(body));
 }
 export async function listModels(
   baseUrl: string,
@@ -109,9 +206,11 @@ export function createPlugin(
       timeoutMs = Number(env.OPENCODE_9ROUTER_TIMEOUT_MS || DEFAULT_TIMEOUT_MS);
     let entries: AcceptedDiscoveryEntry[] = [];
     try {
-      entries = acceptDiscoveryEntries(
-        await discover(baseUrl, timeoutMs, apiKey),
-      );
+      entries = (await discover(
+        baseUrl,
+        timeoutMs,
+        apiKey,
+      )) as AcceptedDiscoveryEntry[];
     } catch {}
     const selected = pickDefaultModel(entries);
     return {
@@ -131,14 +230,23 @@ export function createPlugin(
           Array.isArray(provider.models)
         )
           throw new TypeError("9router models must be an object");
-        for (const { id } of entries)
-          if (!own(provider.models, id))
+        for (const { id, live = {} } of entries)
+          if (!own(provider.models, id)) {
+            const mapped = await mapper({ id, live }, md).catch(() => ({
+              id,
+              name: id,
+              attachment: false,
+              reasoning: false,
+              temperature: false,
+              tool_call: false,
+            }));
             Object.defineProperty(provider.models, id, {
-              value: await mapper(id, md),
+              value: mapped,
               enumerable: true,
               configurable: true,
               writable: true,
             });
+          }
         if (!cfg.model && selected) cfg.model = `9router/${selected}`;
       },
     };

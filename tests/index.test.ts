@@ -17,15 +17,15 @@ describe("discovery", () => {
         ],
       }),
     ).toEqual([
-      { id: "private/model", kind: "llm" },
-      { id: "ok", kind: "llm" },
+      { id: "private/model", kind: "llm", live: { name: "lie" } },
+      { id: "ok", kind: "llm", live: {} },
     ]);
     expect(acceptDiscoveryEntries([{ id: "data/id", kind: "llm" }])).toEqual([
-      { id: "data/id", kind: "llm" },
+      { id: "data/id", kind: "llm", live: {} },
     ]);
     expect(
       acceptDiscoveryEntries({ data: [{ id: "x", kind: "llm" }] }),
-    ).toEqual([{ id: "x", kind: "llm" }]);
+    ).toEqual([{ id: "x", kind: "llm", live: {} }]);
   });
   test("rejects singleton, malformed, and danger IDs", () => {
     expect(acceptDiscoveryEntries({ id: "x", kind: "llm" })).toEqual([]);
@@ -39,7 +39,67 @@ describe("discovery", () => {
           null,
         ],
       }),
-    ).toEqual([{ id: "x", kind: "llm" }]);
+    ).toEqual([{ id: "x", kind: "llm", live: {} }]);
+  });
+});
+
+describe("live discovery metadata", () => {
+  test("keeps bounded own live metadata and never invokes accessors", () => {
+    let read = false;
+    const capabilities: any = { reasoning: "true", tools: false };
+    Object.defineProperty(capabilities, "attachment", {
+      get() {
+        read = true;
+        return true;
+      },
+    });
+    const record: any = { id: "live", name: "Live model", capabilities };
+    Object.defineProperty(record, "limit", {
+      get() {
+        read = true;
+        return { context: 1 };
+      },
+    });
+    expect(acceptDiscoveryEntries({ data: [record] })).toEqual([
+      {
+        id: "live",
+        kind: "llm",
+        live: {
+          name: "Live model",
+          capabilities: { reasoning: true, tools: false },
+        },
+      },
+    ]);
+    expect(read).toBe(false);
+  });
+
+  test("keeps valid ID with empty live data for oversized records", () => {
+    const record: any = Object.fromEntries(
+      Array.from({ length: 33 }, (_, index) => [`key${index}`, index]),
+    );
+    record.id = "kept";
+    expect(acceptDiscoveryEntries({ models: [record] })).toEqual([
+      { id: "kept", kind: "llm", live: {} },
+    ]);
+  });
+
+  test("drops all live metadata for oversized capabilities", () => {
+    const capabilities = Object.fromEntries(
+      Array.from({ length: 33 }, (_, index) => [`key${index}`, index]),
+    );
+    expect(
+      acceptDiscoveryEntries({
+        data: [
+          {
+            id: "kept",
+            capabilities,
+            name: "Valid name",
+            context_length: 100,
+            max_completion_tokens: 10,
+          },
+        ],
+      }),
+    ).toEqual([{ id: "kept", kind: "llm", live: {} }]);
   });
 });
 
@@ -52,7 +112,7 @@ test("factory preserves own user entries and never resolves them", async () => {
       lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
       lookupExact: async () => null,
     },
-    resolveModel: async (id) => {
+    resolveModel: async ({ id }) => {
       calls++;
       return { id };
     },
@@ -114,7 +174,7 @@ test("reject matrix and valid-ID default", async () => {
         inherited,
       ],
     }),
-  ).toEqual([{ id: "x", kind: "llm" }]);
+  ).toEqual([{ id: "x", kind: "llm", live: {} }]);
   expect(acceptDiscoveryEntries("scalar")).toEqual([]);
   expect(acceptDiscoveryEntries({ id: "one", kind: "llm" })).toEqual([]);
   const plugin = createPlugin({
@@ -127,7 +187,7 @@ test("reject matrix and valid-ID default", async () => {
       lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
       lookupExact: async () => null,
     },
-    resolveModel: async (id) => ({ id }),
+    resolveModel: async ({ id }) => ({ id }),
   });
   const hooks = await plugin({} as never);
   const cfg: any = {};
@@ -168,10 +228,10 @@ test("intake accepts exact 512 and ignores remaining kind cases", () => {
       ],
     }),
   ).toEqual([
-    { id, kind: "llm" },
-    { id: "unknown", kind: "llm" },
-    { id: "image-to-text", kind: "llm" },
-    { id: "video", kind: "llm" },
-    { id: "inherited-kind", kind: "llm" },
+    { id, kind: "llm", live: {} },
+    { id: "unknown", kind: "llm", live: {} },
+    { id: "image-to-text", kind: "llm", live: {} },
+    { id: "video", kind: "llm", live: {} },
+    { id: "inherited-kind", kind: "llm", live: {} },
   ]);
 });

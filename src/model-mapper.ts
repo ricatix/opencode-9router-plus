@@ -20,6 +20,15 @@ export interface OpenCodeModelEntry {
   modalities?: { input: string[]; output: string[] };
   variants?: ModelVariants | CatalogModelVariants;
 }
+export interface LiveModelRecord {
+  id: string;
+  live?: {
+    name?: unknown;
+    capabilities?: unknown;
+    context_length?: unknown;
+    max_completion_tokens?: unknown;
+  };
+}
 const defaults = (): OpenCodeModelEntry => ({
   attachment: false,
   reasoning: false,
@@ -33,6 +42,41 @@ const string = (v: unknown) =>
   ![...v].some((c) => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127)
     ? v
     : undefined;
+const ownValue = (v: unknown, key: string): unknown => {
+  if (!v || typeof v !== "object") return;
+  const descriptor = Object.getOwnPropertyDescriptor(v, key);
+  return descriptor && "value" in descriptor ? descriptor.value : undefined;
+};
+const bool = (v: unknown) =>
+  v === true || v === "true"
+    ? true
+    : v === false || v === "false"
+      ? false
+      : undefined;
+const positive = (v: unknown) => {
+  const n =
+    typeof v === "number"
+      ? v
+      : typeof v === "string" && /^[0-9]+$/.test(v)
+        ? Number(v)
+        : NaN;
+  return Number.isSafeInteger(n) && n > 0 ? n : undefined;
+};
+const liveLimit = (record: NonNullable<LiveModelRecord["live"]>) => {
+  const caps = ownValue(record, "capabilities");
+  const pair = (context: unknown, output: unknown) => {
+    const a = positive(context),
+      b = positive(output);
+    return a && b ? { context: a, output: b } : undefined;
+  };
+  return (
+    pair(ownValue(caps, "contextWindow"), ownValue(caps, "maxOutput")) ??
+    pair(
+      ownValue(record, "context_length"),
+      ownValue(record, "max_completion_tokens"),
+    )
+  );
+};
 const number = (v: unknown, max: number, integer = false) =>
   typeof v === "number" &&
   Number.isFinite(v) &&
@@ -96,30 +140,64 @@ function project(
   return out;
 }
 export async function resolveModel(
-  fullId: string,
+  input: string | LiveModelRecord,
   client: ModelsDevClient,
 ): Promise<OpenCodeModelEntry> {
-  const route = matchLlmCatalogRoute(fullId, NINE_ROUTER_LLM_CATALOG);
-  const data = route
-    ? await client.lookupCanonical(
-        route.canonicalProvider ?? route.providerId,
-        `${route.canonicalProvider ?? route.providerId}/${route.canonicalModelId ?? route.model.upstreamModelId ?? route.modelId}`,
-      )
-    : { providerModel: null, modelOnly: await client.lookupUniqueLeaf(fullId) };
-  const entry = {
+  const record = typeof input === "string" ? null : input;
+  const fullId = typeof input === "string" ? input : input.id;
+  const safeTemplate = (): OpenCodeModelEntry => ({
     ...defaults(),
-    ...project(data.providerModel, data.modelOnly),
     id: fullId,
-  };
-  entry.reasoning = route?.model.reasoning?.reasoning === true;
-  if (entry.reasoning) {
-    const variants = resolveCatalogVariants({
-      rawModelId: fullId,
-      staticCapabilities: route?.model.reasoning,
-      picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker,
-    });
-    if (Object.keys(variants).length) entry.variants = variants;
+    name: fullId,
+  });
+  try {
+    const route = matchLlmCatalogRoute(fullId, NINE_ROUTER_LLM_CATALOG);
+    let data: {
+      providerModel: ModelsDevModel | null;
+      modelOnly: ModelsDevModel | null;
+    } = { providerModel: null, modelOnly: null };
+    try {
+      data = route
+        ? await client.lookupCanonical(
+            route.canonicalProvider ?? route.providerId,
+            `${route.canonicalProvider ?? route.providerId}/${route.canonicalModelId ?? route.model.upstreamModelId ?? route.modelId}`,
+          )
+        : {
+            providerModel: null,
+            modelOnly: await client.lookupUniqueLeaf(fullId),
+          };
+    } catch {}
+    const entry: OpenCodeModelEntry = {
+      ...defaults(),
+      ...project(data.providerModel, data.modelOnly),
+      id: fullId,
+    };
+    const liveValue = record && ownValue(record, "live");
+    const live = liveValue && typeof liveValue === "object" ? liveValue : null;
+    const capabilities = live && ownValue(live, "capabilities");
+    const liveReasoning = bool(ownValue(capabilities, "reasoning"));
+    entry.reasoning =
+      liveReasoning ?? route?.model.reasoning?.reasoning === true;
+    entry.tool_call = bool(ownValue(capabilities, "tools")) ?? false;
+    entry.attachment =
+      bool(ownValue(capabilities, "vision")) === true ||
+      bool(ownValue(capabilities, "pdf")) === true;
+    entry.temperature = false;
+    const limit =
+      live && liveLimit(live as NonNullable<LiveModelRecord["live"]>);
+    if (limit) entry.limit = limit;
+    if (entry.reasoning) {
+      const variants = resolveCatalogVariants({
+        rawModelId: fullId,
+        staticCapabilities: route?.model.reasoning,
+        picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker,
+      });
+      if (Object.keys(variants).length) entry.variants = variants;
+    }
+    entry.name =
+      (live && string(ownValue(live, "name"))) ?? entry.name ?? fullId;
+    return entry;
+  } catch {
+    return safeTemplate();
   }
-  entry.name ??= fullId;
-  return entry;
 }

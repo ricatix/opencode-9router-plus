@@ -170,3 +170,88 @@ test("reviewed nonreasoning omits variants", async () => {
   expect(e.reasoning).toBeFalse();
   expect(e.variants).toBeUndefined();
 });
+
+test("live fields win, models.dev booleans do not, and limits stay atomic", async () => {
+  const entry = await resolveModel(
+    {
+      id: "cx/gpt-5.6-sol",
+      live: {
+        name: "Live",
+        capabilities: {
+          reasoning: "false",
+          tools: true,
+          vision: false,
+          pdf: "true",
+          contextWindow: "100",
+          maxOutput: 10,
+        },
+        context_length: 200,
+        max_completion_tokens: 20,
+      },
+    },
+    client({
+      providerModel: {
+        id: "p",
+        name: "Provider",
+        attachment: true,
+        reasoning: true,
+        temperature: true,
+        tool_call: false,
+        limit: { context: 300, output: 30 },
+      },
+      modelOnly: null,
+    }),
+  );
+  expect(entry).toEqual({
+    id: "cx/gpt-5.6-sol",
+    name: "Live",
+    attachment: true,
+    reasoning: false,
+    temperature: false,
+    tool_call: true,
+    limit: { context: 100, output: 10 },
+  });
+  expect(entry.variants).toBeUndefined();
+});
+
+test("invalid live fields fall back per field without mixing limit pairs", async () => {
+  const entry = await resolveModel(
+    {
+      id: "private/exact",
+      live: {
+        name: " bad ",
+        capabilities: { contextWindow: "100", maxOutput: "0" },
+        context_length: "200",
+        max_completion_tokens: "20",
+      },
+    },
+    client(undefined, {
+      id: "global/live",
+      name: "Global",
+      limit: { context: 300, output: 30 },
+    }),
+  );
+  expect(entry).toMatchObject({
+    id: "private/exact",
+    name: "Global",
+    limit: { context: 200, output: 20 },
+  });
+});
+
+test("models.dev error preserves live and catalog fallback", async () => {
+  const broken = {
+    lookupCanonical: async () => {
+      throw new Error("boom");
+    },
+    lookupExact: async () => null,
+    lookupUniqueLeaf: async () => null,
+  };
+  expect(await resolveModel({ id: "cx/gpt-5.6-sol" }, broken)).toMatchObject({
+    id: "cx/gpt-5.6-sol",
+    name: "cx/gpt-5.6-sol",
+    attachment: false,
+    reasoning: true,
+    temperature: false,
+    tool_call: false,
+  });
+});
