@@ -13,8 +13,9 @@ It discovers available models from your 9router endpoint at startup and injects 
 - Sends `OPENCODE_9ROUTER_API_KEY` as Bearer auth when discovering models
 - Injects dynamically discovered models into opencode config at runtime
 - Accepts every valid live model ID; `kind` is optional and ignored during discovery
-- Uses reviewed static catalog capabilities and supported reasoning variants for known LLM routes
-- Uses `models.dev` for metadata enrichment only; unmatched models receive safe template
+- Preserves valid live metadata for model name, reasoning, tools, vision, PDF support, and token limits
+- Uses reviewed static catalog lookup and reasoning variants for known LLM routes
+- Uses `models.dev` for non-capability metadata and limit fallback only; mapper failures use a safe model template without stopping other models
 - Does not write opencode config from the runtime plugin
 - Includes an explicit installer/check CLI for safer setup and troubleshooting
 
@@ -137,9 +138,15 @@ Do not hardcode model lists. The plugin lists them dynamically from the live `/v
 - `OPENCODE_9ROUTER_API_KEY` (recommended): API key used by provider options and model discovery requests
 - `OPENCODE_9ROUTER_TIMEOUT_MS` (optional): fetch timeout in ms. Default `5000`
 
-## Discovery Policy
+## Discovery and Live Metadata
 
-Runtime discovery accepts first occurrence of every explicit, valid model `id` from live array, `models`, or `data` responses. It ignores all other response metadata, including optional `kind`; missing and non-LLM `kind` values do not reject an ID. Invalid, control-character, whitespace-padded, and dangerous object-key IDs remain rejected. This compatibility policy means non-LLM routes may appear in `opencode models 9router` when endpoint exposes them.
+Runtime discovery accepts first occurrence of every explicit, valid model `id` from a root array or a `models` or `data` array. `kind` is ignored, so routes that are not LLMs may appear when exposed by endpoint. Invalid, control-character, whitespace-padded, and dangerous object-key IDs remain rejected.
+
+Discovery reads own data properties only; inherited properties and accessors are ignored. Each endpoint response is capped at 5 MiB, listing is capped at 2,000 records, and records or capability objects with more than 32 own keys retain only valid ID with empty live metadata. Empty, malformed, or oversized responses try compatible fallback endpoints: `/models`, `/model`, then base URL.
+
+Valid live metadata has final authority: name; reasoning; tools; vision/PDF attachment support; and complete token-limit pairs. Boolean values accept only `true`, `false`, `"true"`, or `"false"`; invalid values are ignored. `false` reasoning remains false and removes reasoning variants. Vision or PDF enables attachments; tools enables tool calling; temperature remains disabled.
+
+Limits are atomic: capability pair first, then top-level live pair, then `models.dev`. Pairs never combine values from different sources.
 
 ## Development
 
@@ -169,7 +176,9 @@ OPENCODE_9ROUTER_API_KEY="sk-..." bun run test:live
 
 ## Upstream Catalog Review
 
-`/v1/models` controls runtime listing by valid ID, regardless of `kind`. Reviewed static catalog supplies capabilities and supported reasoning variants for known LLM routes. `models.dev` enriches metadata only. For non-catalog routes, metadata applies only when exactly one global catalog key has an exact, case-sensitive final path segment matching route final path segment; no provider guessing, normalization, or route-ID rewrite occurs. Dynamic or unmatched models receive safe template.
+`/v1/models` controls runtime listing by valid ID, regardless of `kind`. Reviewed static catalog provides canonical metadata lookup, fallback reasoning, and supported reasoning variants for known LLM routes. Variants appear only when final reasoning is true.
+
+`models.dev` enriches non-capability fields such as family, release date, cost, modalities, and complete token-limit pairs when live limits are unavailable. It never controls reasoning, attachments, tools, or temperature. For non-catalog routes, metadata applies only when exactly one global catalog key has an exact, case-sensitive final path segment matching route final path segment; no provider guessing, normalization, or route-ID rewrite occurs. Dynamic, unmatched, or unexpectedly failing models receive a safe template while remaining models continue loading.
 
 Scheduled upstream watch reports only whitelisted catalog-input paths. It never runs upstream source, applies detector output, refreshes catalog, publishes, tags, or releases.
 
@@ -186,6 +195,7 @@ Project notes:
 - Restart opencode after changing config or installing plugins.
 - If `/model` does not show 9router models, run `npx opencode-9router-plus check`.
 - If models are empty, verify that your 9router endpoint is running and `/models` is reachable.
+- If one model has malformed metadata or mapping fails, it is registered with conservative defaults; check endpoint data if its name or capabilities look incomplete.
 - If you see `Missing API Key`, set `OPENCODE_9ROUTER_API_KEY` and restart opencode.
 - If plugin loads twice, remove duplicate `opencode-9router-plus` entries from your OpenCode config before restarting.
 
