@@ -2,5 +2,6 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "project": ["src/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"],
   "ignore": ["tests/fixtures/models-dev.ts"],
-  "ignoreBinaries": ["opencode"]
+  "ignoreBinaries": ["opencode"],
+  "ignoreDependencies": ["@emnapi/core", "@emnapi/runtime"]
 }
