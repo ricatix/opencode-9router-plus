@@ -220,7 +220,7 @@ export function createPlugin(
         const provider = cfg.provider["9router"];
         provider.npm ||= "@ai-sdk/openai-compatible";
         provider.options ||= {};
-        provider.options.name ||= "9Router";
+        provider.options.name = "9router";
         provider.options.baseURL ||= baseUrl;
         if (apiKey && !provider.options.apiKey)
           provider.options.apiKey = apiKey;

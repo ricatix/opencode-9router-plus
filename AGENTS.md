@@ -62,10 +62,11 @@ opencode-9router-plus/
 - ESM package: local TypeScript imports use `.js` suffix.
 - TypeScript: ES2022, NodeNext, declarations, strict mode, unused local and parameter checks.
 - Runtime env: `OPENCODE_9ROUTER_URL`, `OPENCODE_9ROUTER_API_KEY`, `OPENCODE_9ROUTER_TIMEOUT_MS`.
+- Keep the OpenAI-compatible provider `options.name` as lowercase `9router`; OpenCode uses the provider ID as the case-sensitive `providerOptions` namespace for reasoning variants.
 - Live discovery trusts only explicit valid `id`; `kind` is optional and ignored. It preserves bounded normalized name, capabilities, and limits. Live values take priority for those fields; reviewed static catalog supplies canonical lookup, fallback reasoning, and variants.
 - `models.dev` uses exact canonical/provider metadata lookup only. Reviewed Codex routes canonicalize to `openai` for metadata. Non-catalog routes may use global metadata only when exactly one key shares its exact case-sensitive final path segment. It supplies nonboolean metadata and atomic limits only after complete live limit pairs; it has no boolean capability authority. Unmatched models use all-false conservative fallback.
 - CLI config writes back up existing files and write atomically. Commented `.jsonc` fallback edits are refused.
-- Prefer `bun run check` for Prettier format check, Biome lint, unused-code, typecheck, and deterministic tests. `bun run format` writes source, config, and docs formatting without lockfiles or `dist/`. `bun run build` creates `dist/`. Use `bun run test:live` only with `OPENCODE_9ROUTER_API_KEY`. Release runs `bun run check` before `npm publish`; `prepublishOnly` retains `npm run clean && npm run build`.
+- Prefer `bun run check` for Biome format check and lint over TypeScript in `src/`, `scripts/`, and `tests/`, unused-code, typecheck, and deterministic tests. `bun run format` writes Biome formatting for that same TypeScript scope. `bun run build` creates `dist/`. Use `bun run test:live` only with `OPENCODE_9ROUTER_API_KEY`. Release runs `bun run check` before `npm publish`; `prepublishOnly` retains `npm run clean && npm run build`.
 
 ## ANTI-PATTERNS
 

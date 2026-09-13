@@ -3,6 +3,10 @@
   "files": {
     "includes": ["src/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"]
   },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space"
+  },
   "linter": {
     "enabled": true,
     "rules": {
