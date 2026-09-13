@@ -275,7 +275,7 @@ test("existing config skips resolver", async () => {
     provider: {
       "9router": {
         npm: "@ai-sdk/openai-compatible",
-        options: { name: "9Router", baseURL: "http://localhost:20128/v1" },
+        options: { name: "9router", baseURL: "http://localhost:20128/v1" },
         models: { existing: { id: "USER_KEEP" } },
       },
     },

@@ -1,5 +1,0 @@
-dist
-node_modules
-.slim
-bun.lock
-package-lock.json

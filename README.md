@@ -166,7 +166,7 @@ bun run prepublishOnly
 
 `prepublishOnly` intentionally uses npm lifecycle commands internally: `npm run clean && npm run build`.
 
-`bun run check` runs Prettier format check, Biome lint, unused-code, typecheck, and deterministic tests. `bun run format` writes Prettier formatting for tracked source, config, and docs files, excluding lockfiles and `dist/`. Pull requests and pushes to `main` run this same gate. Release tags run it before npm publish. Run `bun run build` to produce `dist/`. Run opt-in live smoke only against a reachable 9router endpoint with an API key:
+`bun run check` runs Biome format check and lint for TypeScript in `src/`, `scripts/`, and `tests/`, then unused-code, typecheck, and deterministic tests. `bun run format` writes Biome formatting for that same TypeScript scope. Pull requests and pushes to `main` run this same gate. Release tags run it before npm publish. Run `bun run build` to produce `dist/`. Run opt-in live smoke only against a reachable 9router endpoint with an API key:
 
 ```bash
 OPENCODE_9ROUTER_API_KEY="sk-..." bun run test:live

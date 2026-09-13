@@ -190,9 +190,12 @@ test("reject matrix and valid-ID default", async () => {
     resolveModel: async ({ id }) => ({ id }),
   });
   const hooks = await plugin({} as never);
-  const cfg: any = {};
+  const cfg: any = {
+    provider: { "9router": { options: { name: "9Router" } } },
+  };
   await hooks.config?.(cfg);
   expect(Object.getPrototypeOf(cfg.provider["9router"].models)).toBeNull();
+  expect(cfg.provider["9router"].options.name).toBe("9router");
   expect(cfg.model).toBe("9router/later/gpt");
 });
 
