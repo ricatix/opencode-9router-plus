@@ -37,7 +37,7 @@ opencode-9router-plus/
 | Runtime provider injection and listing | `src/index.ts`                           | Uses live `${baseUrl}/models`, preserves bounded normalized metadata; default base URL ends in `/v1`, with compatibility fallbacks. |
 | Model entry mapping                    | `src/model-mapper.ts`                    | Applies canonical catalog lookup, fallback reasoning/variants, optional metadata enrichment, safe fallback.                         |
 | Catalog route matching                 | `src/llm-catalog.ts`                     | Broadly validates catalog structure and matches runtime route IDs.                                                                  |
-| Reasoning variants                     | `src/capability-resolver.ts`             | Resolves allowed static catalog variants.                                                                                           |
+| Reasoning variants                     | `src/capability-resolver.ts`             | Resolves route-aware variants: validated live wins, provider-aware catalog fallback.                                                |
 | Generated catalog                      | `src/generated/9router-llm-catalog.ts`   | Reviewed static catalog output.                                                                                                     |
 | Catalog extraction                     | `scripts/extract-9router-llm-catalog.ts` | Extracts only audited upstream inputs.                                                                                              |
 | Upstream watch                         | renderer and workflow                    | Watch renders reports; audited refresh is separate.                                                                                 |
@@ -53,7 +53,7 @@ opencode-9router-plus/
 | `plugin`                                 | `src/index.ts`               | OpenCode plugin factory and live model listing.            |
 | `resolveModel`                           | `src/model-mapper.ts`        | Builds entries from catalog, enrichment, or safe template. |
 | `matchLlmCatalogRoute`                   | `src/llm-catalog.ts`         | Matches runtime ID to reviewed route.                      |
-| `resolveCatalogVariants`                 | `src/capability-resolver.ts` | Creates reasoning variants.                                |
+| `resolveReasoningVariants`               | `src/capability-resolver.ts` | Resolves route-owner reasoning policy and router inputs.    |
 | `lookupModelsDev`                        | `src/models-dev.ts`          | Builds metadata index.                                     |
 | `readCache`, `writeCache`, `getCacheAge` | `src/cache.ts`               | Manages models.dev cache and diagnostics.                  |
 
@@ -63,6 +63,10 @@ opencode-9router-plus/
 - TypeScript: ES2022, NodeNext, declarations, strict mode, unused local and parameter checks.
 - Runtime env: `OPENCODE_9ROUTER_URL`, `OPENCODE_9ROUTER_API_KEY`, `OPENCODE_9ROUTER_TIMEOUT_MS`.
 - Keep the OpenAI-compatible provider `options.name` as lowercase `9router`; OpenCode uses the provider ID as the case-sensitive `providerOptions` namespace for reasoning variants.
+- Mapper passes final reasoning and live capabilities to the route resolver. Plugin-owned config variants include disabled tombstones for inactive known picker keys, including nonreasoning and mapper failures; user-owned model entries are skipped unchanged. Tombstones are config-only, not active resolver payloads.
+- Resolver precedence: per-model thinking levels, first matching provider-scoped pattern rule, then known format levels. A valid live `thinkingFormat` overrides the static format; a valid live `thinkingCanDisable` always wins. Effort levels send `reasoningEffort`; toggle labels (where a route offers them) send `thinking` enabled/disabled; these target the 9router router API, not upstream-native payload shapes. `none` is offered only where the contract proves explicit disable (zai/minimax toggles); omission-only transports and formats (CMC commandcode, tokenrouter, step, gemini-level, muse alias) exclude `none` and live `thinkingCanDisable: false` always removes it. New models may use known live formats, but exact exceptions unpublished in the catalog are not guaranteed.
+- Offline runtime proof is opt-in via `bun run build && bun tests/reasoning-runtime.smoke.ts`: loopback mock, temporary HOME/XDG/config/cache, preseeded empty models.dev caches, macOS `sandbox-exec` denying non-loopback outbound, `opencode` on `PATH`. Captured wire proves router-input forwarding on the tested binary (OpenCode 1.19.0, bundled `@ai-sdk/openai-compatible` 2.0.41) only; upstream enforcement is not proven and HTTP 200 or logger `THINK` lines are not authority over upstream behavior. Do not extend these results to the full peer range or other platforms.
+- Package entry uses the supported `PluginModule` default `{ id, server }` so helper exports are not loaded as plugin factories. The `chat.message` hook rejects explicit unsupported variants only for plugin-owned models before generation; unset selections and manual models are unchanged.
 - Live discovery trusts only explicit valid `id`; `kind` is optional and ignored. It preserves bounded normalized name, capabilities, and limits. Live values take priority for those fields; reviewed static catalog supplies canonical lookup, fallback reasoning, and variants.
 - `models.dev` uses exact canonical/provider metadata lookup only. Reviewed Codex routes canonicalize to `openai` for metadata. Non-catalog routes may use global metadata only when exactly one key shares its exact case-sensitive final path segment. It supplies nonboolean metadata and atomic limits only after complete live limit pairs; it has no boolean capability authority. Unmatched models use all-false conservative fallback.
 - CLI config writes back up existing files and write atomically. Commented `.jsonc` fallback edits are refused.
@@ -73,6 +77,7 @@ opencode-9router-plus/
 - Do not hardcode 9router model lists in `opencode.json`.
 - Do not treat `models.dev` as capability authority.
 - Do not refresh catalog from unreviewed upstream changes. Watch reports first; audited refresh PR later.
+- Extractor policy containers reject spread/accessor/computed/shorthand members during named-field lookup. Operational property values remain unvisited; static picker/capability object spreads retain source-order precedence, while duplicate literal keys are rejected.
 - Do not add fields violating `https://opencode.ai/config.json`.
 - Do not write API keys to docs, config examples, logs, or this file.
 - Do not treat `dist/` as source.
@@ -98,6 +103,7 @@ bun run format:check
 bun run format
 bun run knip
 bun run build
+bun tests/reasoning-runtime.smoke.ts
 bun run clean
 bun run prepublishOnly
 opencode plugin opencode-9router-plus

@@ -148,6 +148,8 @@ Valid live metadata has final authority: name; reasoning; tools; vision/PDF atta
 
 Limits are atomic: capability pair first, then top-level live pair, then `models.dev`. Pairs never combine values from different sources.
 
+Thinking metadata is validated per field and bounded: a nonempty `thinkingFormat` up to 64 characters, boolean `thinkingCanDisable` and `thinkingEffortSupported`, and `thinkingRange` levels (at most 16 unique strings) or a validated numeric min/max pair survive; malformed fields are ignored without discarding other valid metadata. A valid live `thinkingFormat` overrides the catalog format for the route, and a valid live `thinkingCanDisable` always wins; the catalog value applies only when live fields are absent or the formats are compatible.
+
 ## Development
 
 ```bash
@@ -174,6 +176,14 @@ OPENCODE_9ROUTER_API_KEY="sk-..." bun run test:live
 
 `test:live` requires `OPENCODE_9ROUTER_API_KEY`; it is not part of `check` and has no claimed pass result here.
 
+Offline runtime proof needs no API key or running 9router endpoint:
+
+```bash
+bun run build && bun tests/reasoning-runtime.smoke.ts
+```
+
+It uses fresh `dist/` output, points the OpenCode binary at a local loopback mock server through a temporary `HOME`/XDG/`cache` setup, and preseeds empty `models.dev` caches so no external metadata is fetched. Requirements: Bun, a macOS host with `sandbox-exec` (which denies every outbound connection except loopback), and `opencode` on `PATH`.
+
 ## Upstream Catalog Review
 
 `/v1/models` controls runtime listing by valid ID, regardless of `kind`. Reviewed static catalog provides canonical metadata lookup, fallback reasoning, and supported reasoning variants for known LLM routes. Variants appear only when final reasoning is true.
@@ -183,6 +193,21 @@ OPENCODE_9ROUTER_API_KEY="sk-..." bun run test:live
 Scheduled upstream watch reports only whitelisted catalog-input paths. It never runs upstream source, applies detector output, refreshes catalog, publishes, tags, or releases.
 
 Manual catalog refresh is offline and audited: use explicit 40 lowercase hexadecimal upstream SHA, review changes in separate refresh PR, then run local tooling against approved inputs.
+
+## Reasoning Variants
+
+When final reasoning is true, each route gets an effective set of variants resolved per route, not guessed from model name.
+
+- A valid live `thinkingFormat` determines the input format; otherwise the reviewed catalog supplies provider-aware fallback: exact per-model levels first, then the first matching provider-scoped pattern rule, then known levels for the format. Provider identity comes from the route owner alias, not from canonical metadata.
+- Effort levels send `reasoningEffort` to the 9router OpenAI-compatible API. Toggle labels, where a route offers them, send `thinking: {"type": "enabled"}` or `thinking: {"type": "disabled"}`. These inputs target the router API, not each upstream provider's native payload format; upstream normalization is the router's job.
+- `none` is offered only for routes whose contract has an explicit disable input, and a valid live `thinkingCanDisable: false` always removes it. Where `none` only omits the effort field (CMC commandcode, tokenrouter, step, gemini-level, and the muse alias), omission is not a guaranteed off, so `none` is excluded instead of offered as a toggle.
+- New models can use a known live format and its levels even when absent from the reviewed catalog, but exact per-model exceptions that are not published in the catalog are not guaranteed.
+- For plugin-owned models, inactive known picker keys get config-only `disabled: true` tombstones so builtin options outside the allowed set do not reappear; tombstones are never sent as active payloads. User-owned model entries are skipped unchanged, and unset selections keep native OpenCode defaults. Explicitly selecting a variant the route does not allow is rejected for plugin-owned models before generation.
+
+### Tested Runtime and Proof Limits
+
+- Proof covers config-to-router forwarding on the tested runtime: captured requests carry the expected `reasoningEffort` and `thinking` inputs, rejected selections produce no request, and tombstones never reach the wire. It does not prove that each upstream provider enforces the effort; HTTP 200 responses and `THINK` debug logs are not authority over upstream behavior.
+- Offline runtime evidence used the OpenCode 1.19.0 binary with its bundled `@ai-sdk/openai-compatible` adapter 2.0.41 on macOS. No compatibility is claimed for the full peer range, other platforms, or npm distributions.
 
 Project notes:
 
