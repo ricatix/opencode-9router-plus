@@ -103,6 +103,372 @@ describe("live discovery metadata", () => {
   });
 });
 
+describe("live thinking metadata", () => {
+  for (const nested of [false, true]) {
+    describe(nested ? "nested values" : "direct range", () => {
+      for (const [label, range, accepted] of [
+        [
+          "16 unique levels",
+          Array.from({ length: 16 }, (_, i) => `level${i}`),
+          true,
+        ],
+        [
+          "17 unique levels",
+          Array.from({ length: 17 }, (_, i) => `level${i}`),
+          false,
+        ],
+        ["64 characters", ["x".repeat(64)], true],
+        ["65 characters", ["x".repeat(65)], false],
+        ["duplicates", ["low", "low"], false],
+      ] as const) {
+        test(`preserves bounds when range contains ${label}`, () => {
+          const input = nested ? { values: range } : range;
+
+          const actual = acceptDiscoveryEntries([
+            {
+              id: "kept",
+              capabilities: { reasoning: true, thinkingRange: input },
+            },
+          ]);
+
+          expect(actual[0]?.live?.capabilities).toEqual(
+            accepted
+              ? { reasoning: true, thinkingRange: input }
+              : { reasoning: true },
+          );
+        });
+      }
+
+      for (const throwing of [false, true]) {
+        test(`rejects indexed getters without invoking them when throwing=${throwing}`, () => {
+          const range = ["low"];
+          let reads = 0;
+          Object.defineProperty(range, "0", {
+            get() {
+              reads++;
+              if (throwing) throw new Error("indexed getter executed");
+              return "low";
+            },
+          });
+
+          const actual = acceptDiscoveryEntries([
+            {
+              id: "kept",
+              name: "Kept",
+              capabilities: {
+                reasoning: true,
+                tools: true,
+                thinkingRange: nested ? { values: range } : range,
+              },
+            },
+          ]);
+
+          expect(reads).toBe(0);
+          expect(actual).toEqual([
+            {
+              id: "kept",
+              kind: "llm",
+              live: {
+                name: "Kept",
+                capabilities: { reasoning: true, tools: true },
+              },
+            },
+          ]);
+        });
+      }
+
+      for (const inherited of [false, true]) {
+        test(`rejects missing own indices when inherited=${inherited}`, () => {
+          const range = Array(1);
+          if (inherited)
+            Object.setPrototypeOf(
+              range,
+              Object.assign(Object.create(Array.prototype), { 0: "high" }),
+            );
+
+          const actual = acceptDiscoveryEntries([
+            {
+              id: "kept",
+              name: "Kept",
+              capabilities: {
+                reasoning: true,
+                tools: true,
+                thinkingRange: nested ? { values: range } : range,
+              },
+            },
+          ]);
+
+          expect(actual).toEqual([
+            {
+              id: "kept",
+              kind: "llm",
+              live: {
+                name: "Kept",
+                capabilities: { reasoning: true, tools: true },
+              },
+            },
+          ]);
+        });
+      }
+
+      test("copies validated own indices without reading custom methods or iterators", () => {
+        const range = ["low", "high"];
+        let reads = 0;
+        Object.defineProperty(range, "every", {
+          get() {
+            reads++;
+            return () => true;
+          },
+        });
+        Object.defineProperty(range, Symbol.iterator, {
+          get() {
+            reads++;
+            return function* () {
+              yield* Array.from({ length: 17 }, () => ({ bad: true }));
+            };
+          },
+        });
+
+        const actual = acceptDiscoveryEntries([
+          {
+            id: "kept",
+            capabilities: { thinkingRange: nested ? { values: range } : range },
+          },
+        ]);
+
+        expect(reads).toBe(0);
+        expect(actual[0]?.live?.capabilities?.thinkingRange).toEqual(
+          nested ? { values: ["low", "high"] } : ["low", "high"],
+        );
+      });
+    });
+  }
+
+  test("preserves valid thinking format and booleans exactly", () => {
+    expect(
+      acceptDiscoveryEntries({
+        data: [
+          {
+            id: "cmc/test-model",
+            capabilities: {
+              reasoning: "true",
+              thinkingFormat: "commandcode",
+              thinkingCanDisable: "true",
+              thinkingEffortSupported: false,
+            },
+          },
+        ],
+      }),
+    ).toEqual([
+      {
+        id: "cmc/test-model",
+        kind: "llm",
+        live: {
+          capabilities: {
+            reasoning: true,
+            thinkingFormat: "commandcode",
+            thinkingCanDisable: true,
+            thinkingEffortSupported: false,
+          },
+        },
+      },
+    ]);
+  });
+
+  test("preserves bounded thinkingRange array and object shapes", () => {
+    expect(
+      acceptDiscoveryEntries({
+        data: [
+          {
+            id: "range/array",
+            capabilities: { reasoning: true, thinkingRange: ["low", "high"] },
+          },
+          {
+            id: "range/onoff",
+            capabilities: { reasoning: true, thinkingRange: ["on", "off"] },
+          },
+          {
+            id: "range/values",
+            capabilities: {
+              reasoning: true,
+              thinkingRange: { values: ["medium", "high"] },
+            },
+          },
+          {
+            id: "range/budget",
+            capabilities: {
+              reasoning: true,
+              thinkingRange: { min: 0, max: 1_000_000 },
+            },
+          },
+        ],
+      }),
+    ).toEqual([
+      {
+        id: "range/array",
+        kind: "llm",
+        live: {
+          capabilities: { reasoning: true, thinkingRange: ["low", "high"] },
+        },
+      },
+      {
+        id: "range/onoff",
+        kind: "llm",
+        live: {
+          capabilities: { reasoning: true, thinkingRange: ["on", "off"] },
+        },
+      },
+      {
+        id: "range/values",
+        kind: "llm",
+        live: {
+          capabilities: {
+            reasoning: true,
+            thinkingRange: { values: ["medium", "high"] },
+          },
+        },
+      },
+      {
+        id: "range/budget",
+        kind: "llm",
+        live: {
+          capabilities: {
+            reasoning: true,
+            thinkingRange: { min: 0, max: 1_000_000 },
+          },
+        },
+      },
+    ]);
+  });
+
+  test("ignores invalid thinking fields without losing other valid fields", () => {
+    expect(
+      acceptDiscoveryEntries({
+        data: [
+          {
+            id: "kept",
+            name: "Kept",
+            capabilities: {
+              reasoning: "true",
+              tools: true,
+              thinkingFormat: "x".repeat(65),
+              thinkingCanDisable: "maybe",
+              thinkingRange: ["low", "low"],
+              thinkingEffortSupported: 1,
+            },
+          },
+          {
+            id: "still",
+            capabilities: {
+              reasoning: true,
+              thinkingFormat: " bad\n",
+              thinkingRange: { min: 5, max: 1 },
+            },
+          },
+          {
+            id: "oversized-array",
+            capabilities: {
+              reasoning: true,
+              thinkingRange: Array.from({ length: 17 }, (_, i) => `l${i}`),
+            },
+          },
+          {
+            id: "over-budget",
+            capabilities: {
+              reasoning: true,
+              thinkingCanDisable: false,
+              thinkingRange: { min: 0, max: 1_000_001 },
+            },
+          },
+          {
+            id: "empty-or-partial",
+            capabilities: {
+              reasoning: true,
+              thinkingFormat: "",
+              thinkingRange: [],
+            },
+          },
+        ],
+      }),
+    ).toEqual([
+      {
+        id: "kept",
+        kind: "llm",
+        live: { name: "Kept", capabilities: { reasoning: true, tools: true } },
+      },
+      {
+        id: "still",
+        kind: "llm",
+        live: { capabilities: { reasoning: true } },
+      },
+      {
+        id: "oversized-array",
+        kind: "llm",
+        live: { capabilities: { reasoning: true } },
+      },
+      {
+        id: "over-budget",
+        kind: "llm",
+        live: { capabilities: { reasoning: true, thinkingCanDisable: false } },
+      },
+      {
+        id: "empty-or-partial",
+        kind: "llm",
+        live: { capabilities: { reasoning: true } },
+      },
+    ]);
+  });
+
+  test("never reads thinking getters or inherited capability keys", () => {
+    let read = false;
+    const getterCapabilities: any = {
+      reasoning: true,
+      thinkingCanDisable: false,
+    };
+    Object.defineProperty(getterCapabilities, "thinkingRange", {
+      get() {
+        read = true;
+        return { min: 1, max: 2 };
+      },
+    });
+    const inheritedCapabilities: any = Object.create({
+      thinkingFormat: "proto",
+      thinkingCanDisable: true,
+      thinkingRange: ["low"],
+    });
+    inheritedCapabilities.reasoning = true;
+    const accessorRecord: any = { id: "accessor" };
+    Object.defineProperty(accessorRecord, "capabilities", {
+      get() {
+        read = true;
+        return { reasoning: true };
+      },
+    });
+    expect(
+      acceptDiscoveryEntries({
+        data: [
+          { id: "getter", capabilities: getterCapabilities },
+          { id: "inherited", capabilities: inheritedCapabilities },
+          accessorRecord,
+        ],
+      }),
+    ).toEqual([
+      {
+        id: "getter",
+        kind: "llm",
+        live: { capabilities: { reasoning: true, thinkingCanDisable: false } },
+      },
+      {
+        id: "inherited",
+        kind: "llm",
+        live: { capabilities: { reasoning: true } },
+      },
+      { id: "accessor", kind: "llm", live: {} },
+    ]);
+    expect(read).toBe(false);
+  });
+});
+
 test("factory preserves own user entries and never resolves them", async () => {
   let calls = 0;
   const plugin = createPlugin({
@@ -111,6 +477,7 @@ test("factory preserves own user entries and never resolves them", async () => {
     modelsDevClient: {
       lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
       lookupExact: async () => null,
+      lookupUniqueLeaf: async () => null,
     },
     resolveModel: async ({ id }) => {
       calls++;
@@ -144,6 +511,7 @@ test("factory preserves user model reference without reading getters", async () 
     modelsDevClient: {
       lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
       lookupExact: async () => null,
+      lookupUniqueLeaf: async () => null,
     },
     resolveModel: async () => {
       throw new Error("resolver");
@@ -186,6 +554,7 @@ test("reject matrix and valid-ID default", async () => {
     modelsDevClient: {
       lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
       lookupExact: async () => null,
+      lookupUniqueLeaf: async () => null,
     },
     resolveModel: async ({ id }) => ({ id }),
   });
@@ -206,6 +575,7 @@ test("truthy non-object models fails safely", async () => {
     modelsDevClient: {
       lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
       lookupExact: async () => null,
+      lookupUniqueLeaf: async () => null,
     },
     resolveModel: async () => ({}),
   });

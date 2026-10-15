@@ -1,11 +1,16 @@
-import type { Plugin } from "@opencode-ai/plugin";
+import type { Plugin, PluginModule } from "@opencode-ai/plugin";
 import { readCacheBounded, writeCache } from "./cache.js";
 import {
+  configVariants,
   resolveModel as defaultResolveModel,
   type OpenCodeModelEntry,
 } from "./model-mapper.js";
 import { createModelsDevClient, type ModelsDevClient } from "./models-dev.js";
 
+type LiveThinkingRange =
+  | readonly string[]
+  | { values: readonly string[] }
+  | { min: number; max: number };
 type LiveModelMetadata = {
   name?: string;
   capabilities?: {
@@ -15,6 +20,10 @@ type LiveModelMetadata = {
     pdf?: boolean;
     contextWindow?: number;
     maxOutput?: number;
+    thinkingFormat?: string;
+    thinkingCanDisable?: boolean;
+    thinkingRange?: LiveThinkingRange;
+    thinkingEffortSupported?: boolean;
   };
   context_length?: number;
   max_completion_tokens?: number;
@@ -48,10 +57,10 @@ const safe = (id: unknown): id is string =>
   id === id.trim() &&
   ![...id].some((c) => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127) &&
   !["__proto__", "prototype", "constructor"].includes(id);
-const text = (value: unknown): value is string =>
+const text = (value: unknown, max = 512): value is string =>
   typeof value === "string" &&
   value.length > 0 &&
-  value.length <= 512 &&
+  value.length <= max &&
   value === value.trim() &&
   ![...value].some((char) => {
     const code = char.charCodeAt(0);
@@ -78,6 +87,50 @@ const value = (record: object, key: string) => {
 };
 const record = (value: unknown): value is object =>
   !!value && typeof value === "object" && !Array.isArray(value);
+const MAX_RANGE_LEVELS = 16,
+  MAX_THINKING_FORMAT_CHARS = 64,
+  MAX_THINKING_BUDGET = 1_000_000;
+const budgetInteger = (input: unknown) => {
+  const n =
+    typeof input === "number"
+      ? input
+      : typeof input === "string" && /^[0-9]+$/.test(input)
+        ? Number(input)
+        : NaN;
+  return Number.isSafeInteger(n) && n >= 0 && n <= MAX_THINKING_BUDGET
+    ? n
+    : undefined;
+};
+const boundedLevels = (items: unknown): readonly string[] | undefined => {
+  if (
+    !Array.isArray(items) ||
+    items.length === 0 ||
+    items.length > MAX_RANGE_LEVELS
+  )
+    return undefined;
+  const levels: string[] = [];
+  for (let index = 0; index < items.length; index++) {
+    const item: unknown = value(items, String(index));
+    if (!text(item, MAX_THINKING_FORMAT_CHARS) || levels.includes(item))
+      return undefined;
+    levels.push(item);
+  }
+  return levels;
+};
+const thinkingRange = (input: unknown): LiveThinkingRange | undefined => {
+  const values = boundedLevels(input);
+  if (values) return values;
+  if (!record(input)) return undefined;
+  const keys = Object.keys(input).length,
+    viaValues = boundedLevels(value(input, "values"));
+  if (own(input, "values") && keys === 1 && viaValues)
+    return { values: viaValues };
+  const min = budgetInteger(value(input, "min")),
+    max = budgetInteger(value(input, "max"));
+  return keys === 2 && min !== undefined && max !== undefined && min <= max
+    ? { min, max }
+    : undefined;
+};
 function liveMetadata(input: object): LiveModelMetadata {
   if (Object.keys(input).length > 32) return {};
   const capabilities = value(input, "capabilities");
@@ -95,6 +148,18 @@ function liveMetadata(input: object): LiveModelMetadata {
       const normalized = positiveSafeInt(value(capabilities, key));
       if (normalized !== undefined) parsed[key] = normalized;
     }
+    const thinkingFormat = value(capabilities, "thinkingFormat");
+    if (text(thinkingFormat, MAX_THINKING_FORMAT_CHARS))
+      parsed.thinkingFormat = thinkingFormat;
+    for (const key of [
+      "thinkingCanDisable",
+      "thinkingEffortSupported",
+    ] as const) {
+      const normalized = boolean(value(capabilities, key));
+      if (normalized !== undefined) parsed[key] = normalized;
+    }
+    const range = thinkingRange(value(capabilities, "thinkingRange"));
+    if (range !== undefined) parsed.thinkingRange = range;
     if (Object.keys(parsed).length) live.capabilities = parsed;
   }
   for (const key of ["context_length", "max_completion_tokens"] as const) {
@@ -213,7 +278,18 @@ export function createPlugin(
       )) as AcceptedDiscoveryEntry[];
     } catch {}
     const selected = pickDefaultModel(entries);
+    const ownedVariants = new Map<string, Set<string>>();
     return {
+      "chat.message": async (input, output) => {
+        const model = output.message.model;
+        if (model.providerID !== "9router" || input.variant === undefined)
+          return;
+        const allowed = ownedVariants.get(model.modelID);
+        if (allowed && !allowed.has(input.variant))
+          throw new TypeError(
+            `Unsupported 9router variant: ${model.modelID}/${input.variant}`,
+          );
+      },
       config: async (cfg: AnyCfg) => {
         cfg.provider ||= {};
         cfg.provider["9router"] ||= {};
@@ -239,6 +315,7 @@ export function createPlugin(
               reasoning: false,
               temperature: false,
               tool_call: false,
+              variants: configVariants(),
             }));
             Object.defineProperty(provider.models, id, {
               value: mapped,
@@ -246,10 +323,21 @@ export function createPlugin(
               configurable: true,
               writable: true,
             });
+            ownedVariants.set(
+              id,
+              new Set(
+                Object.entries(mapped.variants ?? {})
+                  .filter(([, variant]) => !("disabled" in variant))
+                  .map(([key]) => key),
+              ),
+            );
           }
         if (!cfg.model && selected) cfg.model = `9router/${selected}`;
       },
     };
   };
 }
-export default createPlugin();
+export default {
+  id: "opencode-9router-plus",
+  server: createPlugin(),
+} satisfies PluginModule;

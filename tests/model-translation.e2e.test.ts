@@ -3,13 +3,69 @@ import { createPlugin } from "../src/index.js";
 import { createModelsDevClient } from "../src/models-dev.js";
 
 const cache = { read: async () => null, write: async () => {} };
+
+test("local E2E retains active toggle payloads alongside config-only tombstones", async () => {
+  const server = Bun.serve({
+    port: 0,
+    fetch: () =>
+      Response.json({
+        data: [
+          {
+            id: "cx/task6-toggle",
+            capabilities: {
+              reasoning: true,
+              thinkingFormat: "zai",
+              thinkingCanDisable: true,
+            },
+          },
+        ],
+      }),
+  });
+  try {
+    const hooks = await createPlugin({
+      env: { OPENCODE_9ROUTER_URL: `${server.url}v1` },
+      modelsDevClient: {
+        lookupCanonical: async () => ({ providerModel: null, modelOnly: null }),
+        lookupExact: async () => null,
+        lookupUniqueLeaf: async () => null,
+      },
+    })({} as never);
+    const config: any = {};
+    await hooks.config?.(config);
+    expect(config.provider["9router"].options.name).toBe("9router");
+    expect(
+      config.provider["9router"].models["cx/task6-toggle"].variants,
+    ).toEqual({
+      ...disabledVariants,
+      none: { thinking: { type: "disabled" } },
+      thinking: { thinking: { type: "enabled" } },
+    });
+    expect(
+      config.provider["9router"].models["cx/task6-toggle"].options
+        ?.reasoningEffort,
+    ).toBeUndefined();
+  } finally {
+    server.stop(true);
+  }
+});
+const disabledVariants = {
+  none: { disabled: true },
+  minimal: { disabled: true },
+  low: { disabled: true },
+  medium: { disabled: true },
+  high: { disabled: true },
+  xhigh: { disabled: true },
+  max: { disabled: true },
+  ultra: { disabled: true },
+  thinking: { disabled: true },
+} as const;
 const contract = (
   entry: Record<string, unknown>,
   keys: string[],
   toolCall = false,
   attachment = false,
 ) => {
-  expect(Object.keys(entry).sort()).toEqual(keys.sort());
+  expect(Object.keys(entry).sort()).toEqual([...keys, "variants"].sort());
   expect(entry.id).toEqual(expect.any(String));
   expect(entry.attachment).toBe(attachment);
   expect(entry.temperature).toBeFalse();
@@ -26,16 +82,8 @@ const contract = (
     });
   if (entry.modalities)
     expect(entry.modalities).toEqual({ input: ["text"], output: ["text"] });
-  if (entry.variants) {
-    expect(entry.reasoning).toBeTrue();
-    expect(
-      Object.keys(entry.variants as Record<string, unknown>).sort(),
-    ).toEqual(["high", "low", "max", "medium", "minimal", "none", "xhigh"]);
-    for (const [name, variant] of Object.entries(
-      entry.variants as Record<string, unknown>,
-    ))
-      expect(variant).toEqual({ reasoningEffort: name });
-  }
+  expect(entry.reasoning).toBeFalse();
+  expect(entry.variants).toEqual(disabledVariants);
 };
 
 test("local E2E translates accepted discovery through reviewed and models.dev sources", async () => {
@@ -166,7 +214,7 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
       temperature: false,
       tool_call: true,
     });
-    expect(models["cx/gpt-5.6-sol"].variants).toBeUndefined();
+    expect(models["cx/gpt-5.6-sol"].variants).toEqual(disabledVariants);
     expect(models["private/nested/exact-meta"]).toMatchObject({
       id: "private/nested/exact-meta",
       name: "EXACT_SENTINEL",
@@ -176,6 +224,7 @@ test("local E2E translates accepted discovery through reviewed and models.dev so
     expect(models["private/default-only"]).toEqual({
       id: "private/default-only",
       name: "private/default-only",
+      variants: disabledVariants,
       attachment: false,
       reasoning: false,
       temperature: false,
@@ -319,6 +368,7 @@ test("live discovery fields are authority and only safe mapper output reaches co
     temperature: false,
     tool_call: true,
     limit: { context: 321, output: 123 },
+    variants: disabledVariants,
   });
 });
 
@@ -355,6 +405,7 @@ test("mapper safe template keeps failed model and remaining discovered models", 
     broken: {
       id: "broken",
       name: "broken",
+      variants: disabledVariants,
       attachment: false,
       reasoning: false,
       temperature: false,
