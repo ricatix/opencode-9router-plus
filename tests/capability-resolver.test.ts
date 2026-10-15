@@ -1,405 +1,255 @@
 import { describe, expect, test } from "bun:test";
-import {
-  resolveCatalogVariants,
-  resolveReasoningVariants,
-} from "../src/capability-resolver.js";
-import { NINE_ROUTER_LLM_CATALOG } from "../src/generated/9router-llm-catalog.js";
-import type { NineRouterLlmCatalog } from "../src/route-types.js";
+import { resolveReasoningVariants } from "../src/capability-resolver.js";
+import { NINE_ROUTER_LLM_CATALOG as catalog } from "../src/generated/9router-llm-catalog.js";
 
-const resolve = (capabilities: unknown, reasoningOptions?: unknown) =>
-  resolveReasoningVariants({
-    capabilities: capabilities as never,
-    reasoningOptions: reasoningOptions as never,
-  });
-const all = {
-  none: { reasoningEffort: "none" },
-  low: { reasoningEffort: "low" },
-  medium: { reasoningEffort: "medium" },
-  high: { reasoningEffort: "high" },
-};
-const baseline = {
-  low: { reasoningEffort: "low" },
-  medium: { reasoningEffort: "medium" },
-  high: { reasoningEffort: "high" },
-};
-const options = (values: string[]) => [{ type: "effort", values }];
+const efforts = (levels: string) =>
+  Object.fromEntries(
+    levels
+      .split(" ")
+      .filter(Boolean)
+      .map((level) => [level, { reasoningEffort: level }]),
+  );
+const off = { thinking: { type: "disabled" } };
+const on = { thinking: { type: "enabled" } };
+const resolve = (routeId: string, live?: unknown, reasoning = true) =>
+  resolveReasoningVariants({ routeId, reasoning, live, catalog });
 
-describe("resolveReasoningVariants Oracle Task 3 matrix", () => {
-  test("1 absent capabilities", () => expect(resolve(undefined)).toEqual({}));
-  test("2 reasoning false", () =>
-    expect(resolve({ reasoning: false, thinkingFormat: "openai" })).toEqual(
-      {},
-    ));
-  test("3 reasoning missing", () =>
-    expect(resolve({ thinkingFormat: "openai" })).toEqual({}));
-  test("4 reasoning non-boolean", () =>
-    expect(resolve({ reasoning: "true", thinkingFormat: "openai" })).toEqual(
-      {},
-    ));
-  test("5 OpenAI baseline", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: "openai" })).toEqual(
-      baseline,
-    ));
-  test("6 Gemini baseline", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: "gemini" })).toEqual(
-      baseline,
-    ));
-  test("7 unknown baseline", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: "other" })).toEqual(
-      baseline,
-    ));
-  test("8 undefined format baseline", () =>
-    expect(resolve({ reasoning: true })).toEqual(baseline));
-  test("9 null format baseline", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: null })).toEqual(
-      baseline,
-    ));
-  test("10 OpenAI trim lower", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: " OpEnAi " })).toEqual(
-      baseline,
-    ));
-  test("11 Gemini trim lower", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: " GEMINI " })).toEqual(
-      baseline,
-    ));
-  test("12 no format coercion", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: 1 })).toEqual(baseline));
-  test("13 adaptive empty", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: "adaptive" })).toEqual(
-      {},
-    ));
-  test("14 claude-adaptive empty", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "claude-adaptive" }),
-    ).toEqual({}));
-  test("15 minimax empty", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: "minimax" })).toEqual(
-      {},
-    ));
-  test("16 adaptive trim lower", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: " ADAPTIVE " })).toEqual(
-      {},
-    ));
-  test("17 none needs disable", () =>
-    expect(
-      resolve({
-        reasoning: true,
-        thinkingFormat: "openai",
+describe("audited router format matrix", () => {
+  const cases = [
+    ["openai", "none minimal low medium high xhigh"],
+    ["claude-adaptive", "none low medium high xhigh max"],
+    ["claude-budget", "none low medium high xhigh max"],
+    ["gemini-level", "minimal low medium high"],
+    ["gemini-budget", "none low medium high"],
+    ["qwen", "none low medium high"],
+    ["kimi", "none low medium high max"],
+    ["deepseek", "none high max"],
+    ["commandcode", "low medium high xhigh max"],
+    ["hunyuan", "none low medium high"],
+    ["step", "low medium high"],
+    ["tokenrouter", "low medium high xhigh max"],
+  ];
+  test.each(cases)(
+    "preserves exact effort payloads when live format is %s",
+    (format, levels) => {
+      // Given a new model on a known transport; When resolving its live format.
+      const actual = resolve("openai/new-model", { thinkingFormat: format });
+      // Then no native budgets, defaults, or aliases are invented.
+      expect(actual).toEqual(efforts(levels));
+    },
+  );
+  test.each(["zai", "minimax"])(
+    "uses router toggles when format is %s",
+    (format) => {
+      const actual = resolve("openai/new-model", { thinkingFormat: format });
+      expect(actual).toEqual({ none: off, thinking: on });
+    },
+  );
+  test.each(["zai", "minimax"])(
+    "removes off when %s cannot disable",
+    (format) => {
+      const actual = resolve("openai/new-model", {
+        thinkingFormat: format,
         thinkingCanDisable: false,
-      }),
-    ).toEqual(baseline));
-  test("18 none with disable", () =>
-    expect(
-      resolve({
-        reasoning: true,
-        thinkingFormat: "openai",
-        thinkingCanDisable: true,
-      }),
-    ).toEqual(all));
-  test("19 disable exact boolean", () =>
-    expect(
-      resolve({
-        reasoning: true,
-        thinkingFormat: "openai",
-        thinkingCanDisable: "true",
-      }),
-    ).toEqual(baseline));
-  test("20 metadata undefined baseline", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "gemini" }, undefined),
-    ).toEqual(baseline));
-  test("21 metadata exact efforts filters", () =>
-    expect(
-      resolve(
-        { reasoning: true, thinkingFormat: "openai" },
-        options(["low", "high"]),
-      ),
-    ).toEqual({
-      low: { reasoningEffort: "low" },
-      high: { reasoningEffort: "high" },
-    }));
-  test("22 metadata excludes all", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "openai" }, options([])),
-    ).toEqual({}));
-  test("23 no exact effort entry", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "openai" }, [
-        { type: "other", values: ["low"] },
-      ]),
-    ).toEqual({}));
-  test("24 wrong type case", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "openai" }, [
-        { type: "Effort", values: ["low"] },
-      ]),
-    ).toEqual({}));
-  test("25 malformed options", () =>
-    expect(resolve({ reasoning: true, thinkingFormat: "openai" }, {})).toEqual(
-      {},
-    ));
-  test("26 malformed values", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "openai" }, [
-        { type: "effort", values: "low" },
-      ]),
-    ).toEqual({}));
-  test("27 invalid effort ignored", () =>
-    expect(
-      resolve(
-        { reasoning: true, thinkingFormat: "openai" },
-        options(["low", "max", " LOW "]),
-      ),
-    ).toEqual({ low: { reasoningEffort: "low" } }));
-  test("28 max never output", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "openai" }, options(["max"])),
-    ).toEqual({}));
-  test("29 metadata none still needs disable", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "openai" }, options(["none"])),
-    ).toEqual({}));
-  test("30 DeepSeek needs range", () =>
-    expect(
-      resolve(
-        { reasoning: true, thinkingFormat: "deepseek" },
-        options(["low"]),
-      ),
-    ).toEqual({}));
-  test("31 DeepSeek range intersection", () =>
-    expect(
-      resolve(
-        {
-          reasoning: true,
-          thinkingFormat: "deepseek",
-          thinkingRange: ["low", "high"],
-        },
-        options(["low", "medium"]),
-      ),
-    ).toEqual({ low: { reasoningEffort: "low" } }));
-  test("32 DeepSeek object range", () =>
-    expect(
-      resolve(
-        {
-          reasoning: true,
-          thinkingFormat: "deepseek",
-          thinkingRange: { values: ["medium"] },
-        },
-        options(["medium", "high"]),
-      ),
-    ).toEqual({ medium: { reasoningEffort: "medium" } }));
-  test("33 DeepSeek none needs disable", () =>
-    expect(
-      resolve(
-        {
-          reasoning: true,
-          thinkingFormat: "deepseek",
-          thinkingRange: ["none"],
-          thinkingCanDisable: false,
-        },
-        options(["none"]),
-      ),
-    ).toEqual({}));
-  test("34 DeepSeek none disable", () =>
-    expect(
-      resolve(
-        {
-          reasoning: true,
-          thinkingFormat: "deepseek",
-          thinkingRange: ["none"],
-          thinkingCanDisable: true,
-        },
-        options(["none"]),
-      ),
-    ).toEqual({ none: { reasoningEffort: "none" } }));
-  test("35 DeepSeek malformed array", () =>
-    expect(
-      resolve(
-        {
-          reasoning: true,
-          thinkingFormat: "deepseek",
-          thinkingRange: ["low", 1],
-        },
-        options(["low"]),
-      ),
-    ).toEqual({}));
-  test("36 DeepSeek malformed object", () =>
-    expect(
-      resolve(
-        {
-          reasoning: true,
-          thinkingFormat: "deepseek",
-          thinkingRange: { values: "low" },
-        },
-        options(["low"]),
-      ),
-    ).toEqual({}));
-  test("37 DeepSeek no metadata", () =>
-    expect(
-      resolve({
-        reasoning: true,
-        thinkingFormat: "deepseek",
-        thinkingRange: ["low"],
-      }),
-    ).toEqual({}));
-  test("38 xhigh route and metadata", () =>
-    expect(
-      resolve(
-        { reasoning: true, thinkingFormat: "openai", thinkingRange: ["xhigh"] },
-        options(["xhigh"]),
-      ),
-    ).toEqual({ xhigh: { reasoningEffort: "xhigh" } }));
-  test("39 xhigh needs route evidence", () =>
-    expect(
-      resolve(
-        { reasoning: true, thinkingFormat: "openai" },
-        options(["xhigh"]),
-      ),
-    ).toEqual({}));
-  test("40 no mutation and malformed safe", () => {
-    const caps = {
-      reasoning: true,
-      thinkingFormat: "openai",
-      thinkingRange: ["xhigh"],
-    };
-    const metadata = options(["low", "xhigh"]);
-    const before = JSON.stringify([caps, metadata]);
-    expect(resolve(caps, metadata)).toEqual({
-      low: { reasoningEffort: "low" },
-      xhigh: { reasoningEffort: "xhigh" },
-    });
-    expect(JSON.stringify([caps, metadata])).toBe(before);
-  });
-  test("41 reasoning_effort metadata rejected", () =>
-    expect(
-      resolve({ reasoning: true, thinkingFormat: "openai" }, [
-        { type: "reasoning_effort", values: ["low"] },
-      ]),
-    ).toEqual({}));
-  test("42 on-off array range empty", () =>
-    expect(
-      resolve({
-        reasoning: true,
-        thinkingFormat: "openai",
-        thinkingRange: ["on", "off"],
-      }),
-    ).toEqual({}));
-  test("43 on-off object range empty", () =>
-    expect(
-      resolve({
-        reasoning: true,
-        thinkingFormat: "openai",
-        thinkingRange: { values: ["on"] },
-      }),
-    ).toEqual({}));
+      });
+      expect(actual).toEqual({ thinking: on });
+    },
+  );
 });
 
-const picker = (
-  patternLevels: readonly { pattern: string; levels: readonly string[] }[] = [],
-  formatLevels: Readonly<Record<string, readonly string[]>> = {},
-): NineRouterLlmCatalog["reasoningPicker"] => ({ patternLevels, formatLevels });
-const resolveCatalog = (
-  rawModelId: string,
-  staticCapabilities: unknown,
-  customPicker = picker(),
-) =>
-  resolveCatalogVariants({
-    rawModelId,
-    staticCapabilities: staticCapabilities as never,
-    picker: customPicker,
-  });
-const variants = (...levels: string[]) =>
-  Object.fromEntries(
-    levels.map((reasoningEffort) => [reasoningEffort, { reasoningEffort }]),
+describe("route-scoped precedence", () => {
+  const cases = [
+    ["cmc/deepseek-v4.1-flash", "low medium high xhigh max"],
+    ["commandcode/deepseek-v4.1-flash", "low medium high xhigh max"],
+    ["ds/deepseek-v4.1-flash", "none low medium high xhigh max"],
+    ["cbcn/deepseek-v4.1-flash", "low high max"],
+    ["cbcn/deepseek-v4-pro", "low high xhigh"],
+    ["cbai/deepseek-v4.1-flash", "none low medium high xhigh max"],
+    ["cbai/deepseek-v4-pro", "low high xhigh"],
+    ["cx/gpt-6.1-sol", "low medium high xhigh max"],
+    ["cx/gpt-5.6-sol", "none minimal low medium high xhigh max ultra"],
+    ["cx/gpt-5.6-terra", "none minimal low medium high xhigh max ultra"],
+    ["cx/gpt-5.6-luna", "none minimal low medium high xhigh max"],
+    ["openai/gpt-5.6-sol", ""],
+    ["cbcn/glm-5.2", "high xhigh"],
+    ["cbcn/glm-5.3", "low high max"],
+    ["cbcn/glm-5.3-flash", "low high max"],
+    ["cbcn/kimi-k2.8-preview", "low medium high"],
+    ["cbcn/hy3", "low high"],
+    ["cbcn/hy4-preview", "high"],
+    ["mm/MiniMax-M3", "none high"],
+    ["mmg/MiniMax-M3", "none high"],
+    ["mm/MiniMax-M3.1-Flash-Preview", "low medium high xhigh max"],
+    ["mmg/MiniMax-M3.1-Flash-Preview", "low medium high xhigh max"],
+    ["cc/claude-opus-5", "none low medium high xhigh max"],
+    ["kr/claude-opus-4.5", ""],
+    ["kr/claude-opus-5.5", "none low medium high xhigh max"],
+    ["kr/gpt-5.6-sol", "low medium high xhigh"],
+    ["kr/new-model", ""],
+    ["tr/anthropic/claude-sonnet-4.6", "low medium high max"],
+    ["xmtp/mimo-v2.5-pro", "low medium high xhigh"],
+    ["mimo/mimo-v2.6-pro", "low medium high xhigh"],
+    ["cc/claude-fable-5-1", "low medium high xhigh max"],
+    ["muse/muse-spark-1.3", "minimal low medium high xhigh"],
+    ["muse-ai/muse-spark-1.3", "minimal low medium high xhigh"],
+  ];
+  test.each(cases)(
+    "selects audited levels when route is %s",
+    (routeId, levels) => {
+      const actual = resolve(routeId);
+      expect(actual).toEqual(efforts(levels));
+    },
   );
-
-describe("resolveCatalogVariants Task 4", () => {
-  test("snapshot picker gives gpt-5.6-sol seven discrete efforts", () =>
-    expect(
-      resolveCatalog(
-        "cx/gpt-5.6-sol",
-        { reasoning: true, thinkingFormat: "openai" },
-        NINE_ROUTER_LLM_CATALOG.reasoningPicker,
-      ),
-    ).toEqual(
-      variants("none", "minimal", "low", "medium", "high", "xhigh", "max"),
-    ));
-  test("first matching pattern wins", () =>
-    expect(
-      resolveCatalog(
-        "model",
-        { reasoning: true },
-        picker([
-          { pattern: "*", levels: ["low"] },
-          { pattern: "model", levels: ["high"] },
-        ]),
-      ),
-    ).toEqual(variants("low")));
-  test("glob is case sensitive, escapes regex literals, wildcard matches zero or many", () => {
-    const rules = [{ pattern: "v1.2+[x]?*", levels: ["minimal"] }];
-    expect(
-      resolveCatalog("v1.2+[x]?", { reasoning: true }, picker(rules)),
-    ).toEqual(variants("minimal"));
-    expect(
-      resolveCatalog("v1.2+[x]?suffix", { reasoning: true }, picker(rules)),
-    ).toEqual(variants("minimal"));
-    expect(
-      resolveCatalog("V1.2+[x]?", { reasoning: true }, picker(rules)),
-    ).toEqual({});
-  });
-  test("falls back to exact thinking format", () =>
-    expect(
-      resolveCatalog(
-        "other",
-        { reasoning: true, thinkingFormat: "openai" },
-        picker([], { openai: ["low", "high"] }),
-      ),
-    ).toEqual(variants("low", "high")));
-  test("missing or non-true reasoning gives no variants", () => {
-    expect(resolveCatalog("model", undefined)).toEqual({});
-    expect(resolveCatalog("model", { reasoning: false })).toEqual({});
-    expect(resolveCatalog("model", { reasoning: "true" })).toEqual({});
-  });
-  test("false thinkingCanDisable removes none only", () =>
-    expect(
-      resolveCatalog(
-        "model",
-        { reasoning: true, thinkingCanDisable: false },
-        picker([{ pattern: "*", levels: ["none", "low"] }]),
-      ),
-    ).toEqual(variants("low")));
-  test("non-discrete levels and unknown formats give no variants", () => {
-    expect(
-      resolveCatalog(
-        "model",
-        { reasoning: true },
-        picker([
-          {
-            pattern: "*",
-            levels: ["auto", "on", "off", "thinking", "unknown"],
-          },
-        ]),
-      ),
-    ).toEqual({});
-    expect(
-      resolveCatalog(
-        "model",
-        { reasoning: true, thinkingFormat: "missing" },
-        picker(),
-      ),
-    ).toEqual({});
-  });
-  test("max and xhigh retain distinct payloads without mutating input", () => {
-    const capabilities = {
-      reasoning: true,
-      thinkingFormat: "fmt",
-      thinkingRange: ["on"],
+  test("does not match a pattern against the route alias", () => {
+    const custom = {
+      ...catalog,
+      routeOwners: { ...catalog.routeOwners, "claude-4.6": "openai" },
     };
-    const customPicker = picker([], { fmt: ["xhigh", "max"] });
-    const before = JSON.stringify([capabilities, customPicker]);
-    expect(resolveCatalog("model", capabilities, customPicker)).toEqual(
-      variants("xhigh", "max"),
-    );
-    expect(JSON.stringify([capabilities, customPicker])).toBe(before);
+    const actual = resolveReasoningVariants({
+      routeId: "claude-4.6/new",
+      reasoning: true,
+      live: { thinkingFormat: "openai" },
+      catalog: custom,
+    });
+    expect(actual).toEqual(efforts("none minimal low medium high xhigh"));
+  });
+  test("honors an empty exact model policy instead of falling back", () => {
+    const custom = structuredClone(catalog);
+    Object.assign(custom.providers.codex.models[0], { thinkingLevels: [] });
+    const actual = resolveReasoningVariants({
+      routeId: "cx/gpt-6.1-sol",
+      reasoning: true,
+      catalog: custom,
+    });
+    expect(actual).toEqual({});
+  });
+  test("uses first compatible pattern rather than promoting scoped rules", () => {
+    const custom = {
+      ...catalog,
+      reasoningPicker: {
+        formatLevels: catalog.reasoningPicker.formatLevels,
+        patternLevels: [
+          { provider: "codex", pattern: "*", levels: ["ultra"] },
+          { pattern: "*", levels: ["low"] },
+          { provider: "openai", pattern: "*", levels: ["high"] },
+        ],
+      },
+    };
+    const actual = resolveReasoningVariants({
+      routeId: "openai/new",
+      reasoning: true,
+      live: { thinkingFormat: "openai" },
+      catalog: custom,
+    });
+    expect(actual).toEqual(efforts("low"));
+  });
+  test("keeps regex literals literal and glob case insensitive as router does", () => {
+    const custom = {
+      ...catalog,
+      reasoningPicker: {
+        formatLevels: {},
+        patternLevels: [{ pattern: "v1.2+[x]?*", levels: ["high"] }],
+      },
+    };
+    const actual = resolveReasoningVariants({
+      routeId: "openai/V1.2+[x]?nested/id",
+      reasoning: true,
+      live: { thinkingFormat: "openai" },
+      catalog: custom,
+    });
+    expect(actual).toEqual(efforts("high"));
+  });
+});
+
+describe("live authority and conservative boundary", () => {
+  test("discards incompatible exact model levels when live format changes", () => {
+    const actual = resolve("cx/gpt-6.1-sol", { thinkingFormat: "minimax" });
+    expect(actual).toEqual({ none: off, thinking: on });
+  });
+  test("live canDisable wins over reviewed capability", () => {
+    const actual = resolve("cx/gpt-5.6-sol", { thinkingCanDisable: false });
+    expect(actual).toEqual(efforts("minimal low medium high xhigh max ultra"));
+  });
+  test.each(["cmc/new", "tr/new"])(
+    "never advertises off from transport omission when route is %s",
+    (routeId) => {
+      const actual = resolve(routeId, {
+        thinkingFormat: "minimax",
+        thinkingCanDisable: true,
+      });
+      expect(actual).toEqual({});
+    },
+  );
+  test("does not turn range or speculative supportedEfforts into an exact live list", () => {
+    const actual = resolve("openai/new", {
+      thinkingFormat: "openai",
+      thinkingRange: [],
+      supportedEfforts: ["ultra"],
+    });
+    expect(actual).toEqual(efforts("none minimal low medium high xhigh"));
+  });
+  test.each([false, undefined, "true", null])(
+    "requires final reasoning true when value is %s",
+    (reasoning) => {
+      const actual = resolveReasoningVariants({
+        routeId: "cx/gpt-5.6-sol",
+        reasoning,
+        catalog,
+      });
+      expect(actual).toEqual({});
+    },
+  );
+  test.each(["unknown/new", "openai", "/new", "openai/", "__proto__/new"])(
+    "rejects unsupported route %s",
+    (routeId) => {
+      const actual = resolve(routeId, { thinkingFormat: "openai" });
+      expect(actual).toEqual({});
+    },
+  );
+  test.each(["unknown", " OPENAI ", "OpenAI", "", "x".repeat(65), 1, null])(
+    "fails conservatively for live format %s",
+    (thinkingFormat) => {
+      const actual = resolve("openai/new", { thinkingFormat });
+      expect(actual).toEqual({});
+    },
+  );
+  test("ignores malformed live fields without losing reviewed policy", () => {
+    const actual = resolve("cx/gpt-6.1-sol", {
+      thinkingFormat: 42,
+      thinkingCanDisable: "false",
+      thinkingRange: { min: 8, max: 1 },
+    });
+    expect(actual).toEqual(efforts("low medium high xhigh max"));
+  });
+  test("does not invoke own getters or inherited runtime fields", () => {
+    const live = Object.create({ thinkingCanDisable: false });
+    Object.defineProperty(live, "thinkingFormat", {
+      get() {
+        throw new Error("getter invoked");
+      },
+    });
+    const actual = resolve("cx/gpt-6.1-sol", live);
+    expect(actual).toEqual(efforts("low medium high xhigh max"));
+  });
+  test("does not inspect custom range iterators", () => {
+    const range = ["ultra"];
+    Object.defineProperty(range, Symbol.iterator, {
+      get() {
+        throw new Error("iterator invoked");
+      },
+    });
+    const actual = resolve("openai/new", {
+      thinkingFormat: "openai",
+      thinkingRange: range,
+    });
+    expect(actual).toEqual(efforts("none minimal low medium high xhigh"));
+  });
+  test("does not mutate frozen input", () => {
+    const live = Object.freeze({
+      thinkingFormat: "kimi",
+      thinkingCanDisable: false,
+    });
+    const actual = resolve("openai/new", live);
+    expect(actual).toEqual(efforts("low medium high max"));
   });
 });
