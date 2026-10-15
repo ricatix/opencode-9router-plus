@@ -1,11 +1,11 @@
 import { execFileSync } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import ts from "typescript";
 import { validateLlmCatalog } from "../src/llm-catalog.js";
 
-export const PINNED_9ROUTER_COMMIT = "79918c7830695bbca4a45c9fea4a42c3e9fd73d1";
+export const PINNED_9ROUTER_COMMIT = "ce4460ef79382bfddb4aa5fc0ff9f3cb0d5f95a8";
 export const CATALOG_PROJECTION_VERSION = 1;
 export const CATALOG_PROJECTIONS = [
   "codex-review-v1",
@@ -13,13 +13,30 @@ export const CATALOG_PROJECTIONS = [
   "capability-resolution-v1",
   "models-fetcher-marker-v1",
   "route-owner-v1",
+  "transport-reasoning-v1",
 ] as const;
 const ROOT = "open-sse";
 const DYNAMIC = [
+  "agnes",
+  "api-airforce",
+  "atria",
+  "bai",
+  "bedrock",
+  "bedrock-xai",
+  "dahl",
   "grok-web",
   "kilocode",
   "kimchi",
   "mimo-free",
+  "llm7",
+  "minimax-code",
+  "minimax-code-global",
+  "muse",
+  "opencode-go",
+  "opencode-zen",
+  "tokenharbor",
+  "tokenrouter",
+  "zed",
   "opencode",
   "openrouter",
   "perplexity-agent",
@@ -34,6 +51,8 @@ type Model = {
   canonicalProvider?: string;
   canonicalModelId?: string;
   reasoning?: unknown;
+  thinkingLevels?: unknown;
+  thinkingEligible?: boolean;
 };
 type Provider = {
   id: string;
@@ -42,6 +61,7 @@ type Provider = {
   models: Model[];
   modelsFetcher?: true;
   passthroughModels?: true;
+  thinkingFormat?: string;
 };
 type Counts = {
   providers: number;
@@ -125,13 +145,17 @@ function propertyName(
 function findProperty(
   object: ts.ObjectLiteralExpression,
   wanted: string,
+  field = wanted,
 ): ts.PropertyAssignment | undefined {
-  return object.properties.find(
-    (p): p is ts.PropertyAssignment =>
-      ts.isPropertyAssignment(p) &&
-      (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) &&
-      p.name.text === wanted,
-  );
+  const properties: ts.PropertyAssignment[] = [];
+  for (const entry of object.properties) {
+    const key = propertyName(entry, object.getSourceFile().fileName, field);
+    if (ts.isPropertyAssignment(entry) && key === wanted)
+      properties.push(entry);
+  }
+  if (properties.length > 1)
+    failUnsupported(object.getSourceFile().fileName, properties[1], field);
+  return properties[0];
 }
 function staticValue(
   node: ts.Expression,
@@ -150,27 +174,29 @@ function staticValue(
     return staticValue(ref.expression, ref.file, field, ref.refs);
   }
   if (ts.isArrayLiteralExpression(node))
-    return node.elements.map((x) =>
-      ts.isExpression(x)
-        ? staticValue(x, file, field, refs)
-        : failUnsupported(file, x, field),
-    );
+    return node.elements.flatMap((x) => {
+      if (ts.isSpreadElement(x)) {
+        const value = staticValue(x.expression, file, field, refs);
+        if (!Array.isArray(value)) failUnsupported(file, x, field);
+        return value;
+      }
+      return [staticValue(x, file, field, refs)];
+    });
   if (ts.isObjectLiteralExpression(node)) {
     const out: Record<string, unknown> = {};
+    const seen = new Set<string>();
     for (const p of node.properties) {
       if (ts.isSpreadAssignment(p)) {
         const spread = staticValue(p.expression, file, field, refs);
         if (!spread || typeof spread !== "object" || Array.isArray(spread))
           failUnsupported(file, p, field);
         Object.assign(out, spread);
-      } else if (ts.isPropertyAssignment(p))
-        out[propertyName(p, file, field)] = staticValue(
-          p.initializer,
-          file,
-          field,
-          refs,
-        );
-      else failUnsupported(file, p, field);
+      } else if (ts.isPropertyAssignment(p)) {
+        const key = propertyName(p, file, field);
+        if (seen.has(key)) failUnsupported(file, p, `${field}.${key}`);
+        seen.add(key);
+        out[key] = staticValue(p.initializer, file, field, refs);
+      } else failUnsupported(file, p, field);
     }
     return out;
   }
@@ -185,7 +211,7 @@ function extractReasoning(
   if (!ts.isObjectLiteralExpression(node))
     return staticValue(node, file, field, refs);
   const out: Record<string, unknown> = {};
-  for (const key of ["reasoning", "thinkingFormat", "thinkingCanDisable"]) {
+  for (const key of reasoningKeys) {
     const p = findProperty(node, key);
     if (p) out[key] = staticValue(p.initializer, file, `${field}.${key}`, refs);
   }
@@ -215,6 +241,8 @@ function extractModel(
   const id = get("id");
   if (typeof id !== "string" || !id) failUnsupported(file, node, "model.id");
   const out: Model = { id, kind: "llm" };
+  const levels = get("thinkingLevels");
+  if (levels !== undefined) out.thinkingLevels = levels;
   for (const key of [
     "name",
     "upstreamModelId",
@@ -288,16 +316,8 @@ function extractProvider(
   refs: Map<string, StaticRef>,
   excluded: ExcludedKindCounts,
 ): Provider {
-  const getProperty = (key: string) => {
-    const values = node.properties.filter(
-      (entry): entry is ts.PropertyAssignment =>
-        ts.isPropertyAssignment(entry) &&
-        (ts.isIdentifier(entry.name) || ts.isStringLiteral(entry.name)) &&
-        entry.name.text === key,
-    );
-    if (values.length > 1) failUnsupported(file, values[1], `provider.${key}`);
-    return values[0];
-  };
+  const getProperty = (key: string) =>
+    findProperty(node, key, `provider.${key}`);
   const get = (key: string) => {
     const p = getProperty(key);
     return p
@@ -314,6 +334,33 @@ function extractProvider(
   const aliases = get("aliases");
   const fetcherProp = getProperty("modelsFetcher");
   const passthrough = get("passthroughModels");
+  const transport = getProperty("transport");
+  let thinkingFormat: unknown;
+  if (transport && transport.initializer.kind !== ts.SyntaxKind.NullKeyword) {
+    if (!ts.isObjectLiteralExpression(transport.initializer))
+      failUnsupported(file, transport.initializer, "provider.transport");
+    const format = findProperty(transport.initializer, "thinkingFormat");
+    if (format)
+      thinkingFormat = staticValue(
+        format.initializer,
+        file,
+        "transport.thinkingFormat",
+        refs,
+      );
+    const wire = findProperty(transport.initializer, "format");
+    if (id === "commandcode" && wire)
+      thinkingFormat = staticValue(
+        wire.initializer,
+        file,
+        "transport.format",
+        refs,
+      );
+  }
+  if (
+    thinkingFormat !== undefined &&
+    (typeof thinkingFormat !== "string" || !thinkingFormat)
+  )
+    failUnsupported(file, node, "transport.thinkingFormat");
   const fetcher = fetcherProp
     ? (() => {
         if (fetcherProp.initializer.kind === ts.SyntaxKind.TrueKeyword)
@@ -372,10 +419,11 @@ function extractProvider(
   return {
     id,
     catalogKey: alias ?? id,
-    aliases: aliases ?? [],
+    aliases: (aliases ?? []).filter((key: string) => key !== (alias ?? id)),
     models,
     ...(fetcher === true ? { modelsFetcher: true } : {}),
     ...(passthrough === true ? { passthroughModels: true } : {}),
+    ...(typeof thinkingFormat === "string" ? { thinkingFormat } : {}),
   };
 }
 function git(dir: string, args: string[]) {
@@ -408,8 +456,7 @@ function refs(sf: ts.SourceFile, file: string): Map<string, StaticRef> {
   const out = new Map<string, StaticRef>();
   for (const s of sf.statements)
     if (ts.isVariableStatement(s)) {
-      if (!(s.declarationList.flags & ts.NodeFlags.Const))
-        failUnsupported(file, s, "top-level const");
+      if (!(s.declarationList.flags & ts.NodeFlags.Const)) continue;
       for (const d of s.declarationList.declarations)
         if (ts.isIdentifier(d.name) && d.initializer) {
           if (out.has(d.name.text)) failUnsupported(file, d, d.name.text);
@@ -437,18 +484,8 @@ function resolvePickerLevelReference(
   const levels = r.get("L");
   if (!levels || !ts.isObjectLiteralExpression(levels.expression))
     failUnsupported(file, node, field);
-  const matches = levels.expression.properties.filter(
-    (entry): entry is ts.PropertyAssignment =>
-      ts.isPropertyAssignment(entry) &&
-      (ts.isIdentifier(entry.name) || ts.isStringLiteral(entry.name)) &&
-      entry.name.text === node.name.text,
-  );
-  if (
-    levels.expression.properties.some(ts.isSpreadAssignment) ||
-    matches.length !== 1
-  )
-    failUnsupported(file, node, `${field}.${node.name.text}`);
-  const property = matches[0];
+  const property = findProperty(levels.expression, node.name.text);
+  if (!property) failUnsupported(file, node, `${field}.${node.name.text}`);
   const value = staticValue(
     property.initializer,
     levels.file,
@@ -468,7 +505,7 @@ function picker(sf: ts.SourceFile, file: string) {
   if (formatNode.expression.properties.length === 0)
     failUnsupported(file, formatNode.expression, "FORMAT_LEVELS");
   if (!patternNode) failUnsupported(file, sf, "PATTERN_THINKING");
-  const formatLevels: Record<string, string[]> = {};
+  const formatLevels: Record<string, unknown> = {};
   const seen = new Set<string>();
   for (const entry of formatNode.expression.properties) {
     if (ts.isSpreadAssignment(entry))
@@ -478,12 +515,14 @@ function picker(sf: ts.SourceFile, file: string) {
     seen.add(key);
     if (!ts.isPropertyAssignment(entry))
       failUnsupported(file, entry, `FORMAT_LEVELS.${key}`);
-    formatLevels[key] = resolvePickerLevelReference(
-      entry.initializer,
-      file,
-      `FORMAT_LEVELS.${key}`,
-      r,
-    );
+    formatLevels[key] = ts.isArrayLiteralExpression(entry.initializer)
+      ? staticValue(entry.initializer, file, `FORMAT_LEVELS.${key}`, r)
+      : resolvePickerLevelReference(
+          entry.initializer,
+          file,
+          `FORMAT_LEVELS.${key}`,
+          r,
+        );
   }
   return {
     formatLevels,
@@ -500,6 +539,7 @@ const reasoningKeys = new Set([
   "thinkingFormat",
   "thinkingCanDisable",
   "thinkingRange",
+  "thinkingEffortSupported",
 ]);
 function capabilityObject(
   node: ts.Expression,
@@ -515,6 +555,10 @@ function capabilityObject(
   const out: Record<string, unknown> = {};
   const seen = new Set<string>();
   for (const entry of node.properties) {
+    if (ts.isSpreadAssignment(entry)) {
+      Object.assign(out, capabilityObject(entry.expression, file, field, r));
+      continue;
+    }
     if (!ts.isPropertyAssignment(entry)) failUnsupported(file, entry, field);
     const key = propertyName(entry, file, field);
     if (!reasoningKeys.has(key)) continue;
@@ -524,6 +568,11 @@ function capabilityObject(
   }
   if ("reasoning" in out && typeof out.reasoning !== "boolean")
     failUnsupported(file, node, `${field}.reasoning`);
+  if (
+    "thinkingEffortSupported" in out &&
+    typeof out.thinkingEffortSupported !== "boolean"
+  )
+    failUnsupported(file, node, `${field}.thinkingEffortSupported`);
   if (
     "thinkingFormat" in out &&
     typeof out.thinkingFormat !== "string" &&
@@ -560,6 +609,21 @@ function matches(pattern: string, model: string): boolean {
       .join(".*")}$`,
     "i",
   ).test(model);
+}
+function kiroThinkingEligible(model: string): boolean {
+  const normalized = model.toLowerCase().replace(/-/g, ".");
+  if (/(?:^|[/.])gpt[/.]5[/.]6(?:[/.]|$)/.test(normalized)) return true;
+  if (!normalized.includes("claude")) return false;
+  const version = normalized.match(
+    /(?:^|[/.])claude(?:[/.][a-z]+)*[/.](\d+)(?:[/.](\d+))?(?:[/.]|$)/,
+  );
+  if (!version) return false;
+  const major = Number(version[1]);
+  const minor = version[2] === undefined ? null : Number(version[2]);
+  return !(
+    major < 4 ||
+    (major === 4 && (minor === null || minor <= 5 || minor >= 1000))
+  );
 }
 function capabilityTables(sf: ts.SourceFile, file: string) {
   const r = refs(sf, file);
@@ -609,6 +673,39 @@ function capabilityTables(sf: ts.SourceFile, file: string) {
         r,
       );
     }
+  }
+  for (const statement of sf.statements) {
+    if (
+      !ts.isExpressionStatement(statement) ||
+      !ts.isBinaryExpression(statement.expression)
+    )
+      continue;
+    const { left, right, operatorToken } = statement.expression;
+    const key = (node: ts.Expression): string | undefined => {
+      if (
+        ts.isPropertyAccessExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === "PROVIDER_CAPABILITIES"
+      )
+        return node.name.text;
+      if (
+        ts.isElementAccessExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === "PROVIDER_CAPABILITIES" &&
+        ts.isStringLiteral(node.argumentExpression)
+      )
+        return node.argumentExpression.text;
+      return undefined;
+    };
+    const target = key(left);
+    if (target === undefined) continue;
+    const source = key(right);
+    if (
+      operatorToken.kind !== ts.SyntaxKind.EqualsToken ||
+      source === undefined
+    )
+      failUnsupported(file, statement, "PROVIDER_CAPABILITIES.alias");
+    if (provider[source]) provider[target] = provider[source];
   }
   const patternsRef = r.get("PATTERN_CAPABILITIES");
   if (!patternsRef || !ts.isArrayLiteralExpression(patternsRef.expression))
@@ -749,6 +846,7 @@ export function validateProductionGoldens(
         "high",
         "xhigh",
         "max",
+        "ultra",
       ]) ||
     catalog.routeOwners.mmf !== "mmf" ||
     JSON.stringify(routeCollisions) !==
@@ -858,10 +956,10 @@ export function validateReviewMetadata(
   )
     throw new Error("Review metadata collision mismatch");
   if (
-    imports.length === 100 &&
-    (review.providers.length !== 100 ||
-      review.totals.staticLlm !== 468 ||
-      review.totals.excluded !== 144 ||
+    imports.length === 133 &&
+    (review.providers.length !== 133 ||
+      review.totals.staticLlm !== 810 ||
+      review.totals.excluded !== 189 ||
       review.providers.findIndex((row) => row.providerId === "mimo-free") >=
         review.providers.findIndex((row) => row.providerId === "mmf"))
   )
@@ -917,10 +1015,51 @@ async function extract(
     "open-sse/providers/models/schema.js",
     "open-sse/providers/schema.js",
     "open-sse/providers/thinkingLevels.js",
+    "open-sse/config/kiroConstants.js",
+    "open-sse/translator/concerns/thinkingUnified.js",
     index,
     ...imports.map((x) => `${ROOT}/providers/registry/${x}`),
   ].sort();
   options.verify(sourceDir, sourceFiles);
+  if (options.registryCount === 133) {
+    for (const [file, name, digest] of [
+      [
+        "open-sse/providers/capabilities.js",
+        "getCapabilitiesForModel",
+        "b680c64f73845e1f672590fbdc43e2328cfdec103e1fff2decaa6fbab03ba2fd",
+      ],
+      [
+        "open-sse/config/kiroConstants.js",
+        "resolveKiroEffortPath",
+        "51dc4707758df436ae9f57eade09381fbfc8b785228b904172849ce823799107",
+      ],
+      [
+        "open-sse/config/kiroConstants.js",
+        "parseClaudeVersion",
+        "5cfb11a4251757b13ac2e6415b0f1e98e7e87754474d8e5cafdda8fc5c85c35c",
+      ],
+      [
+        "open-sse/translator/concerns/thinkingUnified.js",
+        "resolveFormat",
+        "0b4a1b1bef2b3e4259736ffd90cf231852921c7c836cf804d783f0a71daa8b83",
+      ],
+    ]) {
+      const sf = ts.createSourceFile(
+        file,
+        await read(sourceDir, file),
+        ts.ScriptTarget.ES2022,
+        true,
+      );
+      const helper = sf.statements.find(
+        (node) => ts.isFunctionDeclaration(node) && node.name?.text === name,
+      );
+      if (
+        !helper ||
+        createHash("sha256").update(helper.getText(sf)).digest("hex") !== digest
+      )
+        throw new Error(`Audited transport helper mismatch: ${file}:${name}`);
+    }
+  }
   const grokFile = "open-sse/config/grokCli.js";
   const grokSf = ts.createSourceFile(
     grokFile,
@@ -1026,9 +1165,18 @@ async function extract(
       const base = model.id.includes("/")
         ? model.id.split("/").pop()!
         : model.id;
+      if (provider.id === "kiro")
+        model.thinkingEligible = kiroThinkingEligible(model.id);
       const selected =
         tables.provider[provider.id]?.[model.id] ??
         tables.provider[provider.id]?.[base] ??
+        (provider.id === "commandcode"
+          ? {
+              reasoning: true,
+              thinkingFormat: provider.thinkingFormat,
+              thinkingEffortSupported: true,
+            }
+          : undefined) ??
         tables.model[base] ??
         tables.model[model.id] ??
         tables.patterns.find(
@@ -1116,7 +1264,7 @@ async function extract(
     routeCollisions,
   };
   validateReviewMetadata(review, catalog, counts, imports);
-  if (options.registryCount === 100)
+  if (options.registryCount === 133)
     validateProductionGoldens(catalog, routeCollisions);
   return {
     catalog,
@@ -1130,17 +1278,17 @@ async function extract(
 }
 const productionOptions: InternalOptions = {
   verify,
-  registryCount: 100,
-  dynamic: DYNAMIC,
+  registryCount: 133,
+  dynamic: DYNAMIC.sort(),
   expected: {
-    providers: 100,
-    llm: 468,
-    excluded: 144,
-    image: 60,
-    stt: 21,
-    embedding: 33,
-    tts: 27,
-    video: 3,
+    providers: 133,
+    llm: 810,
+    excluded: 189,
+    image: 91,
+    stt: 25,
+    embedding: 34,
+    tts: 29,
+    video: 10,
   },
 };
 export async function extractCatalog({
@@ -1166,7 +1314,14 @@ export async function extractFixtureCatalog(
   });
 }
 export function renderCatalogModule(result: ExtractCatalogResult): string {
-  return `import type { NineRouterLlmCatalog } from "../route-types.js";\n\nexport const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = ${JSON.stringify(result.catalog, null, 2)};\n`;
+  return execFileSync(
+    join(import.meta.dirname, "../node_modules/.bin/biome"),
+    ["format", "--stdin-file-path=src/generated/9router-llm-catalog.ts"],
+    {
+      input: `import type { NineRouterLlmCatalog } from "../route-types.js";\n\nexport const NINE_ROUTER_LLM_CATALOG: NineRouterLlmCatalog = ${JSON.stringify(result.catalog, null, 2)};\n`,
+      encoding: "utf8",
+    },
+  );
 }
 export function renderReviewMetadata(result: ExtractCatalogResult): string {
   return `${JSON.stringify(result.review, null, 2)}\n`;

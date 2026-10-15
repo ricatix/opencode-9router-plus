@@ -3,6 +3,7 @@ export interface NineRouterCapabilities {
   thinkingFormat?: string | null;
   thinkingCanDisable?: boolean;
   thinkingRange?: unknown;
+  readonly thinkingEffortSupported?: boolean;
 }
 
 export type NineRouterModelKind =
@@ -22,6 +23,8 @@ export interface StaticLlmModel {
   canonicalProvider?: string;
   canonicalModelId?: string;
   reasoning?: NineRouterCapabilities;
+  readonly thinkingLevels?: readonly string[];
+  readonly thinkingEligible?: boolean;
 }
 
 export interface StaticLlmProvider {
@@ -31,6 +34,7 @@ export interface StaticLlmProvider {
   models: readonly StaticLlmModel[];
   modelsFetcher?: true;
   passthroughModels?: true;
+  readonly thinkingFormat?: string;
 }
 
 export interface NineRouterLlmCatalog {
@@ -40,7 +44,11 @@ export interface NineRouterLlmCatalog {
   routeOwners: Readonly<Record<string, string>>;
   reasoningPicker: {
     formatLevels: Readonly<Record<string, readonly string[]>>;
-    patternLevels: readonly { pattern: string; levels: readonly string[] }[];
+    patternLevels: readonly {
+      readonly provider?: string;
+      readonly pattern: string;
+      readonly levels: readonly string[];
+    }[];
   };
 }
 

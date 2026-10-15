@@ -82,6 +82,229 @@ const fixtureRoot = fileURLToPath(
   new URL("./fixtures/9router-extractor/", import.meta.url),
 );
 describe("extractor field slices", () => {
+  for (const [container, wrap, key] of [
+    [
+      "provider",
+      (field: string) => `{id:"p",models:[{id:"m"}],${field}}`,
+      "alias",
+    ],
+    [
+      "model",
+      (field: string) => `{id:"p",models:[{id:"m",${field}}]}`,
+      "thinkingLevels",
+    ],
+    [
+      "transport",
+      (field: string) =>
+        `{id:"p",models:[{id:"m"}],transport:{thinkingFormat:"openai",${field}}}`,
+      "thinkingFormat",
+    ],
+    [
+      "reasoning",
+      (field: string) =>
+        `{id:"p",models:[{id:"m",capabilities:{reasoning:true,${field}}}]}`,
+      "thinkingCanDisable",
+    ],
+  ] as const) {
+    for (const syntax of [
+      "...make()",
+      `get ${key}(){return make()}`,
+      `["${key}"]:make()`,
+      key,
+    ]) {
+      test(`rejects ${container} when authoritative container contains ${syntax}`, async () => {
+        // Given
+        const dir = await fixture(wrap(syntax));
+        // When / Then
+        await expect(
+          extractFixtureCatalog(dir, opts.expected),
+        ).rejects.toThrow();
+      });
+    }
+  }
+  for (const duplicate of [
+    'provider:"p",provider:"p",pattern:"*",levels:["low"]',
+    'provider:"p",pattern:"m",pattern:"*",levels:["low"]',
+    'provider:"p",pattern:"*",levels:["low"],levels:["high"]',
+  ]) {
+    test(`rejects picker rule when literal keys repeat: ${duplicate}`, async () => {
+      // Given
+      const dir = await fixture('{id:"p",models:[{id:"m"}]}');
+      await writeFile(
+        join(dir, "open-sse/providers/thinkingLevels.js"),
+        `const FORMAT_LEVELS={openai:["low"]}; const PATTERN_THINKING=[{${duplicate}}];`,
+      );
+      // When / Then
+      await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow();
+    });
+  }
+  test("preserves declarative picker spread precedence when literal fields override defaults", async () => {
+    // Given
+    const dir = await fixture('{id:"p",models:[{id:"m"}]}');
+    await writeFile(
+      join(dir, "open-sse/providers/thinkingLevels.js"),
+      'const BASE={provider:"p",pattern:"m",levels:["low"]}; const FORMAT_LEVELS={openai:["low"]}; const PATTERN_THINKING=[{...BASE,pattern:"*",levels:["high"]}];',
+    );
+    // When
+    const result = await extractFixtureCatalog(dir, opts.expected);
+    // Then
+    expect(result.catalog.reasoningPicker).toMatchObject({
+      patternLevels: [{ provider: "p", pattern: "*", levels: ["high"] }],
+    });
+  });
+  for (const id of [
+    "moonshotai/Kimi-K2.7-Code",
+    "moonshotai/Kimi-K2.7-Code-Highspeed",
+    "MiniMaxAI/MiniMax-M2.7",
+    "MiniMaxAI/MiniMax-M2.5",
+    "xiaomi/mimo-v2.5-pro",
+    "xiaomi/mimo-v2.5",
+  ]) {
+    test(`uses CommandCode defaults when family forbids disable for ${id}`, async () => {
+      // Given
+      const dir = await fixture(
+        JSON.stringify({
+          id: "commandcode",
+          transport: { format: "commandcode" },
+          models: [{ id }],
+        }),
+      );
+      await writeFile(
+        join(dir, "open-sse/providers/capabilities.js"),
+        'const DEFAULT_CAPABILITIES={reasoning:false,thinkingFormat:null,thinkingCanDisable:true,thinkingRange:null}; const PROVIDER_CAPABILITIES={}; const MODEL_CAPABILITIES={}; const PATTERN_CAPABILITIES=[{pattern:"*",caps:{reasoning:true,thinkingCanDisable:false,thinkingRange:{min:1,max:99}}}];',
+      );
+      // When
+      const result = await extractFixtureCatalog(dir, opts.expected);
+      // Then
+      expect(result.catalog.providers.commandcode.models[0].reasoning).toEqual({
+        reasoning: true,
+        thinkingFormat: "commandcode",
+        thinkingCanDisable: true,
+        thinkingRange: null,
+        thinkingEffortSupported: true,
+      });
+    });
+  }
+  for (const provider of [
+    '{id:"p",transport:make(),models:[{id:"m"}]}',
+    '{id:"p",models:[{id:"m",thinkingLevels:["low"],thinkingLevels:make()}]}',
+    '{id:"p",transport:{thinkingFormat:"openai",thinkingFormat:make()},models:[{id:"m"}]}',
+    '{id:"commandcode",transport:{format:"commandcode",format:make()},models:[{id:"m"}]}',
+    '{id:"p",transport:{format:"openai",format:make()},models:[{id:"m"}]}',
+    '{id:"p",transport:{},transport:make(),models:[{id:"m"}]}',
+  ]) {
+    test(`rejects ambiguous authoritative source ${provider}`, async () => {
+      // Given
+      const dir = await fixture(provider);
+      // When / Then
+      await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow();
+    });
+  }
+  test("rejects picker rules when expressions or qualified identities are invalid", async () => {
+    // Given
+    for (const rules of [
+      '[{provider:"p",pattern:"*",levels:["low"]},{provider:"p",pattern:"*",levels:["high"]}]',
+      '[{provider:"orphan",pattern:"*",levels:["low"]}]',
+      '[{provider:"p",pattern:"*",levels:make()}]',
+      '[{provider:make(),pattern:"*",levels:["low"]}]',
+    ]) {
+      const dir = await fixture('{id:"p",models:[{id:"m"}]}');
+      await writeFile(
+        join(dir, "open-sse/providers/thinkingLevels.js"),
+        `const L={openai:["low"]}; const FORMAT_LEVELS={openai:L.openai}; const PATTERN_THINKING=${rules};`,
+      );
+      // When / Then
+      await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow();
+    }
+  });
+  test("rejects effort metadata when an executable expression is authoritative", async () => {
+    // Given
+    const dir = await fixture(
+      '{id:"p",models:[{id:"m",capabilities:{reasoning:true,thinkingEffortSupported:make()}}]}',
+    );
+    // When / Then
+    await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow(
+      /thinkingEffortSupported/,
+    );
+  });
+  test("projects Kiro eligibility without changing reasoning capability", async () => {
+    // Given
+    const dir = await fixture(
+      '{id:"kiro",models:[{id:"claude-sonnet-4.5"},{id:"claude-sonnet-4.6"},{id:"gpt-5.6-sol"}]}',
+    );
+    // When
+    const result = await extractFixtureCatalog(dir, {
+      ...opts.expected,
+      llm: 3,
+    });
+    // Then
+    expect(
+      result.catalog.providers.kiro.models.map(
+        (model) => model.thinkingEligible,
+      ),
+    ).toEqual([false, true, true]);
+  });
+  test("projects commandcode transport instead of family reasoning", async () => {
+    // Given
+    const dir = await fixture(
+      '{id:"commandcode",transport:{format:"commandcode"},models:[{id:"toggle"}]}',
+    );
+    // When
+    const result = await extractFixtureCatalog(dir, opts.expected);
+    // Then
+    expect(result.catalog.providers.commandcode).toMatchObject({
+      thinkingFormat: "commandcode",
+      models: [
+        {
+          reasoning: {
+            thinkingFormat: "commandcode",
+            thinkingEffortSupported: true,
+          },
+        },
+      ],
+    });
+  });
+  test("preserves model levels when a broader picker rule differs", async () => {
+    // Given
+    const dir = await fixture(
+      '{id:"codex",models:[{id:"gpt-5.6-sol",thinkingLevels:["low","ultra"],capabilities:{reasoning:true,thinkingEffortSupported:true}}]}',
+    );
+    // When
+    const result = await extractFixtureCatalog(dir, opts.expected);
+    // Then
+    expect(result.catalog.providers.codex.models[0]).toMatchObject({
+      thinkingLevels: ["low", "ultra"],
+      reasoning: { thinkingEffortSupported: true },
+    });
+  });
+  test("preserves scoped picker order when declarative spreads are used", async () => {
+    // Given
+    const dir = await fixture('{id:"p",models:[{id:"m"}]}');
+    await writeFile(
+      join(dir, "open-sse/providers/thinkingLevels.js"),
+      'const L={openai:["low"]}; const EXTRA=["high"]; const FORMAT_LEVELS={openai:L.openai,commandcode:["low","max"]}; const PATTERN_THINKING=[{provider:"p",pattern:"*",levels:[...EXTRA,"ultra"]},{pattern:"*",levels:["thinking"]}];',
+    );
+    // When
+    const result = await extractFixtureCatalog(dir, opts.expected);
+    // Then
+    expect(result.catalog.reasoningPicker).toEqual({
+      formatLevels: { openai: ["low"], commandcode: ["low", "max"] },
+      patternLevels: [
+        { provider: "p", pattern: "*", levels: ["high", "ultra"] },
+        { pattern: "*", levels: ["thinking"] },
+      ],
+    });
+  });
+  test("rejects model levels when they contain executable expressions", async () => {
+    // Given
+    const dir = await fixture(
+      '{id:"p",models:[{id:"m",thinkingLevels:make()}]}',
+    );
+    // When / Then
+    await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow(
+      /model.thinkingLevels/,
+    );
+  });
   test("exports and ignores operational subtrees", async () => {
     expect(PINNED_9ROUTER_COMMIT).toHaveLength(40);
     const dir = await fixture(
@@ -197,6 +420,7 @@ describe("extractor field slices", () => {
       "capability-resolution-v1",
       "models-fetcher-marker-v1",
       "route-owner-v1",
+      "transport-reasoning-v1",
     ]);
     expect(parseCliArgs(["--source-dir", "a", "--output", "b"])).toEqual({
       sourceDir: "a",

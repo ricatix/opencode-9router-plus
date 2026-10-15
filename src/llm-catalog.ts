@@ -1,7 +1,7 @@
 import type { CatalogRouteMatch, NineRouterLlmCatalog } from "./route-types.js";
 
 const sourceFile =
-  /^open-sse\/(?:providers\/registry\/(?:index|[^/]+)\.js|providers\/(?:index|schema)\.js|providers\/models\/(?:schema|helpers)\.js|config\/(?:providerModels|grokCli)\.js|providers\/(?:thinkingLevels|capabilities)\.js)$/;
+  /^open-sse\/(?:providers\/registry\/(?:index|[^/]+)\.js|providers\/(?:index|schema)\.js|providers\/models\/(?:schema|helpers)\.js|config\/(?:providerModels|grokCli|kiroConstants)\.js|providers\/(?:thinkingLevels|capabilities)\.js|translator\/concerns\/thinkingUnified\.js)$/;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -14,7 +14,7 @@ function nonemptyString(value: unknown): value is string {
 const maxCatalogId = 512,
   maxFormat = 64,
   maxPickerEntries = 32,
-  maxLevels = 7,
+  maxLevels = 9,
   maxBudget = 1_000_000;
 const catalogLevels = new Set([
   "none",
@@ -25,6 +25,7 @@ const catalogLevels = new Set([
   "xhigh",
   "max",
   "thinking",
+  "ultra",
 ]);
 const rangeLevels = new Set([
   "none",
@@ -69,8 +70,22 @@ function validRange(value: unknown): boolean {
 function validReasoning(value: unknown): boolean {
   if (
     !isRecord(value) ||
-    Object.keys(value).length > 4 ||
+    Object.keys(value).some(
+      (key) =>
+        ![
+          "reasoning",
+          "thinkingFormat",
+          "thinkingCanDisable",
+          "thinkingRange",
+          "thinkingEffortSupported",
+        ].includes(key),
+    ) ||
     (value.reasoning !== true && value.reasoning !== false)
+  )
+    return false;
+  if (
+    "thinkingEffortSupported" in value &&
+    typeof value.thinkingEffortSupported !== "boolean"
   )
     return false;
   if (
@@ -107,6 +122,7 @@ export function validateLlmCatalog(
     throw new TypeError("Invalid LLM catalog sourceFiles");
   if (!isRecord(catalog.providers))
     throw new TypeError("Invalid LLM catalog providers");
+  const providers = catalog.providers;
   if (!isRecord(catalog.routeOwners))
     throw new TypeError("Invalid LLM catalog routeOwners");
 
@@ -122,6 +138,11 @@ export function validateLlmCatalog(
       !Array.isArray(provider.models)
     )
       throw new TypeError("Invalid LLM catalog provider");
+    if (
+      "thinkingFormat" in provider &&
+      !safeString(provider.thinkingFormat, maxFormat)
+    )
+      throw new TypeError("Invalid LLM catalog provider thinkingFormat");
     if (
       new Set([provider.catalogKey, ...provider.aliases]).size !==
       provider.aliases.length + 1
@@ -142,7 +163,12 @@ export function validateLlmCatalog(
         !["canonicalProvider", "canonicalModelId", "upstreamModelId"].every(
           (key) => !(key in model) || safeString(model[key], maxCatalogId),
         ) ||
-        (!("reasoning" in model) || validReasoning(model.reasoning)) === false
+        (!("reasoning" in model) || validReasoning(model.reasoning)) ===
+          false ||
+        ("thinkingLevels" in model &&
+          !uniqueLevels(model.thinkingLevels, catalogLevels)) ||
+        ("thinkingEligible" in model &&
+          typeof model.thinkingEligible !== "boolean")
       )
         throw new TypeError("Invalid LLM catalog model");
       if (modelIds.has(model.id))
@@ -173,12 +199,20 @@ export function validateLlmCatalog(
     !catalog.reasoningPicker.patternLevels.every(
       (entry) =>
         isRecord(entry) &&
-        Object.keys(entry).length === 2 &&
+        Object.keys(entry).every((key) =>
+          ["provider", "pattern", "levels"].includes(key),
+        ) &&
+        (!("provider" in entry) ||
+          (nonemptyString(entry.provider) &&
+            Object.hasOwn(providers, entry.provider))) &&
         safeString(entry.pattern, maxCatalogId) &&
         uniqueLevels(entry.levels, catalogLevels),
     ) ||
-    new Set(catalog.reasoningPicker.patternLevels.map((entry) => entry.pattern))
-      .size !== catalog.reasoningPicker.patternLevels.length
+    new Set(
+      catalog.reasoningPicker.patternLevels.map((entry) =>
+        JSON.stringify([entry.provider ?? null, entry.pattern]),
+      ),
+    ).size !== catalog.reasoningPicker.patternLevels.length
   )
     throw new TypeError("Invalid LLM catalog reasoningPicker");
 }

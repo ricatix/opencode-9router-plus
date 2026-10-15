@@ -8,10 +8,60 @@ import {
 import { CATALOG_FIXTURE } from "./fixtures/9router-llm-catalog.js";
 
 describe("LLM catalog", () => {
+  test("accepts ordered collisions when provider scopes differ", () => {
+    // Given
+    const patternLevels = [
+      { provider: "codex", pattern: "*", levels: ["ultra"] },
+      { provider: "grok-cli", pattern: "*", levels: ["thinking"] },
+      { pattern: "*", levels: ["low"] },
+    ];
+    const catalog = {
+      ...CATALOG_FIXTURE,
+      reasoningPicker: {
+        ...CATALOG_FIXTURE.reasoningPicker,
+        patternLevels,
+      },
+    };
+    // When / Then
+    expect(() => validateLlmCatalog(catalog)).not.toThrow();
+  });
+  test("rejects patterns when the qualified identity repeats", () => {
+    // Given
+    const patternLevels = [
+      { provider: "codex", pattern: "*", levels: ["low"] },
+      { provider: "codex", pattern: "*", levels: ["high"] },
+    ];
+    // When / Then
+    expect(() =>
+      validateLlmCatalog({
+        ...CATALOG_FIXTURE,
+        reasoningPicker: {
+          ...CATALOG_FIXTURE.reasoningPicker,
+          patternLevels,
+        },
+      }),
+    ).toThrow();
+  });
+  test("rejects patterns when provider is not a transport owner", () => {
+    // Given
+    const patternLevels = [
+      { provider: "openai", pattern: "*", levels: ["low"] },
+    ];
+    // When / Then
+    expect(() =>
+      validateLlmCatalog({
+        ...CATALOG_FIXTURE,
+        reasoningPicker: {
+          ...CATALOG_FIXTURE.reasoningPicker,
+          patternLevels,
+        },
+      }),
+    ).toThrow();
+  });
   test("reviews pinned static snapshot gate", () => {
     validateLlmCatalog(NINE_ROUTER_LLM_CATALOG);
     expect(NINE_ROUTER_LLM_CATALOG.sourceCommit).toBe(
-      "79918c7830695bbca4a45c9fea4a42c3e9fd73d1",
+      "ce4460ef79382bfddb4aa5fc0ff9f3cb0d5f95a8",
     );
     expect(NINE_ROUTER_LLM_CATALOG.sourceFiles).toEqual(
       [...NINE_ROUTER_LLM_CATALOG.sourceFiles].sort(),
@@ -35,12 +85,12 @@ describe("LLM catalog", () => {
     expect(Object.keys(NINE_ROUTER_LLM_CATALOG.providers)).toEqual(
       [...Object.keys(NINE_ROUTER_LLM_CATALOG.providers)].sort(),
     );
-    expect(Object.keys(NINE_ROUTER_LLM_CATALOG.providers)).toHaveLength(100);
+    expect(Object.keys(NINE_ROUTER_LLM_CATALOG.providers)).toHaveLength(133);
     expect(
       Object.values(NINE_ROUTER_LLM_CATALOG.providers).flatMap(
         (provider) => provider.models,
       ),
-    ).toHaveLength(468);
+    ).toHaveLength(810);
     expect(
       Object.values(NINE_ROUTER_LLM_CATALOG.providers)
         .flatMap((provider) => provider.models)
@@ -54,15 +104,31 @@ describe("LLM catalog", () => {
         )
         .map(([id]) => id),
     ).toEqual([
+      "agnes",
+      "api-airforce",
+      "atria",
+      "bai",
+      "bedrock",
+      "bedrock-xai",
+      "dahl",
       "grok-web",
       "kilocode",
       "kimchi",
+      "llm7",
       "mimo-free",
+      "minimax-code",
+      "minimax-code-global",
+      "muse",
       "opencode",
+      "opencode-go",
+      "opencode-zen",
       "openrouter",
       "perplexity-agent",
+      "tokenharbor",
+      "tokenrouter",
       "venice",
       "vercel-ai-gateway",
+      "zed",
     ]);
     expect(NINE_ROUTER_LLM_CATALOG.providers["mimo-free"].catalogKey).toBe(
       "mmf",
@@ -123,7 +189,16 @@ describe("LLM catalog", () => {
       NINE_ROUTER_LLM_CATALOG.reasoningPicker.patternLevels.find(
         (rule) => rule.pattern === "*gpt-5.6-sol*",
       )?.levels,
-    ).toEqual(["none", "minimal", "low", "medium", "high", "xhigh", "max"]);
+    ).toEqual([
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max",
+      "ultra",
+    ]);
     expect(
       matchLlmCatalogRoute("gcli/grok-4.5-high", NINE_ROUTER_LLM_CATALOG)?.model
         .reasoning,
