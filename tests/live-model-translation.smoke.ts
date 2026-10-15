@@ -49,13 +49,18 @@ const contract = (entry: OpenCodeModelEntry) => {
     (!entry.modalities.input.length || !entry.modalities.output.length)
   )
     throw new Error("invalid modalities output");
-  if (entry.variants && !entry.reasoning)
-    throw new Error("variants require reasoning output");
   if (entry.variants)
     for (const value of Object.values(entry.variants))
-      if (
-        Object.keys(value).join() !== "reasoningEffort" ||
-        typeof value.reasoningEffort !== "string"
+      if ("disabled" in value) {
+        if (JSON.stringify(value) !== '{"disabled":true}')
+          throw new Error("invalid config-only tombstone");
+      } else if (
+        !entry.reasoning ||
+        !("reasoningEffort" in value
+          ? Object.keys(value).join() === "reasoningEffort" &&
+            typeof value.reasoningEffort === "string"
+          : Object.keys(value).join() === "thinking" &&
+            ["enabled", "disabled"].includes(value.thinking.type))
       )
         throw new Error("invalid variants output");
 };

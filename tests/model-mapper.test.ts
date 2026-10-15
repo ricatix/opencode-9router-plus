@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { resolveModel } from "../src/model-mapper.js";
+import { configVariants, resolveModel } from "../src/model-mapper.js";
 
 const client = (
   canonical: any = { providerModel: null, modelOnly: null },
@@ -80,6 +80,7 @@ test("unmatched uses unique leaf only, default false flags, rejects unsafe metad
   expect(entry).toEqual({
     id: "private/exact",
     name: "private/exact",
+    variants: configVariants(),
     attachment: false,
     reasoning: false,
     temperature: false,
@@ -165,10 +166,10 @@ test("rejects invalid metadata matrix and ignores models.dev booleans", async ()
     ).toBeUndefined();
 });
 
-test("reviewed nonreasoning omits variants", async () => {
+test("reviewed nonreasoning disables builtin variants", async () => {
   const e = await resolveModel("ag/gemini-pro-agent", client());
   expect(e.reasoning).toBeFalse();
-  expect(e.variants).toBeUndefined();
+  expect(e.variants).toEqual(configVariants());
 });
 
 test("live fields win, models.dev booleans do not, and limits stay atomic", async () => {
@@ -210,8 +211,9 @@ test("live fields win, models.dev booleans do not, and limits stay atomic", asyn
     temperature: false,
     tool_call: true,
     limit: { context: 100, output: 10 },
+    variants: configVariants(),
   });
-  expect(entry.variants).toBeUndefined();
+  expect(entry.variants).toEqual(configVariants());
 });
 
 test("invalid live fields fall back per field without mixing limit pairs", async () => {

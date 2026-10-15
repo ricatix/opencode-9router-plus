@@ -1,7 +1,6 @@
 import {
-  type CatalogModelVariants,
   type ModelVariants,
-  resolveCatalogVariants,
+  resolveReasoningVariants,
 } from "./capability-resolver.js";
 import { NINE_ROUTER_LLM_CATALOG } from "./generated/9router-llm-catalog.js";
 import { matchLlmCatalogRoute } from "./llm-catalog.js";
@@ -18,13 +17,30 @@ export interface OpenCodeModelEntry {
   cost?: { input: number; output: number };
   limit?: { context: number; output: number };
   modalities?: { input: string[]; output: string[] };
-  variants?: ModelVariants | CatalogModelVariants;
+  variants?: Partial<
+    Record<
+      keyof ModelVariants,
+      | NonNullable<ModelVariants[keyof ModelVariants]>
+      | { readonly disabled: true }
+    >
+  >;
 }
 export interface LiveModelRecord {
   id: string;
   live?: {
     name?: unknown;
-    capabilities?: unknown;
+    capabilities?: {
+      reasoning?: unknown;
+      tools?: unknown;
+      vision?: unknown;
+      pdf?: unknown;
+      contextWindow?: unknown;
+      maxOutput?: unknown;
+      thinkingFormat?: unknown;
+      thinkingCanDisable?: unknown;
+      thinkingRange?: unknown;
+      thinkingEffortSupported?: unknown;
+    } & Record<string, unknown>;
     context_length?: unknown;
     max_completion_tokens?: unknown;
   };
@@ -35,6 +51,24 @@ const defaults = (): OpenCodeModelEntry => ({
   temperature: false,
   tool_call: false,
 });
+export function configVariants(
+  active: ModelVariants = {},
+): NonNullable<OpenCodeModelEntry["variants"]> {
+  const variants: NonNullable<OpenCodeModelEntry["variants"]> = {};
+  for (const key of [
+    "none",
+    "minimal",
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+    "ultra",
+    "thinking",
+  ] as const)
+    variants[key] = active[key] ?? { disabled: true };
+  return variants;
+}
 const string = (v: unknown) =>
   typeof v === "string" &&
   v.length <= 512 &&
@@ -149,6 +183,7 @@ export async function resolveModel(
     ...defaults(),
     id: fullId,
     name: fullId,
+    variants: configVariants(),
   });
   try {
     const route = matchLlmCatalogRoute(fullId, NINE_ROUTER_LLM_CATALOG);
@@ -186,14 +221,14 @@ export async function resolveModel(
     const limit =
       live && liveLimit(live as NonNullable<LiveModelRecord["live"]>);
     if (limit) entry.limit = limit;
-    if (entry.reasoning) {
-      const variants = resolveCatalogVariants({
-        rawModelId: fullId,
-        staticCapabilities: route?.model.reasoning,
-        picker: NINE_ROUTER_LLM_CATALOG.reasoningPicker,
-      });
-      if (Object.keys(variants).length) entry.variants = variants;
-    }
+    entry.variants = configVariants(
+      resolveReasoningVariants({
+        routeId: fullId,
+        reasoning: entry.reasoning,
+        live: capabilities,
+        catalog: NINE_ROUTER_LLM_CATALOG,
+      }),
+    );
     entry.name =
       (live && string(ownValue(live, "name"))) ?? entry.name ?? fullId;
     return entry;
