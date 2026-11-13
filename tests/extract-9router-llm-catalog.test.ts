@@ -737,6 +737,122 @@ describe("extractor field slices", () => {
       "https://example.test/models",
     );
   });
+  test("projects modelsFetcher constant URL without emitting its value", async () => {
+    const dir = await fixture('{id:"ignored",models:[]}');
+    await writeFile(
+      join(dir, "open-sse/providers/registry/provider.js"),
+      'import { MODELS_URL } from "../service.js"; export default {id:"nous",modelsFetcher:{url:MODELS_URL,type:"nous-free"},passthroughModels:true,models:[{id:"m"}]};',
+    );
+    const result = await extractFixtureCatalog(dir, opts.expected, ["nous"]);
+    expect((result.catalog.providers as any).nous.modelsFetcher).toBeTrue();
+    expect(renderCatalogModule(result)).not.toContain("MODELS_URL");
+    const local = await fixture('{id:"ignored",models:[]}');
+    await writeFile(
+      join(local, "open-sse/providers/registry/provider.js"),
+      'const MODELS_URL = "https://example.test/models"; export default {id:"nous",modelsFetcher:{url:MODELS_URL,type:"nous-free"},passthroughModels:true,models:[{id:"m"}]};',
+    );
+    await expect(
+      extractFixtureCatalog(local, opts.expected, ["nous"]),
+    ).resolves.toMatchObject({ counts: opts.expected });
+  });
+  test("rejects computed modelsFetcher URLs and types", async () => {
+    for (const descriptor of [
+      '{url:make(),type:"openai"}',
+      '{url:modelsUrl,type:"openai"}',
+      '{url:URLS.models,type:"openai"}',
+      '{url:"https://x",type:make()}',
+    ]) {
+      const dir = await fixture(
+        `{id:"p",modelsFetcher:${descriptor},models:[{id:"m"}]}`,
+      );
+      await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow(
+        /provider\.modelsFetcher/,
+      );
+    }
+  });
+  test("resolves identifier default export to a local const object", async () => {
+    const dir = await fixture('{id:"ignored",models:[]}');
+    await writeFile(
+      join(dir, "open-sse/providers/registry/provider.js"),
+      'const provider = {id:"p",models:[{id:"m"}]}; export default provider;',
+    );
+    const result = await extractFixtureCatalog(dir, opts.expected);
+    expect((result.catalog.providers as any).p.models).toEqual([
+      { id: "m", kind: "llm" },
+    ]);
+  });
+  test("rejects identifier default exports without a literal const object", async () => {
+    for (const source of [
+      "const provider = make(); export default provider;",
+      "export default unknown;",
+      'let provider = {id:"p",models:[]}; export default provider;',
+      'const provider = {id:"p",models:[]}; provider.id = "q"; export default provider;',
+    ]) {
+      const dir = await fixture('{id:"ignored",models:[]}');
+      await writeFile(
+        join(dir, "open-sse/providers/registry/provider.js"),
+        source,
+      );
+      await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow(
+        /\[provider\]/,
+      );
+    }
+  });
+  test("merges literal PROVIDER_CAPABILITIES assignments with duplicate rejection", async () => {
+    const dir = await fixture(
+      '{id:"qoder",models:[{id:"ultimate"},{id:"shared"}]}',
+    );
+    await writeFile(
+      join(dir, "open-sse/providers/capabilities.js"),
+      'const DEFAULT_CAPABILITIES={reasoning:false,thinkingFormat:null,thinkingCanDisable:true,thinkingRange:null}; const MODEL_CAPABILITIES={}; const PROVIDER_CAPABILITIES={}; const SENSENOVA_INTL_CHAT={reasoning:true,thinkingFormat:"openai"}; PROVIDER_CAPABILITIES["qoder"]={"ultimate":{reasoning:true,thinkingFormat:"zai"},"shared":SENSENOVA_INTL_CHAT}; const PATTERN_CAPABILITIES=[];',
+    );
+    const result = await extractFixtureCatalog(dir, {
+      ...opts.expected,
+      llm: 2,
+    });
+    const models = (result.catalog.providers as any).qoder.models;
+    expect(models[0].reasoning).toMatchObject({
+      reasoning: true,
+      thinkingFormat: "zai",
+    });
+    expect(models[1].reasoning).toMatchObject({
+      reasoning: true,
+      thinkingFormat: "openai",
+    });
+    for (const duplicate of [
+      'PROVIDER_CAPABILITIES["qoder"]={"ultimate":{}}; PROVIDER_CAPABILITIES["qoder"]={"shared":{}};',
+      'const PROVIDER_CAPABILITIES={qoder:{"ultimate":{}}}; PROVIDER_CAPABILITIES["qoder"]={"shared":{}};',
+      'PROVIDER_CAPABILITIES[make()]={"ultimate":{}};',
+      'PROVIDER_CAPABILITIES["qoder"]=make();',
+      'PROVIDER_CAPABILITIES["qoder"]={"ultimate":make()};',
+    ]) {
+      await writeFile(
+        join(dir, "open-sse/providers/capabilities.js"),
+        `const DEFAULT_CAPABILITIES={reasoning:false,thinkingFormat:null,thinkingCanDisable:true,thinkingRange:null}; const MODEL_CAPABILITIES={}; ${duplicate} const PATTERN_CAPABILITIES=[];`,
+      );
+      await expect(
+        extractFixtureCatalog(dir, { ...opts.expected, llm: 2 }),
+      ).rejects.toThrow(/PROVIDER_CAPABILITIES/);
+    }
+  });
+  test("resolves chained capability aliases and rejects duplicate alias targets", async () => {
+    const dir = await fixture('{id:"qoder-cn-2",models:[{id:"ultimate"}]}');
+    await writeFile(
+      join(dir, "open-sse/providers/capabilities.js"),
+      'const DEFAULT_CAPABILITIES={reasoning:false,thinkingFormat:null,thinkingCanDisable:true,thinkingRange:null}; const MODEL_CAPABILITIES={}; const PROVIDER_CAPABILITIES={qoder:{"ultimate":{reasoning:true,thinkingFormat:"zai"}}}; PROVIDER_CAPABILITIES["qoder-cn"]=PROVIDER_CAPABILITIES["qoder"]; PROVIDER_CAPABILITIES["qoder-cn-2"]=PROVIDER_CAPABILITIES["qoder-cn"]; const PATTERN_CAPABILITIES=[];',
+    );
+    const result = await extractFixtureCatalog(dir, opts.expected);
+    expect(
+      (result.catalog.providers as any)["qoder-cn-2"].models[0].reasoning,
+    ).toMatchObject({ reasoning: true, thinkingFormat: "zai" });
+    await writeFile(
+      join(dir, "open-sse/providers/capabilities.js"),
+      'const DEFAULT_CAPABILITIES={reasoning:false,thinkingFormat:null,thinkingCanDisable:true,thinkingRange:null}; const MODEL_CAPABILITIES={}; const PROVIDER_CAPABILITIES={qoder:{"ultimate":{}}}; PROVIDER_CAPABILITIES["qoder-cn"]=PROVIDER_CAPABILITIES["qoder"]; PROVIDER_CAPABILITIES["qoder-cn"]=PROVIDER_CAPABILITIES["qoder"]; const PATTERN_CAPABILITIES=[];',
+    );
+    await expect(extractFixtureCatalog(dir, opts.expected)).rejects.toThrow(
+      /PROVIDER_CAPABILITIES/,
+    );
+  });
   test("rejects invalid modelsFetcher descriptors and duplicate flags", async () => {
     for (const value of [
       "false",

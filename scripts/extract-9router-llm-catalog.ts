@@ -5,7 +5,7 @@ import { join } from "node:path";
 import ts from "typescript";
 import { validateLlmCatalog } from "../src/llm-catalog.js";
 
-export const PINNED_9ROUTER_COMMIT = "ce4460ef79382bfddb4aa5fc0ff9f3cb0d5f95a8";
+export const PINNED_9ROUTER_COMMIT = "1855aa44473e88feac9d3f131b9c0c5fc9706b68";
 export const CATALOG_PROJECTION_VERSION = 1;
 export const CATALOG_PROJECTIONS = [
   "codex-review-v1",
@@ -23,25 +23,29 @@ const DYNAMIC = [
   "bai",
   "bedrock",
   "bedrock-xai",
+  "commandcode",
   "dahl",
   "grok-web",
   "kilocode",
   "kimchi",
-  "mimo-free",
   "llm7",
+  "mimo-free",
   "minimax-code",
   "minimax-code-global",
   "muse",
+  "nous",
+  "opencode",
   "opencode-go",
   "opencode-zen",
-  "tokenharbor",
-  "tokenrouter",
-  "zed",
-  "opencode",
   "openrouter",
   "perplexity-agent",
+  "synthetic",
+  "tokenharbor",
+  "tokenrouter",
+  "uc-web",
   "venice",
   "vercel-ai-gateway",
+  "zed",
 ];
 type Model = {
   id: string;
@@ -383,14 +387,31 @@ function extractProvider(
           );
         const url = findProperty(fetcherProp.initializer, "url");
         const type = findProperty(fetcherProp.initializer, "type");
+        const urlInitializer = url?.initializer;
+        const staticUrl = (() => {
+          if (!urlInitializer) return false;
+          if (
+            (ts.isStringLiteral(urlInitializer) ||
+              ts.isNoSubstitutionTemplateLiteral(urlInitializer)) &&
+            urlInitializer.text
+          )
+            return true;
+          if (!ts.isIdentifier(urlInitializer)) return false;
+          const bindings = importBindings(node.getSourceFile());
+          if (bindings.has(urlInitializer.text)) return true;
+          if (!refs.has(urlInitializer.text)) return false;
+          const value = staticValue(
+            urlInitializer,
+            file,
+            "provider.modelsFetcher.url",
+            refs,
+          );
+          return typeof value === "string" && value.length > 0;
+        })();
         if (
           !url ||
           !type ||
-          !(
-            (ts.isStringLiteral(url.initializer) ||
-              ts.isNoSubstitutionTemplateLiteral(url.initializer)) &&
-            url.initializer.text
-          ) ||
+          !staticUrl ||
           !(
             (ts.isStringLiteral(type.initializer) ||
               ts.isNoSubstitutionTemplateLiteral(type.initializer)) &&
@@ -451,6 +472,19 @@ export function verifyWhitelistedCleanForTest(
 }
 async function read(dir: string, file: string) {
   return readFile(join(dir, file), "utf8");
+}
+function importBindings(sf: ts.SourceFile): Set<string> {
+  const out = new Set<string>();
+  for (const statement of sf.statements) {
+    if (!ts.isImportDeclaration(statement) || !statement.importClause) continue;
+    const { name, namedBindings } = statement.importClause;
+    if (name) out.add(name.text);
+    if (namedBindings && ts.isNamespaceImport(namedBindings))
+      out.add(namedBindings.name.text);
+    else if (namedBindings)
+      for (const element of namedBindings.elements) out.add(element.name.text);
+  }
+  return out;
 }
 function refs(sf: ts.SourceFile, file: string): Map<string, StaticRef> {
   const out = new Map<string, StaticRef>();
@@ -653,27 +687,64 @@ function capabilityTables(sf: ts.SourceFile, file: string) {
     );
   }
   const provider: Record<string, Record<string, Record<string, unknown>>> = {};
+  const providerIds = new Set<string>();
+  const setProvider = (
+    id: string,
+    node: ts.Expression,
+    field: string,
+  ): void => {
+    if (!ts.isObjectLiteralExpression(node) || providerIds.has(id))
+      failUnsupported(file, node, field);
+    const caps: Record<string, Record<string, unknown>> = {};
+    const modelIds = new Set<string>();
+    for (const modelEntry of node.properties) {
+      if (!ts.isPropertyAssignment(modelEntry))
+        failUnsupported(file, modelEntry, field);
+      const modelId = propertyName(modelEntry, file, field);
+      if (modelIds.has(modelId))
+        failUnsupported(file, modelEntry, `${field}.${modelId}`);
+      modelIds.add(modelId);
+      caps[modelId] = capabilityObject(
+        modelEntry.initializer,
+        file,
+        `${field}.${modelId}`,
+        r,
+      );
+    }
+    providerIds.add(id);
+    provider[id] = caps;
+  };
   for (const entry of table("PROVIDER_CAPABILITIES").node.properties) {
     if (!ts.isPropertyAssignment(entry))
       failUnsupported(file, entry, "PROVIDER_CAPABILITIES");
     const id = propertyName(entry, file, "PROVIDER_CAPABILITIES");
-    if (provider[id] || !ts.isObjectLiteralExpression(entry.initializer))
-      failUnsupported(file, entry, `PROVIDER_CAPABILITIES.${id}`);
-    provider[id] = {};
-    for (const modelEntry of entry.initializer.properties) {
-      if (!ts.isPropertyAssignment(modelEntry))
-        failUnsupported(file, modelEntry, `PROVIDER_CAPABILITIES.${id}`);
-      const id2 = propertyName(modelEntry, file, `PROVIDER_CAPABILITIES.${id}`);
-      if (provider[id][id2])
-        failUnsupported(file, modelEntry, `PROVIDER_CAPABILITIES.${id}.${id2}`);
-      provider[id][id2] = capabilityObject(
-        modelEntry.initializer,
-        file,
-        `PROVIDER_CAPABILITIES.${id}.${id2}`,
-        r,
-      );
-    }
+    setProvider(id, entry.initializer, `PROVIDER_CAPABILITIES.${id}`);
   }
+  const root = (node: ts.Expression): boolean => {
+    if (ts.isIdentifier(node)) return node.text === "PROVIDER_CAPABILITIES";
+    if (
+      ts.isPropertyAccessExpression(node) ||
+      ts.isElementAccessExpression(node)
+    )
+      return root(node.expression);
+    return false;
+  };
+  const key = (node: ts.Expression): string | undefined => {
+    if (
+      ts.isPropertyAccessExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      node.expression.text === "PROVIDER_CAPABILITIES"
+    )
+      return node.name.text;
+    if (
+      ts.isElementAccessExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      node.expression.text === "PROVIDER_CAPABILITIES" &&
+      ts.isStringLiteral(node.argumentExpression)
+    )
+      return node.argumentExpression.text;
+    return undefined;
+  };
   for (const statement of sf.statements) {
     if (
       !ts.isExpressionStatement(statement) ||
@@ -681,31 +752,23 @@ function capabilityTables(sf: ts.SourceFile, file: string) {
     )
       continue;
     const { left, right, operatorToken } = statement.expression;
-    const key = (node: ts.Expression): string | undefined => {
-      if (
-        ts.isPropertyAccessExpression(node) &&
-        ts.isIdentifier(node.expression) &&
-        node.expression.text === "PROVIDER_CAPABILITIES"
-      )
-        return node.name.text;
-      if (
-        ts.isElementAccessExpression(node) &&
-        ts.isIdentifier(node.expression) &&
-        node.expression.text === "PROVIDER_CAPABILITIES" &&
-        ts.isStringLiteral(node.argumentExpression)
-      )
-        return node.argumentExpression.text;
-      return undefined;
-    };
     const target = key(left);
-    if (target === undefined) continue;
-    const source = key(right);
-    if (
-      operatorToken.kind !== ts.SyntaxKind.EqualsToken ||
-      source === undefined
-    )
+    if (target === undefined) {
+      if (root(left))
+        failUnsupported(file, statement, "PROVIDER_CAPABILITIES.alias");
+      continue;
+    }
+    if (operatorToken.kind !== ts.SyntaxKind.EqualsToken)
       failUnsupported(file, statement, "PROVIDER_CAPABILITIES.alias");
-    if (provider[source]) provider[target] = provider[source];
+    const source = key(right);
+    if (source !== undefined) {
+      if (!providerIds.has(source) || providerIds.has(target))
+        failUnsupported(file, statement, "PROVIDER_CAPABILITIES.alias");
+      providerIds.add(target);
+      provider[target] = provider[source];
+      continue;
+    }
+    setProvider(target, right, `PROVIDER_CAPABILITIES.${target}`);
   }
   const patternsRef = r.get("PATTERN_CAPABILITIES");
   if (!patternsRef || !ts.isArrayLiteralExpression(patternsRef.expression))
@@ -956,10 +1019,10 @@ export function validateReviewMetadata(
   )
     throw new Error("Review metadata collision mismatch");
   if (
-    imports.length === 133 &&
-    (review.providers.length !== 133 ||
-      review.totals.staticLlm !== 810 ||
-      review.totals.excluded !== 189 ||
+    imports.length === 145 &&
+    (review.providers.length !== 145 ||
+      review.totals.staticLlm !== 896 ||
+      review.totals.excluded !== 370 ||
       review.providers.findIndex((row) => row.providerId === "mimo-free") >=
         review.providers.findIndex((row) => row.providerId === "mmf"))
   )
@@ -1021,7 +1084,7 @@ async function extract(
     ...imports.map((x) => `${ROOT}/providers/registry/${x}`),
   ].sort();
   options.verify(sourceDir, sourceFiles);
-  if (options.registryCount === 133) {
+  if (options.registryCount === 145) {
     for (const [file, name, digest] of [
       [
         "open-sse/providers/capabilities.js",
@@ -1041,7 +1104,7 @@ async function extract(
       [
         "open-sse/translator/concerns/thinkingUnified.js",
         "resolveFormat",
-        "0b4a1b1bef2b3e4259736ffd90cf231852921c7c836cf804d783f0a71daa8b83",
+        "e5d969fc27c946c0ab2bcbc86b609a2ca60b35ea4a542ffafbcfe7ca62b2b4b9",
       ],
     ]) {
       const sf = ts.createSourceFile(
@@ -1098,15 +1161,34 @@ async function extract(
       true,
     );
     const assignment = sf.statements.find(ts.isExportAssignment);
-    if (!assignment || !ts.isObjectLiteralExpression(assignment.expression))
-      failUnsupported(file, assignment ?? sf, "provider");
+    if (!assignment) failUnsupported(file, sf, "provider");
+    let providerExpression = assignment.expression;
     const localRefs = refs(sf, file);
+    if (!ts.isObjectLiteralExpression(providerExpression)) {
+      if (!ts.isIdentifier(providerExpression))
+        failUnsupported(file, providerExpression, "provider");
+      const name = providerExpression.text;
+      const reference = localRefs.get(name);
+      if (!reference || !ts.isObjectLiteralExpression(reference.expression))
+        failUnsupported(file, providerExpression, "provider");
+      let uses = 0;
+      const countUses = (node: ts.Node): void => {
+        if (node === assignment.expression) return;
+        if (ts.isIdentifier(node) && node.text === name) uses++;
+        ts.forEachChild(node, countUses);
+      };
+      countUses(sf);
+      if (uses !== 1) failUnsupported(file, providerExpression, "provider");
+      providerExpression = reference.expression;
+    }
+    if (!ts.isObjectLiteralExpression(providerExpression))
+      failUnsupported(file, providerExpression, "provider");
     if (fileName === "grok-cli.js") {
       const constant = grokRefs.get("GROK_CLI_MODEL");
       if (constant) localRefs.set("GROK_CLI_MODEL", constant);
     }
     const before = { ...excluded };
-    const p = extractProvider(assignment.expression, file, localRefs, excluded);
+    const p = extractProvider(providerExpression, file, localRefs, excluded);
     if (entries[p.id]) throw new Error("Duplicate provider id");
     entries[p.id] = p;
     for (const key of [p.catalogKey, ...p.aliases]) routeOwners[key] = p.id;
@@ -1217,7 +1299,7 @@ async function extract(
     .map((provider) => provider.id)
     .sort();
   if (dynamic.join(",") !== options.dynamic.join(","))
-    throw new Error("Dynamic provider flags mismatch");
+    throw new Error(`Dynamic provider flags mismatch: ${dynamic.join(",")}`);
   const collisions: Record<string, string[]> = {};
   for (const provider of Object.values(entries))
     for (const key of [provider.catalogKey, ...provider.aliases]) {
@@ -1264,7 +1346,7 @@ async function extract(
     routeCollisions,
   };
   validateReviewMetadata(review, catalog, counts, imports);
-  if (options.registryCount === 133)
+  if (options.registryCount === 145)
     validateProductionGoldens(catalog, routeCollisions);
   return {
     catalog,
@@ -1278,17 +1360,17 @@ async function extract(
 }
 const productionOptions: InternalOptions = {
   verify,
-  registryCount: 133,
+  registryCount: 145,
   dynamic: DYNAMIC.sort(),
   expected: {
-    providers: 133,
-    llm: 810,
-    excluded: 189,
-    image: 91,
-    stt: 25,
-    embedding: 34,
-    tts: 29,
-    video: 10,
+    providers: 145,
+    llm: 896,
+    excluded: 370,
+    image: 121,
+    stt: 27,
+    embedding: 131,
+    tts: 47,
+    video: 44,
   },
 };
 export async function extractCatalog({
