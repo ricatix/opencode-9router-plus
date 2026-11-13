@@ -43,6 +43,7 @@ export interface LiveModelRecord {
     } & Record<string, unknown>;
     context_length?: unknown;
     max_completion_tokens?: unknown;
+    thinking_levels?: unknown;
   };
 }
 const defaults = (): OpenCodeModelEntry => ({
@@ -226,6 +227,7 @@ export async function resolveModel(
         routeId: fullId,
         reasoning: entry.reasoning,
         live: capabilities,
+        liveLevels: live && ownValue(live, "thinking_levels"),
         catalog: NINE_ROUTER_LLM_CATALOG,
       }),
     );

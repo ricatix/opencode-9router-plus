@@ -166,6 +166,26 @@ test("rejects invalid metadata matrix and ignores models.dev booleans", async ()
     ).toBeUndefined();
 });
 
+test("forwards bounded live thinking_levels to the reasoning resolver", async () => {
+  const entry = await resolveModel(
+    {
+      id: "cx/gpt-6.1-sol",
+      live: {
+        capabilities: { reasoning: true },
+        thinking_levels: ["low", "high"],
+      },
+    },
+    client(),
+  );
+  expect(entry.reasoning).toBeTrue();
+  expect(entry.variants).toEqual(
+    configVariants({
+      low: { reasoningEffort: "low" },
+      high: { reasoningEffort: "high" },
+    }),
+  );
+});
+
 test("reviewed nonreasoning disables builtin variants", async () => {
   const e = await resolveModel("ag/gemini-pro-agent", client());
   expect(e.reasoning).toBeFalse();
