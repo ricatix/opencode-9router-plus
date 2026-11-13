@@ -244,6 +244,36 @@ describe("live thinking metadata", () => {
     });
   }
 
+  test("preserves bounded top-level thinking_levels and ignores malformed ones", () => {
+    expect(
+      acceptDiscoveryEntries({
+        data: [
+          { id: "levels/valid", thinking_levels: ["low", "high"] },
+          { id: "levels/duplicates", thinking_levels: ["low", "low"] },
+          {
+            id: "levels/oversized",
+            thinking_levels: Array.from(
+              { length: 17 },
+              (_, index) => `l${index}`,
+            ),
+          },
+          { id: "levels/nonstring", thinking_levels: ["low", 1] },
+          { id: "levels/empty", thinking_levels: [] },
+        ],
+      }),
+    ).toEqual([
+      {
+        id: "levels/valid",
+        kind: "llm",
+        live: { thinking_levels: ["low", "high"] },
+      },
+      { id: "levels/duplicates", kind: "llm", live: {} },
+      { id: "levels/oversized", kind: "llm", live: {} },
+      { id: "levels/nonstring", kind: "llm", live: {} },
+      { id: "levels/empty", kind: "llm", live: {} },
+    ]);
+  });
+
   test("preserves valid thinking format and booleans exactly", () => {
     expect(
       acceptDiscoveryEntries({

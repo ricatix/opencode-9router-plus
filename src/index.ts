@@ -27,6 +27,7 @@ type LiveModelMetadata = {
   };
   context_length?: number;
   max_completion_tokens?: number;
+  thinking_levels?: readonly string[];
 };
 export type AcceptedDiscoveryEntry = {
   id: string;
@@ -166,6 +167,8 @@ function liveMetadata(input: object): LiveModelMetadata {
     const normalized = positiveSafeInt(value(input, key));
     if (normalized !== undefined) live[key] = normalized;
   }
+  const levels = boundedLevels(value(input, "thinking_levels"));
+  if (levels !== undefined) live.thinking_levels = levels;
   return live;
 }
 export function acceptDiscoveryEntries(
