@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+// allow: SIZE_OK - The bulk is audited route/format expectation tables; one owner per resolver contract.
 import { resolveReasoningVariants } from "../src/capability-resolver.js";
 import { NINE_ROUTER_LLM_CATALOG as catalog } from "../src/generated/9router-llm-catalog.js";
 
@@ -27,6 +28,7 @@ describe("audited router format matrix", () => {
     ["commandcode", "low medium high xhigh max"],
     ["hunyuan", "none low medium high"],
     ["step", "low medium high"],
+    ["nous", "low medium high"],
     ["tokenrouter", "low medium high xhigh max"],
   ];
   test.each(cases)(
@@ -83,13 +85,14 @@ describe("route-scoped precedence", () => {
     ["mmg/MiniMax-M3.1-Flash-Preview", "low medium high xhigh max"],
     ["cc/claude-opus-5", "none low medium high xhigh max"],
     ["kr/claude-opus-4.5", ""],
-    ["kr/claude-opus-5.5", "none low medium high xhigh max"],
+    ["kr/claude-opus-5.5", "low medium high xhigh max"],
     ["kr/gpt-5.6-sol", "low medium high xhigh"],
     ["kr/new-model", ""],
     ["tr/anthropic/claude-sonnet-4.6", "low medium high max"],
-    ["xmtp/mimo-v2.5-pro", "low medium high xhigh"],
+    ["xmtp/mimo-v2.6-pro", "low medium high xhigh"],
     ["mimo/mimo-v2.6-pro", "low medium high xhigh"],
-    ["cc/claude-fable-5-1", "low medium high xhigh max"],
+    ["cc/claude-fable-5-2", "low medium high xhigh max"],
+    ["nous/meituan/longcat-2.0:free", "low medium high"],
     ["muse/muse-spark-1.3", "minimal low medium high xhigh"],
     ["muse-ai/muse-spark-1.3", "minimal low medium high xhigh"],
   ];
@@ -180,6 +183,56 @@ describe("live authority and conservative boundary", () => {
       expect(actual).toEqual({});
     },
   );
+  test("nous omits none instead of offering an off toggle when disabling", () => {
+    const actual = resolve("nous/new-model", {
+      thinkingFormat: "nous",
+      thinkingCanDisable: true,
+    });
+    expect(actual).toEqual(efforts("low medium high"));
+  });
+  test("live selectable levels win over static per-model and pattern levels", () => {
+    const actual = resolveReasoningVariants({
+      routeId: "cx/gpt-6.1-sol",
+      reasoning: true,
+      liveLevels: ["low", "high"],
+      catalog,
+    });
+    expect(actual).toEqual(efforts("low high"));
+  });
+  test("ignores malformed live levels and keeps the static fallback", () => {
+    const actual = resolveReasoningVariants({
+      routeId: "cx/gpt-6.1-sol",
+      reasoning: true,
+      liveLevels: ["low", "invented", "low"],
+      catalog,
+    });
+    expect(actual).toEqual(efforts("low medium high xhigh max"));
+  });
+  test("live levels still honor explicit disable policy", () => {
+    const actual = resolveReasoningVariants({
+      routeId: "openai/new-model",
+      reasoning: true,
+      live: { thinkingFormat: "openai", thinkingCanDisable: false },
+      liveLevels: ["none", "low", "high"],
+      catalog,
+    });
+    expect(actual).toEqual(efforts("low high"));
+  });
+  test("does not inspect live level getters", () => {
+    const levels = ["low", "high"];
+    Object.defineProperty(levels, "0", {
+      get() {
+        throw new Error("level getter invoked");
+      },
+    });
+    const actual = resolveReasoningVariants({
+      routeId: "cx/gpt-6.1-sol",
+      reasoning: true,
+      liveLevels: levels,
+      catalog,
+    });
+    expect(actual).toEqual(efforts("low medium high xhigh max"));
+  });
   test("does not turn range or speculative supportedEfforts into an exact live list", () => {
     const actual = resolve("openai/new", {
       thinkingFormat: "openai",

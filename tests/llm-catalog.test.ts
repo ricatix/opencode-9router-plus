@@ -61,7 +61,7 @@ describe("LLM catalog", () => {
   test("reviews pinned static snapshot gate", () => {
     validateLlmCatalog(NINE_ROUTER_LLM_CATALOG);
     expect(NINE_ROUTER_LLM_CATALOG.sourceCommit).toBe(
-      "ce4460ef79382bfddb4aa5fc0ff9f3cb0d5f95a8",
+      "1855aa44473e88feac9d3f131b9c0c5fc9706b68",
     );
     expect(NINE_ROUTER_LLM_CATALOG.sourceFiles).toEqual(
       [...NINE_ROUTER_LLM_CATALOG.sourceFiles].sort(),
@@ -85,12 +85,12 @@ describe("LLM catalog", () => {
     expect(Object.keys(NINE_ROUTER_LLM_CATALOG.providers)).toEqual(
       [...Object.keys(NINE_ROUTER_LLM_CATALOG.providers)].sort(),
     );
-    expect(Object.keys(NINE_ROUTER_LLM_CATALOG.providers)).toHaveLength(133);
+    expect(Object.keys(NINE_ROUTER_LLM_CATALOG.providers)).toHaveLength(145);
     expect(
       Object.values(NINE_ROUTER_LLM_CATALOG.providers).flatMap(
         (provider) => provider.models,
       ),
-    ).toHaveLength(810);
+    ).toHaveLength(896);
     expect(
       Object.values(NINE_ROUTER_LLM_CATALOG.providers)
         .flatMap((provider) => provider.models)
@@ -110,6 +110,7 @@ describe("LLM catalog", () => {
       "bai",
       "bedrock",
       "bedrock-xai",
+      "commandcode",
       "dahl",
       "grok-web",
       "kilocode",
@@ -119,13 +120,16 @@ describe("LLM catalog", () => {
       "minimax-code",
       "minimax-code-global",
       "muse",
+      "nous",
       "opencode",
       "opencode-go",
       "opencode-zen",
       "openrouter",
       "perplexity-agent",
+      "synthetic",
       "tokenharbor",
       "tokenrouter",
+      "uc-web",
       "venice",
       "vercel-ai-gateway",
       "zed",
